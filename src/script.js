@@ -362,6 +362,7 @@ function
 		}
 	);
 	request_frame();
+	postcard_refresh();
 }
 
 function
@@ -3201,6 +3202,347 @@ function
 
 
 /* ========================================================================== */
+/* 3D TILT                                                                    */
+/* ========================================================================== */
+
+/*
+** CARDS THAT LEAN TOWARDS THE POINTER: THE TEAM PROFILES AND THE POSTCARD.
+**
+** THE POINTER IS READ ON A STILL ZONE AROUND THE CARD (.tilt_zone), SO THE
+** TILTING CARD NEVER SLIPS OUT FROM UNDER IT AT THE EDGES. EVERY FRAME THE
+** ANGLE EASES TOWARDS ITS TARGET, SO IT GLIDES INSTEAD OF SNAPPING, AND IT
+** SETTLES BACK FLAT WHEN THE POINTER LEAVES. A SOFT GLARE FOLLOWS THE
+** POINTER AND THE AVATAR FLOATS A LITTLE ABOVE THE CARD.
+**
+** MOUSE AND PEN ONLY: ON A TOUCH SCREEN THE FINGER SCROLLS THE PAGE.
+*/
+const	tilts = [];
+var		tilt_frame_id = 0;
+var		tilt_time = 0;
+
+function
+	tilt_wake()
+{
+	if (!tilt_frame_id)
+	{
+		tilt_time = 0;
+		tilt_frame_id = window.requestAnimationFrame(tilt_frame);
+	}
+}
+
+function
+	tilt_frame(now)
+{
+	const	step = tilt_time ? Math.min((now - tilt_time) / 1000, 0.05) : 1 / 60;
+	const	follow = 1 - Math.exp(-step * 9);
+	var		busy = false;
+
+	tilt_time = now;
+	tilt_frame_id = 0;
+
+	JS.ITERATE(
+		tilts,
+		function(tilt)
+		{
+			const	card = tilt.card;
+
+			tilt.x += (tilt.target_x - tilt.x) * follow;
+			tilt.y += (tilt.target_y - tilt.y) * follow;
+			tilt.scale += (tilt.target_scale - tilt.scale) * follow;
+			tilt.glare += (tilt.target_glare - tilt.glare) * follow;
+
+			if (
+				Math.abs(tilt.target_x - tilt.x) + Math.abs(tilt.target_y - tilt.y) > 0.02 ||
+				Math.abs(tilt.target_scale - tilt.scale) > 0.0005 ||
+				Math.abs(tilt.target_glare - tilt.glare) > 0.005
+			)
+				busy = true;
+			else if (!tilt.hover)
+			{
+				/* BACK AT REST: THE CARD BELONGS TO ITS STYLESHEET AGAIN */
+				if (tilt.moving)
+				{
+					tilt.moving = false;
+					card.style.transform = "";
+					card.style.willChange = "";
+					card.style.removeProperty("--glare");
+					card.style.removeProperty("--depth-x");
+					card.style.removeProperty("--depth-y");
+				}
+
+				return ;
+			}
+
+			tilt.moving = true;
+			card.style.willChange = "transform";
+			card.style.transform = "perspective(1100px) rotateX(" + round_2(tilt.x) + "deg) rotateY(" + round_2(tilt.y) + "deg) scale(" + (Math.round(tilt.scale * 1000) / 1000) + ")";
+			card.style.setProperty("--glare", round_2(tilt.glare).toString());
+			card.style.setProperty("--glare-x", round_2(tilt.glare_x) + "%");
+			card.style.setProperty("--glare-y", round_2(tilt.glare_y) + "%");
+			card.style.setProperty("--depth-x", round_2(tilt.y / tilt.max * 6) + "px");
+			card.style.setProperty("--depth-y", round_2(-tilt.x / tilt.max * 6) + "px");
+		}
+	);
+
+	if (busy)
+		tilt_frame_id = window.requestAnimationFrame(tilt_frame);
+}
+
+function
+	tilt_aim(tilt, event)
+{
+	const	rect = tilt.zone.getBoundingClientRect();
+	const	u = clamp((event.clientX - rect.left) / rect.width, 0, 1);
+	const	v = clamp((event.clientY - rect.top) / rect.height, 0, 1);
+	const	focus = document.activeElement;
+
+	/* WHILE SOMEONE IS WRITING ON THE POSTCARD, IT ONLY LEANS A LITTLE */
+	const	calm = tilt.card.contains(focus) && (focus.tagName === "TEXTAREA" || focus.tagName === "INPUT") ? 0.3 : 1;
+
+	tilt.hover = true;
+	tilt.target_x = (0.5 - v) * 2 * tilt.max * calm;
+	tilt.target_y = (u - 0.5) * 2 * tilt.max * calm;
+	tilt.target_scale = 1.02;
+	tilt.target_glare = 1;
+	tilt.glare_x = u * 100;
+	tilt.glare_y = v * 100;
+	tilt_wake();
+}
+
+function
+	tilt_rest(tilt)
+{
+	tilt.hover = false;
+	tilt.target_x = 0;
+	tilt.target_y = 0;
+	tilt.target_scale = 1;
+	tilt.target_glare = 0;
+	tilt_wake();
+}
+
+function
+	tilt_start()
+{
+	if (reduced_motion || !window.requestAnimationFrame)
+		return ;
+
+	JS.ITERATE(
+		to_array(DOM.GET.ALL(".tilt_zone")),
+		function(zone)
+		{
+			const	card = DOM.GET.ALL(zone, ".tilt")[0];
+			var		tilt;
+
+			if (!card)
+				return ;
+
+			tilt = {
+				zone: zone,
+				card: card,
+				max: DOM.CLASS.CHECK(card, "postcard") ? 6 : 9,
+				x: 0,
+				y: 0,
+				scale: 1,
+				glare: 0,
+				glare_x: 50,
+				glare_y: 50,
+				target_x: 0,
+				target_y: 0,
+				target_scale: 1,
+				target_glare: 0,
+				hover: false,
+				moving: false
+			};
+			tilts.push(tilt);
+			zone.addEventListener(
+				"pointermove",
+				function(event)
+				{
+					if (event.pointerType !== "touch")
+						tilt_aim(tilt, event);
+				},
+				{passive: true}
+			);
+			zone.addEventListener(
+				"pointerleave",
+				function()
+				{
+					tilt_rest(tilt);
+				}
+			);
+		}
+	);
+}
+
+/* ========================================================================== */
+/* POSTCARD                                                                   */
+/* ========================================================================== */
+
+/*
+** THE CONTACT POSTCARD. PICK WHAT YOU WANT TO BUILD, WRITE A LINE AND SEND:
+** IT GETS A POSTMARK WITH TODAY'S DATE, AND THE MAIL APP OPENS WITH THE
+** LETTER ALREADY WRITTEN TO US. WHILE THE MESSAGE IS EMPTY, ITS PLACEHOLDER
+** TYPES EXAMPLE IDEAS FOR THE CHOSEN KIND. WITHOUT JAVASCRIPT THE FORM IS A
+** PLAIN mailto: FORM.
+*/
+const	postcard = DOM.GET.ID("postcard");
+const	postcard_text = DOM.GET.ID("pc_text");
+const	postcard_examples = {website: [730, 731, 732], tool: [733, 734, 735], app: [736, 737, 738], strange: [739, 740, 741]};
+const	postcard_subjects = {website: 716, tool: 717, app: 718, strange: 719};
+const	postcard_typer = {started: false, visible: false, kind: "website", index: 0, length: 0, deleting: false, timer: 0};
+
+function
+	postcard_kind()
+{
+	const	checked = DOM.GET.ALL(postcard, "input[name='kind']:checked")[0];
+
+	return (checked && postcard_examples[checked.value] ? checked.value : "website");
+}
+
+/* ONE STEP OF THE TYPING PLACEHOLDER: A LETTER IN, OR TWO OUT */
+function
+	postcard_type()
+{
+	const	typer = postcard_typer;
+	const	keys = postcard_examples[typer.kind];
+	const	full = text_of(keys[typer.index % keys.length]);
+	var		wait = 46;
+
+	window.clearTimeout(typer.timer);
+
+	if (postcard_text.value || !typer.visible)
+		return ;
+
+	/* STILL, WHOLE IDEAS: FOR REDUCED MOTION, AND WHILE THE BOX HAS FOCUS */
+	if (reduced_motion || document.activeElement === postcard_text)
+	{
+		postcard_text.placeholder = full;
+		typer.length = full.length;
+		typer.deleting = false;
+		return ;
+	}
+
+	if (!typer.deleting)
+	{
+		typer.length = Math.min(full.length, typer.length + 1);
+
+		if (typer.length === full.length)
+		{
+			typer.deleting = true;
+			wait = 2200;
+		}
+	}
+	else
+	{
+		typer.length = Math.max(0, typer.length - 2);
+		wait = 18;
+
+		if (typer.length === 0)
+		{
+			typer.deleting = false;
+			typer.index += 1;
+			wait = 420;
+		}
+	}
+
+	postcard_text.placeholder = full.slice(0, typer.length);
+	typer.timer = window.setTimeout(postcard_type, wait);
+}
+
+/* A NEW KIND (OR A NEW LANGUAGE): START TYPING ITS FIRST IDEA */
+function
+	postcard_refresh()
+{
+	if (!postcard_typer.started)
+		return ;
+
+	postcard_typer.kind = postcard_kind();
+	postcard_typer.index = 0;
+	postcard_typer.length = 0;
+	postcard_typer.deleting = false;
+	postcard_type();
+}
+
+function
+	postcard_date()
+{
+	const	now = new Date();
+
+	try
+	{
+		return (now.toLocaleDateString(lang === "tr" ? "tr-TR" : "en-GB", {day: "2-digit", month: "short", year: "numeric"}).toLocaleUpperCase(lang));
+	}
+	catch (error)
+	{
+		return (now.getDate() + "." + (now.getMonth() + 1) + "." + now.getFullYear());
+	}
+}
+
+/* THE LETTER, READY FOR THE MAIL APP: "Hi Maximum Tension, I want to build ..." */
+function
+	postcard_address()
+{
+	const	subject = text_of(postcard_subjects[postcard_kind()]);
+	const	message = postcard_text.value.replace(/^\s+|\s+$/g, "");
+	const	letter = text_of(710) + "\n\n" + subject + "." + (message ? "\n\n" + message : "") + "\n";
+
+	return ("mailto:teo@maximum-tension.com?subject=" + encodeURIComponent(subject) + "&body=" + encodeURIComponent(letter));
+}
+
+function
+	postcard_send(event)
+{
+	const	address = postcard_address();
+
+	event.preventDefault();
+	DOM.GET.ID("pm_date").textContent = postcard_date();
+
+	/* STAMP IT AGAIN ON EVERY SEND */
+	DOM.CLASS.REMOVE(postcard, "sent");
+	void postcard.offsetWidth;
+	DOM.CLASS.ADD(postcard, "sent");
+	DOM.GET.ID("pc_note").textContent = text_of(724);
+
+	window.setTimeout(
+		function()
+		{
+			window.location.href = address;
+		},
+		reduced_motion ? 0 : 750
+	);
+}
+
+function
+	postcard_start()
+{
+	if (!postcard || !postcard_text)
+		return ;
+
+	postcard_typer.started = true;
+	postcard_typer.kind = postcard_kind();
+	postcard.addEventListener("submit", postcard_send);
+	postcard.addEventListener(
+		"change",
+		function(event)
+		{
+			if (event.target.name === "kind")
+				postcard_refresh();
+		}
+	);
+	postcard_text.addEventListener("focus", postcard_type);
+	postcard_text.addEventListener("blur", postcard_type);
+	postcard_text.addEventListener("input", postcard_type);
+	observe(
+		postcard,
+		function(visible)
+		{
+			postcard_typer.visible = visible;
+			postcard_type();
+		}
+	);
+}
+
+/* ========================================================================== */
 /* SMOOTH SCROLL                                                              */
 /* ========================================================================== */
 
@@ -3333,6 +3675,8 @@ function
 	window.addEventListener("resize", on_resize);
 	year_date.textContent = new Date().getFullYear().toString();
 	render_frame();
+	tilt_start();
+	postcard_start();
 	scroll_start();
 }
 

@@ -92,15 +92,26 @@
   <meta name="twitter:card" content="summary_large_image"/>
   <meta name="twitter:title" content="Maximum Tension"/>
   <meta name="twitter:description" content="We're Maximum Tension. We build software, algorithms and circuits from the lowest level up, do our own 3D, art and animation, and design websites with Apple-level care at small-studio prices."/>
-  <meta name="twitter:image" content="favicons/thumbnail.png"/>
-  <meta name="twitter:image:alt" content="Maximum Tension"/>
-  <meta property="og:description" content="Maximum Tension"/>
+  <meta name="twitter:image" content="https://maximum-tension.com/images/share/PREVIEW.gif"/>
+  <meta name="twitter:image:alt" content="Maximum Tension, next to a jack-o&#39;-lantern drawn in ASCII characters, slowly spinning"/>
+  <meta property="og:description" content="We're Maximum Tension. We build software, algorithms and circuits from the lowest level up, do our own 3D, art and animation, and design websites with Apple-level care at small-studio prices."/>
   <meta property="og:type" content="website"/>
   <meta property="og:title" content="Maximum Tension"/>
   <meta property="og:site_name" content="maximum-tension.com"/>
   <meta property="og:url" content="https://maximum-tension.com/"/>
-  <meta property="og:image" content="favicons/thumbnail.png"/>
-  <meta property="og:image:alt" content="We're Maximum Tension. We build software, algorithms and circuits from the lowest level up, do our own 3D, art and animation, and design websites with Apple-level care at small-studio prices."/>
+  <!-- LINK PREVIEW: AN ANIMATED GIF (DISCORD PLAYS IT, MOST OTHERS SHOW ITS FIRST FRAME), THEN A SMALL STILL FOR APPS THAT WANT ONE -->
+  <meta property="og:image" content="https://maximum-tension.com/images/share/PREVIEW.gif"/>
+  <meta property="og:image:secure_url" content="https://maximum-tension.com/images/share/PREVIEW.gif"/>
+  <meta property="og:image:type" content="image/gif"/>
+  <meta property="og:image:width" content="1024"/>
+  <meta property="og:image:height" content="512"/>
+  <meta property="og:image:alt" content="Maximum Tension, next to a jack-o&#39;-lantern drawn in ASCII characters, slowly spinning"/>
+  <meta property="og:image" content="https://maximum-tension.com/images/share/PREVIEW.jpg"/>
+  <meta property="og:image:secure_url" content="https://maximum-tension.com/images/share/PREVIEW.jpg"/>
+  <meta property="og:image:type" content="image/jpeg"/>
+  <meta property="og:image:width" content="1024"/>
+  <meta property="og:image:height" content="512"/>
+  <meta property="og:image:alt" content="Maximum Tension, next to a jack-o&#39;-lantern drawn in ASCII characters, slowly spinning"/>
   <meta property="og:locale" content="en_US"/>
   <link rel="apple-touch-icon" href="favicons/apple-icon-57x57.png"/>
   <link rel="apple-touch-icon" sizes="57x57" href="favicons/apple-icon-57x57.png"/>
@@ -146,15 +157,15 @@ if (
 )
 {
 	DOM.GET.ID("favicon").href =
-		"${MW_URL}/FAVICONS/favicon-dark.ico";
-	DOM.GET.ID("FAVICON_16").href =
-		"${MW_URL}/FAVICONS/favicon-16x16-DARK.png";
-	DOM.GET.ID("FAVICON_16_SHORTCUT").href =
-		"${MW_URL}/FAVICONS/favicon-16x16-DARK.png";
-	DOM.GET.ID("FAVICON_16_SIZES").href =
-		"${MW_URL}/FAVICONS/favicon-16x16-DARK.png";
-	DOM.GET.ID("FAVICON_32").href =
-		"${MW_URL}/FAVICONS/favicon-32x32-DARK.png";
+		"favicons/favicon-dark.ico";
+	DOM.GET.ID("favicon_16").href =
+		"favicons/favicon-16x16-DARK.png";
+	DOM.GET.ID("favicon_16_shortcut").href =
+		"favicons/favicon-16x16-DARK.png";
+	DOM.GET.ID("favicon_16_sizes").href =
+		"favicons/favicon-16x16-DARK.png";
+	DOM.GET.ID("favicon_32").href =
+		"favicons/favicon-32x32-DARK.png";
 }
   </SCRIPT>
   <script type="text/javascript" src="lang.js"></script>
@@ -273,22 +284,22 @@ if (
          <div class="explorer_info" id="explorer_info" aria-live="polite"><p class="info_hint" data-lang="378">Select an item to view its description.</p></div>
         </div>
         <ul class="folders" id="folders">
-         <li class="folder"><button class="folder_button" type="button" data-text="381" data-doc="ASM"><picture><source type="image/webp" srcset="icons/32/ASM.webp"/><img src="icons/32/ASM.gif" alt="" width="32" height="32" loading="lazy" decoding="async"/></picture><span class="folder_name">ASM</span></button></li>
-         <li class="folder"><button class="folder_button" type="button" data-text="382" data-doc="CONSOLE"><picture><source type="image/webp" srcset="icons/32/CONSOLE.webp"/><img src="icons/32/CONSOLE.gif" alt="" width="32" height="32" loading="lazy" decoding="async"/></picture><span class="folder_name">CONSOLE</span></button></li>
-         <li class="folder"><button class="folder_button" type="button" data-text="383" data-doc="OBJECT"><picture><source type="image/webp" srcset="icons/32/OBJECT.webp"/><img src="icons/32/OBJECT.gif" alt="" width="32" height="32" loading="lazy" decoding="async"/></picture><span class="folder_name">OBJECT</span></button></li>
-         <li class="folder"><button class="folder_button" type="button" data-text="384" data-doc="TRY_CATCH"><picture><source type="image/webp" srcset="icons/32/TRY_CATCH.webp"/><img src="icons/32/TRY_CATCH.gif" alt="" width="32" height="32" loading="lazy" decoding="async"/></picture><span class="folder_name">TRY_CATCH</span></button></li>
-         <li class="folder"><button class="folder_button" type="button" data-text="385" data-doc="MEMORY"><picture><source type="image/webp" srcset="icons/32/MEMORY.webp"/><img src="icons/32/MEMORY.gif" alt="" width="32" height="32" loading="lazy" decoding="async"/></picture><span class="folder_name">MEMORY</span></button></li>
-         <li class="folder"><button class="folder_button" type="button" data-text="386" data-doc="THREAD"><picture><source type="image/webp" srcset="icons/32/THREAD.webp"/><img src="icons/32/THREAD.gif" alt="" width="32" height="32" loading="lazy" decoding="async"/></picture><span class="folder_name">THREAD</span></button></li>
-         <li class="folder"><button class="folder_button" type="button" data-text="387" data-doc="MUTEX"><picture><source type="image/webp" srcset="icons/32/MUTEX.webp"/><img src="icons/32/MUTEX.gif" alt="" width="32" height="32" loading="lazy" decoding="async"/></picture><span class="folder_name">MUTEX</span></button></li>
-         <li class="folder"><button class="folder_button" type="button" data-text="388" data-doc="KERNEL32"><picture><source type="image/webp" srcset="icons/32/KERNEL32.webp"/><img src="icons/32/KERNEL32.gif" alt="" width="32" height="32" loading="lazy" decoding="async"/></picture><span class="folder_name">KERNEL32</span></button></li>
-         <li class="folder"><button class="folder_button" type="button" data-text="389" data-doc="USER32"><picture><source type="image/webp" srcset="icons/32/USER32.webp"/><img src="icons/32/USER32.gif" alt="" width="32" height="32" loading="lazy" decoding="async"/></picture><span class="folder_name">USER32</span></button></li>
-         <li class="folder"><button class="folder_button" type="button" data-text="390" data-doc="__PEB_LOADER__"><picture><source type="image/webp" srcset="icons/32/__PEB_LOADER__.webp"/><img src="icons/32/__PEB_LOADER__.gif" alt="" width="32" height="32" loading="lazy" decoding="async"/></picture><span class="folder_name">__PEB_LOADER__</span></button></li>
-         <li class="folder"><button class="folder_button" type="button" data-text="391" data-doc="PLATFORM"><picture><source type="image/webp" srcset="icons/32/PLATFORM.webp"/><img src="icons/32/PLATFORM.gif" alt="" width="32" height="32" loading="lazy" decoding="async"/></picture><span class="folder_name">PLATFORM</span></button></li>
-         <li class="folder"><button class="folder_button" type="button" data-text="392" data-doc="CPU"><picture><source type="image/webp" srcset="icons/32/CPU.webp"/><img src="icons/32/CPU.gif" alt="" width="32" height="32" loading="lazy" decoding="async"/></picture><span class="folder_name">CPU</span></button></li>
-         <li class="folder"><button class="folder_button" type="button" data-text="393" data-doc="ABI"><picture><source type="image/webp" srcset="icons/32/ABI.webp"/><img src="icons/32/ABI.gif" alt="" width="32" height="32" loading="lazy" decoding="async"/></picture><span class="folder_name">ABI</span></button></li>
-         <li class="folder"><button class="folder_button" type="button" data-text="394" data-doc="BOOLEAN"><picture><source type="image/webp" srcset="icons/32/BOOLEAN.webp"/><img src="icons/32/BOOLEAN.gif" alt="" width="32" height="32" loading="lazy" decoding="async"/></picture><span class="folder_name">BOOLEAN</span></button></li>
-         <li class="folder"><button class="folder_button" type="button" data-text="395" data-doc="VA_ARGS"><picture><source type="image/webp" srcset="icons/32/VA_ARGS.webp"/><img src="icons/32/VA_ARGS.gif" alt="" width="32" height="32" loading="lazy" decoding="async"/></picture><span class="folder_name">VA_ARGS</span></button></li>
-         <li class="folder"><button class="folder_button" type="button" data-text="396" data-doc="W_XOR_X"><picture><source type="image/webp" srcset="icons/32/W_XOR_X.webp"/><img src="icons/32/W_XOR_X.gif" alt="" width="32" height="32" loading="lazy" decoding="async"/></picture><span class="folder_name">W_XOR_X</span></button></li>
+         <li class="folder"><button class="folder_button" type="button" data-text="381" data-doc="ASM"><picture><source type="image/webp" srcset="images/icons/32/ASM.webp"/><img src="images/icons/32/ASM.gif" alt="" width="32" height="32" loading="lazy" decoding="async"/></picture><span class="folder_name">ASM</span></button></li>
+         <li class="folder"><button class="folder_button" type="button" data-text="382" data-doc="CONSOLE"><picture><source type="image/webp" srcset="images/icons/32/CONSOLE.webp"/><img src="images/icons/32/CONSOLE.gif" alt="" width="32" height="32" loading="lazy" decoding="async"/></picture><span class="folder_name">CONSOLE</span></button></li>
+         <li class="folder"><button class="folder_button" type="button" data-text="383" data-doc="OBJECT"><picture><source type="image/webp" srcset="images/icons/32/OBJECT.webp"/><img src="images/icons/32/OBJECT.gif" alt="" width="32" height="32" loading="lazy" decoding="async"/></picture><span class="folder_name">OBJECT</span></button></li>
+         <li class="folder"><button class="folder_button" type="button" data-text="384" data-doc="TRY_CATCH"><picture><source type="image/webp" srcset="images/icons/32/TRY_CATCH.webp"/><img src="images/icons/32/TRY_CATCH.gif" alt="" width="32" height="32" loading="lazy" decoding="async"/></picture><span class="folder_name">TRY_CATCH</span></button></li>
+         <li class="folder"><button class="folder_button" type="button" data-text="385" data-doc="MEMORY"><picture><source type="image/webp" srcset="images/icons/32/MEMORY.webp"/><img src="images/icons/32/MEMORY.gif" alt="" width="32" height="32" loading="lazy" decoding="async"/></picture><span class="folder_name">MEMORY</span></button></li>
+         <li class="folder"><button class="folder_button" type="button" data-text="386" data-doc="THREAD"><picture><source type="image/webp" srcset="images/icons/32/THREAD.webp"/><img src="images/icons/32/THREAD.gif" alt="" width="32" height="32" loading="lazy" decoding="async"/></picture><span class="folder_name">THREAD</span></button></li>
+         <li class="folder"><button class="folder_button" type="button" data-text="387" data-doc="MUTEX"><picture><source type="image/webp" srcset="images/icons/32/MUTEX.webp"/><img src="images/icons/32/MUTEX.gif" alt="" width="32" height="32" loading="lazy" decoding="async"/></picture><span class="folder_name">MUTEX</span></button></li>
+         <li class="folder"><button class="folder_button" type="button" data-text="388" data-doc="KERNEL32"><picture><source type="image/webp" srcset="images/icons/32/KERNEL32.webp"/><img src="images/icons/32/KERNEL32.gif" alt="" width="32" height="32" loading="lazy" decoding="async"/></picture><span class="folder_name">KERNEL32</span></button></li>
+         <li class="folder"><button class="folder_button" type="button" data-text="389" data-doc="USER32"><picture><source type="image/webp" srcset="images/icons/32/USER32.webp"/><img src="images/icons/32/USER32.gif" alt="" width="32" height="32" loading="lazy" decoding="async"/></picture><span class="folder_name">USER32</span></button></li>
+         <li class="folder"><button class="folder_button" type="button" data-text="390" data-doc="__PEB_LOADER__"><picture><source type="image/webp" srcset="images/icons/32/__PEB_LOADER__.webp"/><img src="images/icons/32/__PEB_LOADER__.gif" alt="" width="32" height="32" loading="lazy" decoding="async"/></picture><span class="folder_name">__PEB_LOADER__</span></button></li>
+         <li class="folder"><button class="folder_button" type="button" data-text="391" data-doc="PLATFORM"><picture><source type="image/webp" srcset="images/icons/32/PLATFORM.webp"/><img src="images/icons/32/PLATFORM.gif" alt="" width="32" height="32" loading="lazy" decoding="async"/></picture><span class="folder_name">PLATFORM</span></button></li>
+         <li class="folder"><button class="folder_button" type="button" data-text="392" data-doc="CPU"><picture><source type="image/webp" srcset="images/icons/32/CPU.webp"/><img src="images/icons/32/CPU.gif" alt="" width="32" height="32" loading="lazy" decoding="async"/></picture><span class="folder_name">CPU</span></button></li>
+         <li class="folder"><button class="folder_button" type="button" data-text="393" data-doc="ABI"><picture><source type="image/webp" srcset="images/icons/32/ABI.webp"/><img src="images/icons/32/ABI.gif" alt="" width="32" height="32" loading="lazy" decoding="async"/></picture><span class="folder_name">ABI</span></button></li>
+         <li class="folder"><button class="folder_button" type="button" data-text="394" data-doc="BOOLEAN"><picture><source type="image/webp" srcset="images/icons/32/BOOLEAN.webp"/><img src="images/icons/32/BOOLEAN.gif" alt="" width="32" height="32" loading="lazy" decoding="async"/></picture><span class="folder_name">BOOLEAN</span></button></li>
+         <li class="folder"><button class="folder_button" type="button" data-text="395" data-doc="VA_ARGS"><picture><source type="image/webp" srcset="images/icons/32/VA_ARGS.webp"/><img src="images/icons/32/VA_ARGS.gif" alt="" width="32" height="32" loading="lazy" decoding="async"/></picture><span class="folder_name">VA_ARGS</span></button></li>
+         <li class="folder"><button class="folder_button" type="button" data-text="396" data-doc="W_XOR_X"><picture><source type="image/webp" srcset="images/icons/32/W_XOR_X.webp"/><img src="images/icons/32/W_XOR_X.gif" alt="" width="32" height="32" loading="lazy" decoding="async"/></picture><span class="folder_name">W_XOR_X</span></button></li>
         </ul>
        </div>
        <div class="win_status"><span><b>16</b> <span data-lang="377">object(s)</span></span><span class="status_pc"><span class="field_icon" aria-hidden="true"><svg viewBox="0 0 16 16"><rect x="2" y="2" width="12" height="9" fill="#D4D0C8" stroke="#000"/><rect x="4" y="4" width="8" height="5" fill="#3A6EA5"/><rect x="5" y="12" width="6" height="2" fill="#D4D0C8" stroke="#000"/></svg></span><span data-lang="379">My Computer</span></span></div>
@@ -304,19 +315,19 @@ if (
            <h3 class="layers_title" data-lang="310">Built from the bottom up</h3>
            <p class="layers_lead" data-lang="301">Instead of relying on what each compiler or operating system happens to provide, CMT builds its own foundations from the lowest level, so everything above them is written once and runs everywhere.</p>
           </div>
-          <picture class="wizard_icon"><source type="image/webp" srcset="icons/32/LIB.webp"/><img src="icons/32/LIB.gif" alt="" width="32" height="32" loading="lazy" decoding="async"/></picture>
+          <picture class="wizard_icon"><source type="image/webp" srcset="images/icons/32/LIB.webp"/><img src="images/icons/32/LIB.gif" alt="" width="32" height="32" loading="lazy" decoding="async"/></picture>
          </div>
          <div class="wizard_body">
           <ol class="stack" id="stack">
-           <li class="slab" data-state="done"><picture><source type="image/webp" srcset="icons/32/ENVIRONMENTS.webp"/><img src="icons/32/ENVIRONMENTS.gif" alt="" width="32" height="32" loading="lazy" decoding="async"/></picture><span class="slab_name" data-lang="320">Environment detection</span><span class="slab_text" data-lang="321">Platform, CPU, architecture, ABI, and K&amp;R or ANSI, all detected at compile time.</span><i class="slab_mark" aria-hidden="true"></i></li>
-           <li class="slab" data-state="done"><picture><source type="image/webp" srcset="icons/32/KEYWORDS.webp"/><img src="icons/32/KEYWORDS.gif" alt="" width="32" height="32" loading="lazy" decoding="async"/></picture><span class="slab_name" data-lang="322">Language helpers</span><span class="slab_text" data-lang="323">TRY, CATCH and CANCEL for C, portable types, booleans, variadic arguments, and a large set of compiler attributes and calling conventions.</span><i class="slab_mark" aria-hidden="true"></i></li>
-           <li class="slab" data-state="done"><picture><source type="image/webp" srcset="icons/32/INLINE_ASM.webp"/><img src="icons/32/INLINE_ASM.gif" alt="" width="32" height="32" loading="lazy" decoding="async"/></picture><span class="slab_name" data-lang="324">Assembly in C macros</span><span class="slab_text" data-lang="325">x86 instructions written as macros like MOV_RAX_RBX, with exact byte sizes. Inline assembly on GCC and MSVC; machine code written into memory on everything else.</span><i class="slab_mark" aria-hidden="true"></i></li>
-           <li class="slab" data-state="done"><picture><source type="image/webp" srcset="icons/32/OS_API.webp"/><img src="icons/32/OS_API.gif" alt="" width="32" height="32" loading="lazy" decoding="async"/></picture><span class="slab_name" data-lang="326">Operating system services</span><span class="slab_text" data-lang="327">Memory, including executable memory, threads and mutexes on Windows, Linux, OS/2, Haiku, real-time systems and more, plus instruction cache control.</span><i class="slab_mark" aria-hidden="true"></i></li>
-           <li class="slab" data-state="done"><picture><source type="image/webp" srcset="icons/32/__PEB_LOADER__.webp"/><img src="icons/32/__PEB_LOADER__.gif" alt="" width="32" height="32" loading="lazy" decoding="async"/></picture><span class="slab_name" data-lang="328">Windows without imports</span><span class="slab_text" data-lang="329">KERNEL32 and USER32 functions are found at runtime by walking the process's own internal structures. No windows.h, no linking.</span><i class="slab_mark" aria-hidden="true"></i></li>
-           <li class="slab" data-state="done"><picture><source type="image/webp" srcset="icons/32/OBJECTS.webp"/><img src="icons/32/OBJECTS.gif" alt="" width="32" height="32" loading="lazy" decoding="async"/></picture><span class="slab_name" data-lang="330">Objects</span><span class="slab_text" data-lang="331">Objects with bound methods in C: console.print("Hi") with no self argument, through small machine code trampolines generated at runtime.</span><i class="slab_mark" aria-hidden="true"></i></li>
-           <li class="slab" data-state="done"><picture><source type="image/webp" srcset="icons/32/CONSOLE.webp"/><img src="icons/32/CONSOLE.gif" alt="" width="32" height="32" loading="lazy" decoding="async"/></picture><span class="slab_name">CONSOLE</span><span class="slab_text" data-lang="333">A full terminal UI module: colours, cursor, shapes, mouse and keyboard input on Windows, Linux and macOS. Usable from plain C, CMT objects or C++ classes.</span><i class="slab_mark" aria-hidden="true"></i></li>
-           <li class="slab" data-state="work"><picture><source type="image/webp" srcset="icons/32/READ_FILE.webp"/><img src="icons/32/READ_FILE.gif" alt="" width="32" height="32" loading="lazy" decoding="async"/></picture><span class="slab_name" data-lang="334">Core modules</span><span class="slab_text" data-lang="335">Disk and file I/O, environment variables, signals and exit handling, NEAR and HUGE pointers, and CMT's own STDLIB, STDIO and MATH.</span><i class="slab_mark" aria-hidden="true"></i></li>
-           <li class="slab" data-state="next"><picture><source type="image/webp" srcset="icons/32/GRAPHICS.webp"/><img src="icons/32/GRAPHICS.gif" alt="" width="32" height="32" loading="lazy" decoding="async"/></picture><span class="slab_name">GRAPHICS</span><span class="slab_text" data-lang="337">Full window control on WebView, OpenGL, Vulkan, DirectX, Core Graphics, Metal and VGA, with true cross-platform behaviour.</span><i class="slab_mark" aria-hidden="true"></i></li>
+           <li class="slab" data-state="done"><picture><source type="image/webp" srcset="images/icons/32/ENVIRONMENTS.webp"/><img src="images/icons/32/ENVIRONMENTS.gif" alt="" width="32" height="32" loading="lazy" decoding="async"/></picture><span class="slab_name" data-lang="320">Environment detection</span><span class="slab_text" data-lang="321">Platform, CPU, architecture, ABI, and K&amp;R or ANSI, all detected at compile time.</span><i class="slab_mark" aria-hidden="true"></i></li>
+           <li class="slab" data-state="done"><picture><source type="image/webp" srcset="images/icons/32/KEYWORDS.webp"/><img src="images/icons/32/KEYWORDS.gif" alt="" width="32" height="32" loading="lazy" decoding="async"/></picture><span class="slab_name" data-lang="322">Language helpers</span><span class="slab_text" data-lang="323">TRY, CATCH and CANCEL for C, portable types, booleans, variadic arguments, and a large set of compiler attributes and calling conventions.</span><i class="slab_mark" aria-hidden="true"></i></li>
+           <li class="slab" data-state="done"><picture><source type="image/webp" srcset="images/icons/32/INLINE_ASM.webp"/><img src="images/icons/32/INLINE_ASM.gif" alt="" width="32" height="32" loading="lazy" decoding="async"/></picture><span class="slab_name" data-lang="324">Assembly in C macros</span><span class="slab_text" data-lang="325">x86 instructions written as macros like MOV_RAX_RBX, with exact byte sizes. Inline assembly on GCC and MSVC; machine code written into memory on everything else.</span><i class="slab_mark" aria-hidden="true"></i></li>
+           <li class="slab" data-state="done"><picture><source type="image/webp" srcset="images/icons/32/OS_API.webp"/><img src="images/icons/32/OS_API.gif" alt="" width="32" height="32" loading="lazy" decoding="async"/></picture><span class="slab_name" data-lang="326">Operating system services</span><span class="slab_text" data-lang="327">Memory, including executable memory, threads and mutexes on Windows, Linux, OS/2, Haiku, real-time systems and more, plus instruction cache control.</span><i class="slab_mark" aria-hidden="true"></i></li>
+           <li class="slab" data-state="done"><picture><source type="image/webp" srcset="images/icons/32/__PEB_LOADER__.webp"/><img src="images/icons/32/__PEB_LOADER__.gif" alt="" width="32" height="32" loading="lazy" decoding="async"/></picture><span class="slab_name" data-lang="328">Windows without imports</span><span class="slab_text" data-lang="329">KERNEL32 and USER32 functions are found at runtime by walking the process's own internal structures. No windows.h, no linking.</span><i class="slab_mark" aria-hidden="true"></i></li>
+           <li class="slab" data-state="done"><picture><source type="image/webp" srcset="images/icons/32/OBJECTS.webp"/><img src="images/icons/32/OBJECTS.gif" alt="" width="32" height="32" loading="lazy" decoding="async"/></picture><span class="slab_name" data-lang="330">Objects</span><span class="slab_text" data-lang="331">Objects with bound methods in C: console.print("Hi") with no self argument, through small machine code trampolines generated at runtime.</span><i class="slab_mark" aria-hidden="true"></i></li>
+           <li class="slab" data-state="done"><picture><source type="image/webp" srcset="images/icons/32/CONSOLE.webp"/><img src="images/icons/32/CONSOLE.gif" alt="" width="32" height="32" loading="lazy" decoding="async"/></picture><span class="slab_name">CONSOLE</span><span class="slab_text" data-lang="333">A full terminal UI module: colours, cursor, shapes, mouse and keyboard input on Windows, Linux and macOS. Usable from plain C, CMT objects or C++ classes.</span><i class="slab_mark" aria-hidden="true"></i></li>
+           <li class="slab" data-state="work"><picture><source type="image/webp" srcset="images/icons/32/READ_FILE.webp"/><img src="images/icons/32/READ_FILE.gif" alt="" width="32" height="32" loading="lazy" decoding="async"/></picture><span class="slab_name" data-lang="334">Core modules</span><span class="slab_text" data-lang="335">Disk and file I/O, environment variables, signals and exit handling, NEAR and HUGE pointers, and CMT's own STDLIB, STDIO and MATH.</span><i class="slab_mark" aria-hidden="true"></i></li>
+           <li class="slab" data-state="next"><picture><source type="image/webp" srcset="images/icons/32/GRAPHICS.webp"/><img src="images/icons/32/GRAPHICS.gif" alt="" width="32" height="32" loading="lazy" decoding="async"/></picture><span class="slab_name">GRAPHICS</span><span class="slab_text" data-lang="337">Full window control on WebView, OpenGL, Vulkan, DirectX, Core Graphics, Metal and VGA, with true cross-platform behaviour.</span><i class="slab_mark" aria-hidden="true"></i></li>
           </ol>
           <div class="layer_detail" id="layer_detail" aria-live="polite">
            <p class="layer_state" id="layer_state" data-state="done">Works today</p>
@@ -409,12 +420,12 @@ int main(void)
         <div class="timeline_scroll">
          <div class="timeline" id="timeline" role="img" aria-label="C standards from K&amp;R C in 1978 to C23, and C++ from C++98 to C++20" data-lang-aria="361">
           <ol class="devices" aria-hidden="true">
-           <li class="device" style="--year: 1978"><img src="icons/devices/terminal.png" alt="" width="32" height="32" loading="lazy" decoding="async"/></li>
-           <li class="device" style="--year: 1989"><img src="icons/devices/dos_pc.png" alt="" width="32" height="32" loading="lazy" decoding="async"/></li>
-           <li class="device" style="--year: 1999"><img src="icons/devices/tower.png" alt="" width="32" height="32" loading="lazy" decoding="async"/></li>
-           <li class="device" style="--year: 2011"><img src="icons/devices/laptop.png" alt="" width="32" height="32" loading="lazy" decoding="async"/></li>
-           <li class="device" style="--year: 2018"><img src="icons/devices/board.png" alt="" width="32" height="32" loading="lazy" decoding="async"/></li>
-           <li class="device" style="--year: 2024"><img src="icons/devices/flat.png" alt="" width="32" height="32" loading="lazy" decoding="async"/></li>
+           <li class="device" style="--year: 1978"><img src="images/icons/devices/terminal.png" alt="" width="32" height="32" loading="lazy" decoding="async"/></li>
+           <li class="device" style="--year: 1989"><img src="images/icons/devices/dos_pc.png" alt="" width="32" height="32" loading="lazy" decoding="async"/></li>
+           <li class="device" style="--year: 1999"><img src="images/icons/devices/tower.png" alt="" width="32" height="32" loading="lazy" decoding="async"/></li>
+           <li class="device" style="--year: 2011"><img src="images/icons/devices/laptop.png" alt="" width="32" height="32" loading="lazy" decoding="async"/></li>
+           <li class="device" style="--year: 2018"><img src="images/icons/devices/board.png" alt="" width="32" height="32" loading="lazy" decoding="async"/></li>
+           <li class="device" style="--year: 2024"><img src="images/icons/devices/flat.png" alt="" width="32" height="32" loading="lazy" decoding="async"/></li>
           </ol>
           <div class="timeline_axis"><i class="timeline_fill"></i></div>
           <ol class="timeline_row c">
@@ -552,31 +563,95 @@ int main(void)
        <h3 class="feature_title" data-lang="420">Works today</h3>
        <ul class="feature_list">
         <li data-lang="421">An infinite canvas with smooth pan and zoom, a dot grid, and a pixel grid up close.</li>
-        <li data-lang="422">Boxes, text, images, SVG, video, audio, PDFs and whole web pages that hold other objects.</li>
-        <li data-lang="423">Move, resize, rotate around a movable pivot, corner radius, flip, smart guides, groups, undo and redo.</li>
-        <li data-lang="424">Padding, margin and gap handles you drag right on the object.</li>
-        <li data-lang="425">Auto layout: turn objects into flex or grid containers and drag items in and out.</li>
+        <li data-lang="422">Boxes, text, images, SVG, video, audio, PDFs and whole web pages that hold other objects. Drop many files at once and they land neatly laid out.</li>
+        <li data-lang="423">Move, resize and rotate around a movable pivot, corner radius, flip past the opposite edge, undo and redo.</li>
+        <li data-lang="427">Snapping to edges and equal gaps, even between rotated objects, with tilted guides.</li>
+        <li data-lang="424">Padding, margin and gap handles you drag right on the object. Hold Ctrl to change every side.</li>
+        <li data-lang="425">Auto layout with Shift&nbsp;+&nbsp;A: flex or grid. Drop items in at the exact slot, drag them out, or reorder them in place.</li>
+        <li data-lang="428">Tidy arrangements: even grids and rows of mixed sizes, at any angle, with swaps that glide.</li>
+        <li data-lang="429">Text with Sublime-style multiple cursors: Ctrl&nbsp;+&nbsp;D, column select, one line per cursor when pasting.</li>
         <li data-lang="426">Animated cursors with a spring swing. Smooth with thousands of objects on screen.</li>
        </ul>
       </div>
       <div class="feature_group">
-       <h3 class="feature_title" data-lang="430">Coming next</h3>
+       <h3 class="feature_title" data-lang="430">Building now</h3>
        <ul class="feature_list">
-        <li data-lang="431">A toolbar for creating objects.</li>
-        <li data-lang="432">Layers and properties panels.</li>
-        <li data-lang="433">Saving, loading and export.</li>
-        <li data-lang="434">A brush editor that reads and writes Photoshop and Procreate brushes.</li>
-        <li data-lang="435">A bone system for animation, extended beyond DragonBones.</li>
-        <li data-lang="436">Free to use.</li>
+        <li data-lang="431">Saving and opening projects, with autosave and crash recovery.</li>
+        <li data-lang="432">Version history on GitHub: saves become commits you can browse and go back to.</li>
+        <li data-lang="433">Components with properties, slots and variants. Change the main one and every copy follows.</li>
+        <li data-lang="434">Export that compiles: components become plain HTML, styles become clean CSS classes and variables. No framework ends up in your site.</li>
+        <li data-lang="435">Import: bring HTML and CSS back into the editor.</li>
+        <li data-lang="436">Your own fonts, exported with only the letters you use.</li>
        </ul>
       </div>
       <div class="feature_group size">
        <div class="file" aria-hidden="true">
         <span class="file_icon"></span>
-        <span class="folder_name">Visual Universe</span>
+        <span class="file_name">Visual Universe</span>
         <span class="file_size">4 MB</span>
        </div>
        <p class="size_text" data-lang="440">The whole editor is one executable of about 4 MB. Its window is a WebView made in C, with CMT.</p>
+       <p class="size_text" data-lang="441">Free, and open source under Apache-2.0, like CMT.</p>
+      </div>
+     </div>
+     <!-- BEFORE RELEASE: EVERY KIND OF FILE GETS ITS OWN EDITOR, ALL IN ONE PROJECT -->
+     <div class="studio">
+      <div class="studio_head">
+       <h3 class="studio_title" data-lang="460">Before release: an editor for every kind of file</h3>
+       <p class="studio_lead" data-lang="461">Double-click an object and it opens in the editor made for it, then goes back to the canvas when you are done. Every editor saves into the same project file and shares one undo history.</p>
+      </div>
+      <ul class="studio_grid">
+       <li class="studio_card">
+        <div class="studio_card_head"><svg class="icon" viewBox="0 0 24 24" aria-hidden="true"><path d="M3 5 H21 V19 H3 Z"/><path d="M9 5 V19 M3 9.5 H9 M3 14 H9"/></svg><h4 class="studio_name" data-lang="462">Workspace</h4></div>
+        <p class="studio_text" data-lang="463">Layers, an inspector for every CSS property, a toolbar and a command palette with shortcuts you can change. Full pen support: pressure, tilt, rotation, hover, the eraser end and palm rejection.</p>
+        <p class="studio_tags">Apple Pencil&nbsp;· Wacom&nbsp;· Windows Ink</p>
+       </li>
+       <li class="studio_card">
+        <div class="studio_card_head"><svg class="icon" viewBox="0 0 24 24" aria-hidden="true"><circle cx="12" cy="12" r="9"/><path d="M3 12 H21 M12 3 C15.5 6.5 15.5 17.5 12 21 C8.5 17.5 8.5 6.5 12 3"/></svg><h4 class="studio_name" data-lang="464">Live web pages</h4></div>
+        <p class="studio_text" data-lang="465">Open any site inside the editor and take its elements, styles and images. Try your design at other screen sizes and pixel densities, in dark mode or with reduced motion.</p>
+        <p class="studio_tags">Viewport&nbsp;· DPR&nbsp;· User agent&nbsp;· 3D CSS</p>
+       </li>
+       <li class="studio_card">
+        <div class="studio_card_head"><svg class="icon" viewBox="0 0 24 24" aria-hidden="true"><path d="M4 18 C7 7 17 7 20 18"/><path d="M4 18 L8 7.5 M20 18 L16 7.5"/><circle cx="8" cy="7.5" r="1.4"/><circle cx="16" cy="7.5" r="1.4"/></svg><h4 class="studio_name" data-lang="466">Vector</h4></div>
+        <p class="studio_text" data-lang="467">Pen, pencil and shapes with bezier handles, boolean operations, gradients, masks and text on a path. Draw a set of glyphs and export it as a font, icon fonts included.</p>
+        <p class="studio_tags">SVG&nbsp;· PNG&nbsp;· PDF&nbsp;· TTF&nbsp;· OTF&nbsp;· WOFF2</p>
+       </li>
+       <li class="studio_card">
+        <div class="studio_card_head"><svg class="icon" viewBox="0 0 24 24" aria-hidden="true"><path d="M6.2 17.8 L10.8 13.2 M13.2 11.8 L16.8 9.2"/><circle cx="5" cy="19" r="1.8"/><circle cx="12" cy="12.5" r="1.8"/><circle cx="18.5" cy="8" r="1.8"/></svg><h4 class="studio_name" data-lang="468">Bones and animation</h4></div>
+        <p class="studio_text" data-lang="469">Bones, weights, IK, mesh deformation and skin swapping on a keyframe timeline. Opens DragonBones and Spine rigs, and exports as CSS, SMIL, JSON, GIF or video.</p>
+        <p class="studio_tags">DragonBones&nbsp;· Spine&nbsp;· CSS&nbsp;· SMIL</p>
+       </li>
+       <li class="studio_card">
+        <div class="studio_card_head"><svg class="icon" viewBox="0 0 24 24" aria-hidden="true"><path d="M3 5 H21 V19 H3 Z"/><path d="M3 16 L9 11 L13 15 L16 12.5 L21 16.5"/><circle cx="16" cy="8.5" r="1.5"/></svg><h4 class="studio_name" data-lang="470">Images and brushes</h4></div>
+        <p class="studio_text" data-lang="471">Layers, blend modes, masks, selections and filters. The brush engine runs in C on the graphics card with pressure and tilt, and the brush designer opens and saves Procreate and Photoshop brushes.</p>
+        <p class="studio_tags">.brush&nbsp;· .brushset&nbsp;· .abr</p>
+       </li>
+       <li class="studio_card">
+        <div class="studio_card_head"><svg class="icon" viewBox="0 0 24 24" aria-hidden="true"><path d="M8 4 H20 V16"/><path d="M4 8 H16 V20 H4 Z"/><path d="M8 12 L12 14 L8 16 Z"/></svg><h4 class="studio_name" data-lang="472">Frames and icons</h4></div>
+        <p class="studio_text" data-lang="473">One frame editor for animated images and icons: onion skin, timing, palettes, many sizes in one file, and cursor hotspots.</p>
+        <p class="studio_tags">GIF&nbsp;· APNG&nbsp;· WebP&nbsp;· ICO&nbsp;· CUR&nbsp;· ANI</p>
+       </li>
+       <li class="studio_card">
+        <div class="studio_card_head"><svg class="icon" viewBox="0 0 24 24" aria-hidden="true"><path d="M3 6 H21 V18 H3 Z"/><path d="M10 9.5 L14.5 12 L10 14.5 Z"/></svg><h4 class="studio_name" data-lang="474">Video</h4></div>
+        <p class="studio_text" data-lang="475">A smooth timeline with trims, keyframes, titles and audio. Frames decode on the graphics card, and big files get light copies in the background so scrubbing is instant. Our own MP4 and WebM code, no FFmpeg.</p>
+        <p class="studio_tags">MP4&nbsp;· WebM&nbsp;· WebCodecs&nbsp;· WebGPU</p>
+       </li>
+       <li class="studio_card">
+        <div class="studio_card_head"><svg class="icon" viewBox="0 0 24 24" aria-hidden="true"><path d="M8 7 L3 12 L8 17 M16 7 L21 12 L16 17 M13.5 4.5 L10.5 19.5"/></svg><h4 class="studio_name" data-lang="476">Code</h4><span class="studio_started" data-lang="479">Started</span></div>
+        <p class="studio_text" data-lang="477">A Sublime-like editor with highlighting, multiple cursors and find and replace. Change the code or the canvas and the other follows. Text on the canvas already has the multiple cursors.</p>
+        <p class="studio_tags">HTML&nbsp;· CSS&nbsp;· JS&nbsp;· JSON&nbsp;· SVG</p>
+       </li>
+      </ul>
+      <div class="later">
+       <p class="later_title" data-lang="480">After release</p>
+       <ul class="later_list">
+        <li data-lang="481">PDF editing</li>
+        <li data-lang="482">Word, PowerPoint and Excel files</li>
+        <li data-lang="483">Compiling native programs with TCC</li>
+        <li data-lang="484">Figma import</li>
+        <li data-lang="485">Plugins</li>
+        <li data-lang="486">Live collaboration</li>
+       </ul>
       </div>
      </div>
     </div>
@@ -667,11 +742,107 @@ int main(void)
     </div>
    </section>
    <section class="contact" id="contact">
+    <div class="wrap contact_grid">
+     <div class="contact_copy">
+      <h2 class="contact_title" data-lang="700">Tell us what you want to build.</h2>
+      <p class="lead" data-lang="701">A website, a tool, a strange idea. Write to us and we will answer.</p>
+      <a class="contact_mail" href="mailto:teo@maximum-tension.com">teo@maximum-tension.com</a>
+      <a class="link" href="https://github.com/TeomanDeniz" target="_blank" rel="noopener" data-lang="702">Our code on GitHub</a>
+     </div>
+     <!-- A POSTCARD TO FILL IN. SEND STAMPS IT AND OPENS THE MAIL APP WITH THE LETTER WRITTEN (WITHOUT JS, THE FORM ITSELF IS A mailto:) -->
+     <div class="tilt_zone postcard_zone">
+      <form class="postcard tilt" id="postcard" action="mailto:teo@maximum-tension.com" method="post" enctype="text/plain" aria-label="Postcard to Maximum Tension" data-lang-aria="725">
+       <div class="pc_side pc_message">
+        <p class="pc_hello" data-lang="710">Hi Maximum Tension,</p>
+        <fieldset class="pc_kinds">
+         <legend class="pc_label" data-lang="711">I want to build</legend>
+         <div class="pc_kind_list"><label class="pc_kind"><input type="radio" name="kind" value="website" checked/><span data-lang="712">a website</span></label><label class="pc_kind"><input type="radio" name="kind" value="tool"/><span data-lang="713">a tool</span></label><label class="pc_kind"><input type="radio" name="kind" value="app"/><span data-lang="714">an app</span></label><label class="pc_kind"><input type="radio" name="kind" value="strange"/><span data-lang="715">a strange idea</span></label></div>
+        </fieldset>
+        <label class="sr_only" for="pc_text" data-lang="720">Your message</label>
+        <textarea class="pc_text" id="pc_text" name="message" rows="4"></textarea>
+       </div>
+       <div class="pc_side pc_address">
+        <div class="stamp" aria-hidden="true"><div class="stamp_face"><svg class="stamp_glyph" viewBox="0 0 29 18" shape-rendering="crispEdges"><use href="#brand_glyph"/></svg><span class="stamp_name">MAXIMUM TENSION</span></div></div>
+        <svg class="postmark" viewBox="0 0 170 90" aria-hidden="true"><defs><path id="pm_arc" d="M89 45 A31 31 0 0 1 151 45"/></defs><g class="pm_waves"><path d="M2 29 q7 -5 14 0 t14 0 t14 0 t14 0 t14 0 t14 0"/><path d="M2 39 q7 -5 14 0 t14 0 t14 0 t14 0 t14 0 t14 0"/><path d="M2 49 q7 -5 14 0 t14 0 t14 0 t14 0 t14 0 t14 0"/><path d="M2 59 q7 -5 14 0 t14 0 t14 0 t14 0 t14 0 t14 0"/></g><circle cx="120" cy="45" r="37"/><circle cx="120" cy="45" r="27"/><text class="pm_ring"><textPath href="#pm_arc" startOffset="50%" text-anchor="middle">MAXIMUM ✦ TENSION</textPath></text><text class="pm_date" id="pm_date" x="120" y="49" text-anchor="middle"></text></svg>
+        <p class="pc_to" data-lang="721">To</p>
+        <p class="pc_line">Maximum Tension</p>
+        <p class="pc_line">teo@maximum-tension.com</p>
+        <p class="pc_line" data-lang="722">Somewhere on the Internet</p>
+        <button class="pc_send" type="submit"><svg class="icon" viewBox="0 0 24 24" aria-hidden="true"><path d="M3 11 L21 3 L14 21 L11 13 Z"/><path d="M11 13 L21 3"/></svg><span data-lang="723">Send</span></button>
+       </div>
+       <span class="tilt_glare" aria-hidden="true"></span>
+      </form>
+      <p class="pc_note" id="pc_note" aria-live="polite"></p>
+     </div>
+    </div>
+   </section>
+   <!-- THE TEAM: PROFILE CARDS IN THE SPIRIT OF DISCORD, ONE THEME PER PERSON -->
+   <section class="team" id="team">
     <div class="wrap">
-     <h2 class="contact_title" data-lang="700">Tell us what you want to build.</h2>
-     <p class="lead" data-lang="701">A website, a tool, a strange idea. Write to us and we will answer.</p>
-     <a class="contact_mail" href="mailto:teo@maximum-tension.com">teo@maximum-tension.com</a>
-     <a class="link" href="https://github.com/TeomanDeniz" target="_blank" rel="noopener" data-lang="702">Our code on GitHub</a>
+     <div class="team_head">
+      <h2 class="heading" data-lang="750">Team</h2>
+      <p class="lead" data-lang="751">The people behind Maximum Tension.</p>
+     </div>
+     <div class="team_grid">
+      <div class="tilt_zone">
+       <article class="profile tilt art">
+        <div class="profile_card">
+         <div class="profile_banner">
+          <svg class="banner_art" viewBox="0 0 600 140" preserveAspectRatio="xMaxYMid slice" aria-hidden="true">
+           <g class="art_pen">
+            <path class="art_handle" d="M178 100 L222 26 M330 60 L284 126"/>
+            <path class="art_curve" d="M178 100 C222 26 284 126 330 60"/>
+            <rect x="173" y="95" width="10" height="10"/><rect x="325" y="55" width="10" height="10"/>
+            <circle cx="222" cy="26" r="4.5"/><circle cx="284" cy="126" r="4.5"/>
+           </g>
+           <g class="art_onion"><circle cx="364" cy="108" r="8" opacity="0.14"/><circle cx="386" cy="78" r="8" opacity="0.22"/><circle cx="410" cy="60" r="8" opacity="0.32"/><circle cx="434" cy="56" r="8" opacity="0.44"/><circle cx="458" cy="66" r="8" opacity="0.58"/></g>
+           <circle class="art_ball" cx="482" cy="96" r="9"/>
+           <g class="art_cube">
+            <path d="M510 60 H548 V98 H510 Z M528 44 H566 V82 M510 60 L528 44 M548 60 L566 44 M548 98 L566 82"/>
+            <path class="art_hidden" d="M528 44 V82 H566 M510 98 L528 82"/>
+           </g>
+          </svg>
+         </div>
+         <div class="profile_avatar">
+          <picture><source type="image/webp" srcset="images/team/SYLWIA_DENIZ.webp"/><img src="images/team/SYLWIA_DENIZ.png" alt="" width="222" height="222" loading="lazy" decoding="async"/></picture>
+          <i class="profile_status"><span class="sr_only" data-lang="753">Online</span></i>
+         </div>
+         <div class="profile_badges" aria-hidden="true"><span class="badge"><svg class="icon" viewBox="0 0 24 24" aria-hidden="true"><path d="M12 3 L18 10 L14 20 H10 L6 10 Z"/><path d="M12 3 V12"/><circle cx="12" cy="13.5" r="1.5"/></svg></span><span class="badge"><svg class="icon" viewBox="0 0 24 24" aria-hidden="true"><path d="M19.5 4.5 L11 13"/><path d="M11 13 C8 12.5 6 14.5 6.5 17 C6.8 18.6 5.5 19.5 4 19.5 C7 21.5 12 20.5 12.5 16.5 C12.7 15 12 13.8 11 13 Z"/></svg></span><span class="badge"><svg class="icon" viewBox="0 0 24 24" aria-hidden="true"><path d="M12 3 L20 7.5 V16.5 L12 21 L4 16.5 V7.5 Z"/><path d="M4 7.5 L12 12 L20 7.5 M12 12 V21"/></svg></span><span class="badge"><svg class="icon" viewBox="0 0 24 24" aria-hidden="true"><path d="M4 5 H20 V19 H4 Z"/><path d="M8 5 V19 M16 5 V19 M4 9.5 H8 M4 14.5 H8 M16 9.5 H20 M16 14.5 H20"/></svg></span><span class="badge"><svg class="icon" viewBox="0 0 24 24" aria-hidden="true"><path d="M9 6 H20 M9 12 H20 M9 18 H20"/><path d="M3.5 6 L4.8 7.3 L7 5 M3.5 12 L4.8 13.3 L7 11"/><circle cx="5" cy="18" r="1.2"/></svg></span></div>
+         <div class="profile_body">
+          <h3 class="profile_name">Sylwia Deniz</h3>
+          <p class="profile_summary" data-lang="760">Draws, designs, models and animates, and keeps every project on track.</p>
+          <hr class="profile_rule"/>
+          <p class="profile_label" data-lang="752">Roles</p>
+          <ul class="profile_roles"><li class="role pink" data-lang="761">Designer</li><li class="role peach" data-lang="762">Artist</li><li class="role cyan" data-lang="763">3D Modeller</li><li class="role violet" data-lang="764">Animator</li><li class="role mint" data-lang="765">Project Manager</li></ul>
+         </div>
+         <span class="tilt_glare" aria-hidden="true"></span>
+        </div>
+       </article>
+      </div>
+      <div class="tilt_zone">
+       <article class="profile tilt term">
+        <div class="profile_card">
+         <div class="profile_banner">
+          <div class="crt_text" aria-hidden="true"><span>C:\&gt;debug cmt.exe</span><span>-d 0100</span><span>0B7C:0100&nbsp; 4D 5A 90 00 03 00&nbsp; MZ....</span><span>C:\&gt;<i class="crt_caret"></i></span></div>
+          <svg class="crt_glyph" viewBox="0 0 29 18" aria-hidden="true" shape-rendering="crispEdges"><use href="#brand_glyph"/></svg>
+         </div>
+         <div class="profile_avatar">
+          <picture><source type="image/webp" srcset="images/team/TEOMAN_DENIZ.webp"/><img src="images/team/TEOMAN_DENIZ.png" alt="" width="222" height="222" loading="lazy" decoding="async"/></picture>
+          <i class="profile_status"><span class="sr_only" data-lang="753">Online</span></i>
+         </div>
+         <div class="profile_badges" aria-hidden="true"><span class="badge"><svg class="icon" viewBox="0 0 24 24" aria-hidden="true"><path d="M8 7 L3 12 L8 17 M16 7 L21 12 L16 17"/></svg></span><span class="badge"><svg class="icon" viewBox="0 0 24 24" aria-hidden="true"><path d="M4 4 H17 L20 7 V20 H4 Z"/><path d="M8 4 V9 H15 V4 M7 20 V14 H17 V20"/></svg></span><span class="badge"><svg class="icon" viewBox="0 0 24 24" aria-hidden="true"><path d="M7 7 H17 V17 H7 Z"/><path d="M10 10 H14 V14 H10 Z"/><path d="M10 3 V7 M14 3 V7 M10 17 V21 M14 17 V21 M3 10 H7 M3 14 H7 M17 10 H21 M17 14 H21"/></svg></span></div>
+         <div class="profile_body">
+          <h3 class="profile_name">Teoman Deniz</h3>
+          <p class="profile_summary" data-lang="770">Programs close to the metal, from today’s systems back to legacy ones.</p>
+          <hr class="profile_rule"/>
+          <p class="profile_label" data-lang="752">Roles</p>
+          <ul class="profile_roles"><li class="role ember" data-lang="771">Sr. Programmer</li><li class="role green" data-lang="772">Legacy Systems Engineer</li><li class="role blue" data-lang="773">Systems Engineer</li></ul>
+         </div>
+         <span class="tilt_glare" aria-hidden="true"></span>
+        </div>
+       </article>
+      </div>
+     </div>
     </div>
    </section>
   </main>
