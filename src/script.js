@@ -1727,20 +1727,66 @@ function
 /* ========================================================================== */
 
 /*
-** NOTHING IS DOWNLOADED UNTIL THE SECTION IS NEAR. PHONES AND DATA SAVERS GET
-** THE 720P FILE; WEBM WHERE IT PLAYS, MP4 EVERYWHERE ELSE. IT PLAYS ONLY
+** NOTHING IS DOWNLOADED UNTIL THE SECTION IS NEAR. PHONES AND DATA SAVERS ASK
+** FOR 720P FIRST. MP4 COMES BEFORE WEBM (IT IS THE SMALLER FILE HERE). IF A
+** FILE IS MISSING OR WILL NOT PLAY, THE NEXT ONE IS TRIED. IT PLAYS ONLY
 ** WHILE ON SCREEN AND FADES IN ONCE IT REALLY PLAYS (NO FILES, NO VIDEO).
 */
+function
+	space_sources(small)
+{
+	const	sizes = small ? ["720", "1080"] : ["1080", "720"];
+	const	list = [];
+
+	JS.ITERATE(
+		sizes,
+		function(size)
+		{
+			JS.ITERATE(
+				[["mp4", "video/mp4; codecs=\"avc1.640028\""], ["webm", "video/webm; codecs=\"vp9\""]],
+				function(format)
+				{
+					if (DOM.GET.ID("space_video").canPlayType(format[1]))
+						list.push("videos/UNIVERSE_" + size + "." + format[0]);
+				}
+			);
+		}
+	);
+	return (list);
+}
+
 function
 	space_start()
 {
 	const	video = DOM.GET.ID("space_video");
 	const	small = window.innerWidth < 900 || (navigator.connection && navigator.connection.saveData);
-	const	size = small ? "720" : "1080";
+	var		sources = [];
 	var		loaded = false;
 
 	if (!video || !video.canPlayType)
 		return ;
+
+	function
+		play()
+	{
+		const	playing = video.play();
+
+		if (playing && playing.catch)
+			playing.catch(function() {});
+	}
+
+	function
+		next_source()
+	{
+		if (!sources.length)
+		{
+			video.removeAttribute("src");
+			return ;
+		}
+
+		video.src = sources.shift();
+		play();
+	}
 
 	video.addEventListener(
 		"playing",
@@ -1749,6 +1795,7 @@ function
 			DOM.CLASS.ADD(video, "ready");
 		}
 	);
+	video.addEventListener("error", next_source);
 
 	observe(
 		DOM.GET.ID("universe"),
@@ -1773,16 +1820,13 @@ function
 					return ;
 				}
 
-				video.src = "videos/UNIVERSE_" + size + (video.canPlayType("video/webm; codecs=\"vp9\"") ? ".webm" : ".mp4");
+				sources = space_sources(small);
+				next_source();
+				return ;
 			}
 
-			if (!reduced_motion)
-			{
-				const	playing = video.play();
-
-				if (playing && playing.catch)
-					playing.catch(function() {});
-			}
+			if (!reduced_motion && video.getAttribute("src"))
+				play();
 		},
 		{rootMargin: "300px 0px"}
 	);
@@ -3157,6 +3201,35 @@ function
 
 
 /* ========================================================================== */
+/* SMOOTH SCROLL                                                              */
+/* ========================================================================== */
+
+/*
+** THE WHEEL AND THE KEYBOARD GLIDE INSTEAD OF JUMPING (js/smooth_scroll.js).
+** IT EASES THE REAL SCROLL POSITION, SO THE STICKY SCENES, THE SCROLL-DRIVEN
+** EFFECTS AND THE OBSERVERS ALL KEEP WORKING AS THEY ARE.
+**
+** FINGERS STAY NATIVE: PHONES ALREADY SCROLL SMOOTHLY WITH MOMENTUM, AND
+** THEIR OWN SCROLLING KEEPS THE ADDRESS BAR HIDING AND THE EDGE BOUNCE.
+**
+** IT STARTS LAST, SO THE KEYS THE PAGE USES ITSELF (THE COMMAND PROMPT
+** WAITING FOR A KEY, THE LANGUAGE MENU, THE EDITOR) ARE HANDLED FIRST.
+**
+** ONLY THE PAGE IS SMOOTHED, SO IT DOES NOT WATCH FOR NEW ELEMENTS: THE
+** COMMAND PROMPT AND THE DRONE CHANGE THE PAGE ALL THE TIME.
+*/
+var		page_scroll = null;
+
+function
+	scroll_start()
+{
+	if (typeof(smooth_scroll) === "undefined" || !window.AbortController || !window.Map)
+		return ;
+
+	page_scroll = smooth_scroll.start({targets: window, duration: 1, touch: false, watch_dom: false});
+}
+
+/* ========================================================================== */
 /* FRAME                                                                      */
 /* ========================================================================== */
 
@@ -3260,6 +3333,7 @@ function
 	window.addEventListener("resize", on_resize);
 	year_date.textContent = new Date().getFullYear().toString();
 	render_frame();
+	scroll_start();
 }
 
 DOM.START(main);

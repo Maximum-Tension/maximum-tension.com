@@ -1,0 +1,1300 @@
+<!DOCTYPE html>
+<!--
+  Maximum Tension - 404 black hole recorder
+  -----------------------------------------
+  Open this file in Chrome or Edge (desktop). Pick a scene, press "Render".
+  Every frame is ray traced on a fixed clock (frame N = N / 60 s) at full
+  quality and encoded in the browser (WebCodecs), however long it takes.
+  The scene is a seamless 24 second loop: the camera sways and comes back,
+  and the disc's swirls fade and renew on the same 24 second cycle.
+
+  Output, per scene:  BLACKHOLE_<WIDE|TALL>_1440.mp4 (the master; 1080p and
+                      720p can be ticked too), BLACKHOLE_<WIDE|TALL>_POSTER.webp
+                      and _POSTER_720.webp.
+  Then shrink the masters for the site with compress_videos.cmd:
+      compress_videos.cmd BLACKHOLE_WIDE_1440.mp4 BLACKHOLE_WIDE
+      compress_videos.cmd BLACKHOLE_TALL_1440.mp4 BLACKHOLE_TALL
+  and copy the four posters into videos/.
+-->
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Maximum Tension black hole recorder</title>
+<style>
+	:root
+	{
+		--bg: #000000;
+		--panel: rgba(236, 230, 216, 0.05);
+		--line: rgba(236, 230, 216, 0.14);
+		--text: #ECE6D8;
+		--muted: rgba(236, 230, 216, 0.6);
+		--pink: #FF7A1A;
+	}
+
+	*
+	{
+		box-sizing: border-box;
+	}
+
+	html, body
+	{
+		margin: 0;
+		min-height: 100%;
+		color: var(--text);
+		background:
+			radial-gradient(60% 50% at 20% 0%, rgba(122, 140, 255, 0.12), transparent 70%),
+			radial-gradient(50% 50% at 90% 100%, rgba(255, 122, 26, 0.10), transparent 70%),
+			var(--bg);
+		font: 15px/1.45 system-ui, -apple-system, "Segoe UI", Roboto, sans-serif;
+	}
+
+	main
+	{
+		gap: 24px;
+		display: grid;
+		padding: 24px;
+		grid-template-columns: minmax(0, 1fr) 360px;
+		align-items: start;
+	}
+
+	@media (max-width: 1100px)
+	{
+		main
+		{
+			grid-template-columns: minmax(0, 1fr);
+		}
+	}
+
+	h1
+	{
+		margin: 0 0 4px 0;
+		font-size: 22px;
+		font-weight: 600;
+	}
+
+	.sub
+	{
+		color: var(--muted);
+		margin: 0 0 18px 0;
+	}
+
+	.stage
+	{
+		position: relative;
+		overflow: hidden;
+		aspect-ratio: 16 / 9;
+		border-radius: 14px;
+		background: #000;
+		box-shadow: 0 0 0 1px var(--line), 0 30px 60px -30px rgba(0, 0, 0, 0.9);
+	}
+
+	.stage canvas
+	{
+		width: 100%;
+		height: 100%;
+		display: block;
+	}
+
+	.stage .badge
+	{
+		top: 12px;
+		left: 12px;
+		padding: 4px 10px;
+		position: absolute;
+		font-size: 12.5px;
+		border-radius: 999px;
+		background: rgba(0, 0, 0, 0.45);
+		backdrop-filter: blur(8px);
+		color: var(--muted);
+	}
+
+	.card
+	{
+		padding: 18px;
+		border-radius: 16px;
+		background: var(--panel);
+		box-shadow: inset 0 0 0 1px var(--line);
+		backdrop-filter: blur(14px);
+	}
+
+	.card + .card
+	{
+		margin-top: 14px;
+	}
+
+	.card h2
+	{
+		margin: 0 0 12px 0;
+		font-size: 13px;
+		font-weight: 600;
+		letter-spacing: 0.1em;
+		text-transform: uppercase;
+		color: var(--muted);
+	}
+
+	.scenes
+	{
+		gap: 8px;
+		display: grid;
+	}
+
+	.scene
+	{
+		gap: 2px;
+		display: flex;
+		cursor: pointer;
+		padding: 10px 12px;
+		border-radius: 12px;
+		flex-direction: column;
+		box-shadow: inset 0 0 0 1px var(--line);
+		transition: box-shadow 0.2s ease, background 0.2s ease;
+	}
+
+	.scene input
+	{
+		display: none;
+	}
+
+	.scene small
+	{
+		color: var(--muted);
+	}
+
+	.scene:has(input:checked)
+	{
+		background: rgba(255, 122, 26, 0.12);
+		box-shadow: inset 0 0 0 1.5px var(--pink);
+	}
+
+	.row
+	{
+		gap: 10px;
+		display: flex;
+		flex-wrap: wrap;
+		align-items: center;
+	}
+
+	.check
+	{
+		gap: 8px;
+		display: inline-flex;
+		cursor: pointer;
+		padding: 6px 12px;
+		border-radius: 999px;
+		align-items: center;
+		box-shadow: inset 0 0 0 1px var(--line);
+	}
+
+	.check input
+	{
+		accent-color: var(--pink);
+	}
+
+	label.slider
+	{
+		display: block;
+		margin-top: 12px;
+	}
+
+	label.slider span
+	{
+		float: right;
+		color: var(--muted);
+		font-variant-numeric: tabular-nums;
+	}
+
+	input[type="range"]
+	{
+		width: 100%;
+		accent-color: var(--pink);
+	}
+
+	button
+	{
+		color: #fff;
+		border: 0;
+		cursor: pointer;
+		padding: 11px 18px;
+		font: inherit;
+		font-weight: 600;
+		border-radius: 12px;
+		background: rgba(255, 255, 255, 0.08);
+		box-shadow: inset 0 0 0 1px var(--line);
+		transition: filter 0.2s ease, background 0.2s ease;
+	}
+
+	button:hover
+	{
+		filter: brightness(1.15);
+	}
+
+	button.primary
+	{
+		background: linear-gradient(135deg, #f0569a, #b83ad8);
+		box-shadow: 0 8px 24px -10px rgba(255, 122, 26, 0.8);
+	}
+
+	button:disabled
+	{
+		opacity: 0.45;
+		cursor: default;
+		filter: none;
+	}
+
+	.buttons
+	{
+		gap: 8px;
+		display: grid;
+		grid-template-columns: 1fr 1fr;
+	}
+
+	.buttons .wide
+	{
+		grid-column: 1 / -1;
+	}
+
+	.progress
+	{
+		height: 8px;
+		overflow: hidden;
+		margin-top: 14px;
+		border-radius: 999px;
+		background: rgba(255, 255, 255, 0.08);
+	}
+
+	.progress div
+	{
+		width: 0%;
+		height: 100%;
+		background: linear-gradient(90deg, #f0569a, #b83ad8);
+		transition: width 0.15s linear;
+	}
+
+	.status
+	{
+		color: var(--muted);
+		margin-top: 8px;
+		min-height: 1.4em;
+		font-variant-numeric: tabular-nums;
+	}
+
+	.files
+	{
+		gap: 6px;
+		display: grid;
+	}
+
+	.files a
+	{
+		gap: 10px;
+		display: flex;
+		color: var(--text);
+		padding: 8px 12px;
+		border-radius: 10px;
+		text-decoration: none;
+		justify-content: space-between;
+		background: rgba(255, 255, 255, 0.05);
+	}
+
+	.files a:hover
+	{
+		background: rgba(255, 122, 26, 0.15);
+	}
+
+	.files a small
+	{
+		color: var(--muted);
+	}
+
+	.note
+	{
+		color: var(--muted);
+		font-size: 13px;
+		margin: 10px 0 0 0;
+	}
+
+	.warn
+	{
+		color: #ffb3c9;
+	}
+</style>
+</head>
+<body>
+<main>
+	<section>
+		<h1>404 black hole</h1>
+		<p class="sub">A ray-traced black hole for the 404 page. A seamless 24 second loop at 60 FPS, rendered frame by frame at full quality.</p>
+		<div class="stage" id="stage">
+			<canvas id="view"></canvas>
+			<span class="badge" id="badge">Preview</span>
+		</div>
+		<p class="note">The preview uses a quick, rough version of the renderer so it can move. The video uses the full one: 8 rays per pixel, tiny integration steps, and a six-level glow. Expect a few minutes per scene on a fast GPU.</p>
+	</section>
+
+	<aside>
+		<div class="card">
+			<h2>Scene</h2>
+			<div class="scenes" id="scenes"></div>
+		</div>
+
+		<div class="card">
+			<h2>Output</h2>
+			<div class="row">
+				<label class="check"><input type="checkbox" id="r1440" checked> 1440p (master)</label>
+				<label class="check"><input type="checkbox" id="r1080"> 1080p</label>
+				<label class="check"><input type="checkbox" id="r720"> 720p</label>
+			</div>
+			<div class="row" style="margin-top: 8px">
+				<label class="check"><input type="checkbox" id="fmp4" checked> MP4 (H.264)</label>
+				<label class="check"><input type="checkbox" id="fwebm"> WebM (VP9)</label>
+			</div>
+			<label class="slider">Rays per pixel <span id="sv"></span>
+				<input type="range" id="samples" min="1" max="16" step="1" value="8">
+			</label>
+			<label class="slider">Quality / size <span id="qv"></span>
+				<input type="range" id="quality" min="0.5" max="2" step="0.1" value="1.2">
+			</label>
+			<p class="note">Render the 1440p master, then shrink it for the site with <b>compress_videos.cmd</b>: <code>compress_videos.cmd BLACKHOLE_WIDE_1440.mp4 BLACKHOLE_WIDE</code> (and the same for TALL). Copy the two posters into <b>videos/</b> too.</p>
+			<p class="note" id="support"></p>
+		</div>
+
+		<div class="card">
+			<div class="buttons">
+				<button id="preview">Pause preview</button>
+				<button id="poster">Poster only</button>
+				<button id="render" class="primary">Render this scene</button>
+				<button id="renderAll">Render both</button>
+				<button id="download" class="wide" disabled>Download all files</button>
+			</div>
+			<div class="progress"><div id="bar"></div></div>
+			<div class="status" id="status">Ready.</div>
+		</div>
+
+		<div class="card">
+			<h2>Files</h2>
+			<div class="files" id="files"><small style="color: var(--muted)">Rendered files show up here.</small></div>
+		</div>
+	</aside>
+</main>
+
+<script type="importmap">
+{
+	"imports":
+	{
+		"mp4-muxer": "https://cdn.jsdelivr.net/npm/mp4-muxer@5.2.2/build/mp4-muxer.mjs",
+		"webm-muxer": "https://cdn.jsdelivr.net/npm/webm-muxer@5.1.4/build/webm-muxer.mjs"
+	}
+}
+</script>
+
+<script type="module">
+import { Muxer as Mp4Muxer, ArrayBufferTarget as Mp4Target } from "mp4-muxer";
+import { Muxer as WebmMuxer, ArrayBufferTarget as WebmTarget } from "webm-muxer";
+
+/* ========================================================================== */
+/* CONSTANTS                                                                  */
+/* ========================================================================== */
+
+const FPS = 60;
+const LOOP = 24;                      /* SECONDS - EVERY MOTION REPEATS EXACTLY */
+const FRAMES = FPS * LOOP;
+const TAU = Math.PI * 2;
+
+/*
+** TWO FRAMINGS OF THE SAME HOLE. WIDE (16:9) FOR DESKTOPS, TALL (9:16) FOR
+** PHONES: THE CAMERA STEPS BACK AND THE LENS WIDENS SO THE SHADOW AND THE
+** BENT DISC FIT. shift MOVES THE HOLE UP, LEAVING ROOM FOR THE PAGE'S TEXT.
+*/
+const SCENES = {
+	BLACKHOLE_WIDE: { title: "Wide (16:9)", text: "Desktops and laptops", tall: false, distance: 30, zoom: 0.45, shift: 0.13 },
+	BLACKHOLE_TALL: { title: "Tall (9:16)", text: "Phones held upright", tall: true, distance: 38, zoom: 0.6, shift: 0.17 }
+};
+
+/* LONG SIDE x SHORT SIDE; TALL SCENES SWAP THEM */
+const OUT = {
+	1440: { long: 2560, short: 1440, mp4: ["avc1.640033", "avc1.640034", "avc1.4D4033"], webm: ["vp09.00.50.08", "vp09.00.51.08"], bitrate: { mp4: 30e6, webm: 22e6 } },
+	1080: { long: 1920, short: 1080, mp4: ["avc1.64002A", "avc1.640032", "avc1.4D402A"], webm: ["vp09.00.41.08", "vp09.00.40.08"], bitrate: { mp4: 14e6, webm: 10e6 } },
+	720: { long: 1280, short: 720, mp4: ["avc1.640020", "avc1.64001F", "avc1.4D4020"], webm: ["vp09.00.31.08", "vp09.00.40.08"], bitrate: { mp4: 6e6, webm: 4.5e6 } }
+};
+
+function frameSize(key, res)
+{
+	const o = OUT[res];
+	return SCENES[key].tall ? { w: o.short, h: o.long } : { w: o.long, h: o.short };
+}
+
+/* ========================================================================== */
+/* THE RAY TRACER                                                             */
+/* ========================================================================== */
+
+/*
+** EVERY PIXEL FOLLOWS RAYS OF LIGHT BACKWARDS FROM THE CAMERA ALONG THEIR
+** REAL PATHS AROUND A NON-ROTATING (SCHWARZSCHILD) BLACK HOLE. IN UNITS WHERE
+** THE MASS M = 1, A RAY STAYS IN ONE PLANE AND u = 1 / r OBEYS
+**
+**     d2u / dphi2 = -u + 3 u^2,
+**
+** STEPPED WITH VELOCITY VERLET. THE SHADOW, THE BACK OF THE DISC BENT OVER
+** AND UNDER IT, THE PHOTON RINGS AND THE EINSTEIN RING OF STARS ALL COME OUT
+** OF THAT ONE EQUATION.
+**
+** THE DISC IS THIN AND FLAT FROM THE INNERMOST STABLE ORBIT (r = 6) OUT. ITS
+** HEAT FOLLOWS THE THIN-DISC FLUX F ~ (1 - sqrt(6 / r)) / r^3. EACH BIT IS SEEN
+** SHIFTED BY THE EXACT FACTOR FOR A CIRCULAR ORBIT,
+**
+**     g = sqrt(1 - 3 / r) / (1 - OMEGA * xi),  OMEGA = r^-1.5
+**
+** (DOPPLER AND GRAVITY TOGETHER; xi IS THE RAY'S ANGULAR MOMENTUM ABOUT THE
+** DISC'S AXIS): A BLACKBODY AT g * T, g^4 AS BRIGHT. THE SIDE COMING TOWARDS
+** YOU IS BRIGHTER AND BLUER.
+*/
+
+const VERTEX = `#version 300 es
+in vec2 position;
+out vec2 v_uv;
+void main()
+{
+	v_uv = position * 0.5 + 0.5;
+	gl_Position = vec4(position, 0.0, 1.0);
+}`;
+
+const COMMON = `
+float hash13(vec3 p)
+{
+	p = fract(p * 0.1031);
+	p += dot(p, p.zyx + 31.32);
+	return fract((p.x + p.y) * p.z);
+}
+float noise(vec3 p)
+{
+	vec3 i = floor(p);
+	vec3 f = fract(p);
+	f = f * f * (3.0 - 2.0 * f);
+	return mix(
+		mix(mix(hash13(i), hash13(i + vec3(1, 0, 0)), f.x), mix(hash13(i + vec3(0, 1, 0)), hash13(i + vec3(1, 1, 0)), f.x), f.y),
+		mix(mix(hash13(i + vec3(0, 0, 1)), hash13(i + vec3(1, 0, 1)), f.x), mix(hash13(i + vec3(0, 1, 1)), hash13(i + vec3(1, 1, 1)), f.x), f.y),
+		f.z);
+}
+float fbm(vec3 p)
+{
+	float sum = 0.0;
+	float amp = 0.5;
+	for (int i = 0; i < OCTAVES; i++)
+	{
+		sum += amp * noise(p);
+		p = p * 2.03 + vec3(17.1, 3.7, 9.2);
+		amp *= 0.5;
+	}
+	return sum;
+}
+/* A BLACKBODY'S COLOUR (TANNER HELLAND'S FIT), MADE LINEAR */
+vec3 blackbody(float kelvin)
+{
+	float t = clamp(kelvin, 1000.0, 40000.0) / 100.0;
+	float r = t <= 66.0 ? 1.0 : clamp(1.29293618606 * pow(t - 60.0, -0.1332047592), 0.0, 1.0);
+	float g = t <= 66.0 ? clamp(0.39008157876 * log(t) - 0.63184144378, 0.0, 1.0) : clamp(1.12989086089 * pow(t - 60.0, -0.0755148492), 0.0, 1.0);
+	float b = t >= 66.0 ? 1.0 : (t <= 19.0 ? 0.0 : clamp(0.54320678911 * log(t - 10.0) - 1.19625408914, 0.0, 1.0));
+	return pow(vec3(r, g, b), vec3(2.2));
+}
+`;
+
+const SCENE = `
+uniform vec2 u_size;
+uniform vec2 u_jitter;
+uniform float u_weight;
+uniform float u_time;
+uniform float u_life;
+uniform vec3 u_eye;
+uniform vec3 u_right;
+uniform vec3 u_up;
+uniform vec3 u_back;
+uniform float u_zoom;
+uniform float u_shift;
+out vec4 out_color;
+const float RIN = 6.0;
+const float ROUT = 22.0;
+
+/* STARS ON THE SIX FACES OF A CUBE, FOUR SIZES, BLACKBODY COLOURS, AND A FAINT GALAXY */
+vec3 sky(vec3 d)
+{
+	vec3 col = vec3(0.0);
+	vec3 a = abs(d);
+	vec2 uv;
+	float face;
+	if (a.x >= a.y && a.x >= a.z) { uv = d.yz / a.x; face = d.x > 0.0 ? 0.0 : 1.0; }
+	else if (a.y >= a.z) { uv = d.xz / a.y; face = d.y > 0.0 ? 2.0 : 3.0; }
+	else { uv = d.xy / a.z; face = d.z > 0.0 ? 4.0 : 5.0; }
+	for (int layer = 0; layer < 4; layer++)
+	{
+		float scale = 64.0 * pow(1.75, float(layer));
+		vec2 g = uv * scale;
+		vec2 cell = floor(g);
+		vec2 f = fract(g);
+		float seed = face * 13.0 + float(layer) * 101.0;
+		float h = hash13(vec3(cell, seed));
+		if (h > 0.88)
+		{
+			vec2 c = vec2(hash13(vec3(cell, seed + 31.0)), hash13(vec3(cell, seed + 57.0))) * 0.5 + 0.25;
+			float dist = length(f - c);
+			float bright = pow((h - 0.88) / 0.12, 4.0) * 10.0 / (1.0 + float(layer) * 1.4);
+			float kelvin = mix(3000.0, 15000.0, pow(hash13(vec3(cell, seed + 91.0)), 1.7));
+			col += blackbody(kelvin) * bright * exp(-dist * dist * 340.0);
+		}
+	}
+	float across = dot(d, normalize(vec3(0.25, 1.0, 0.4))) * 3.2;
+	float band = exp(-across * across);
+	float dust = smoothstep(0.35, 0.75, fbm(d * 9.0 + 7.0));
+	vec3 gas = vec3(0.34, 0.21, 0.48) * fbm(d * 3.0) + vec3(0.12, 0.2, 0.38) * fbm(d * 6.5 + 3.0);
+	col += (vec3(0.006, 0.005, 0.01) + gas * 0.035) * (0.25 + 1.5 * band) * (1.0 - 0.55 * dust * band);
+	return col;
+}
+
+/* THE DISC WHERE THE RAY CROSSES IT: LIGHT (rgb) AND COVERAGE (a) */
+vec4 disc(vec3 p, float xi)
+{
+	float r = length(p.xz);
+	if (r < RIN || r > ROUT)
+		return vec4(0.0);
+	float omega = pow(r, -1.5);
+	float g = sqrt(1.0 - 3.0 / r) / (1.0 - omega * xi);
+	float flux = (1.0 - sqrt(RIN / r)) / (r * r * r) / 2.63e-4;
+	float kelvin = 5900.0 * pow(max(flux, 0.0), 0.25);
+	/*
+	** SWIRLS ORBIT AT THE LOCAL KEPLER SPEED (THE INSIDE OVERTAKES THE OUTSIDE).
+	** TWO LAYERS TAKE TURNS, EACH LIVING u_life SECONDS (= THE LOOP), FADING
+	** OUT BEFORE THE SHEAR WINDS IT TOO TIGHT, SO THE VIDEO LOOPS SEAMLESSLY.
+	*/
+	float angle = atan(p.z, p.x);
+	float swirl = 0.0;
+	float fine = 0.0;
+	float weight = 0.0;
+	for (int k = 0; k < 2; k++)
+	{
+		float age = mod(u_time + float(k) * u_life * 0.5, u_life);
+		float w = sin(3.14159265 * age / u_life);
+		float a = angle - omega * age * 7.0 - float(k) * 1.7;
+		vec3 q = vec3(cos(a) * 2.4, sin(a) * 2.4, log(r) * 10.0 + float(k) * 23.0);
+		swirl += w * (fbm(q) * 0.75 + fbm(q * vec3(1.0, 1.0, 3.0)) * 0.35);
+		fine += w * fbm(q * vec3(2.5, 2.5, 9.0) + 40.0);
+		weight += w;
+	}
+	swirl /= max(weight, 0.001);
+	fine /= max(weight, 0.001);
+	float edge = smoothstep(RIN, RIN + 0.45, r) * (1.0 - smoothstep(ROUT * 0.5, ROUT, r));
+	float dense = smoothstep(0.2, 0.85, swirl) * mix(0.75, 1.15, smoothstep(0.3, 0.7, fine));
+	vec3 light = blackbody(kelvin * g) * flux * g * g * g * g * mix(0.25, 1.6, dense) * edge * 3.0;
+	float cover = clamp(edge * mix(0.45, 0.97, dense), 0.0, 1.0);
+	return vec4(light, cover);
+}
+
+void main()
+{
+	vec2 p = (gl_FragCoord.xy + u_jitter - 0.5 * u_size) / u_size.y - vec2(0.0, u_shift);
+	vec3 dir = normalize(-u_back + (p.x * u_right + p.y * u_up) * 2.0 * u_zoom);
+	float r0 = length(u_eye);
+	vec3 e1 = u_eye / r0;
+	vec3 n = cross(e1, dir);
+	float sin_a = length(n);
+	if (sin_a < 1e-6)
+	{
+		n = normalize(cross(e1, vec3(0.0001, 1.0, 0.0)));
+		sin_a = 1e-6;
+	}
+	else
+		n /= sin_a;
+	vec3 e2 = cross(n, e1);
+	float cos_a = dot(dir, e1);
+	float u = 1.0 / r0;
+	float lapse = sqrt(1.0 - 2.0 * u);
+	/* THE CAMERA HOVERS IN PLACE: ITS RAY ANGLE GIVES u' AND THE IMPACT PARAMETER */
+	float du = -u * lapse * cos_a / sin_a;
+	float b = r0 * sin_a / lapse;
+	float xi = -b * n.y;
+	float c = 1.0;
+	float s = 0.0;
+	vec3 col = vec3(0.0);
+	float see = 1.0;
+	vec3 prev = u_eye;
+	bool escaped = false;
+	vec3 away = dir;
+	for (int i = 0; i < STEPS; i++)
+	{
+		float h = mix(H_FAR, H_NEAR, smoothstep(0.12, 0.34, u));
+		float acc = -u + 3.0 * u * u;
+		float next = u + du * h + 0.5 * acc * h * h;
+		du += 0.5 * (acc - next + 3.0 * next * next) * h;
+		/* TURN (c, s) BY h WITHOUT CALLING sin / cos */
+		float h2 = h * h;
+		float ch = 1.0 - h2 * 0.5 + h2 * h2 / 24.0;
+		float sh = h - h2 * h / 6.0;
+		float cn = c * ch - s * sh;
+		float sn = s * ch + c * sh;
+		if (next <= 0.0)
+		{
+			/* GONE TO INFINITY: ITS FINAL DIRECTION IS WHERE u REACHES 0 */
+			float f = u / (u - next);
+			away = normalize(mix(c * e1 + s * e2, cn * e1 + sn * e2, f));
+			escaped = true;
+			break;
+		}
+		u = next;
+		float k = inversesqrt(cn * cn + sn * sn);
+		c = cn * k;
+		s = sn * k;
+		if (u >= 0.5)
+			break;
+		vec3 pos = (c * e1 + s * e2) / u;
+		if (prev.y * pos.y < 0.0 && see > 0.003)
+		{
+			vec3 hit = mix(prev, pos, prev.y / (prev.y - pos.y));
+			vec4 d = disc(hit, xi);
+			col += see * d.rgb;
+			see *= 1.0 - d.a;
+		}
+		prev = pos;
+	}
+	if (escaped)
+		col += see * sky(away);
+	/* A BROKEN PIXEL (NaN / INFINITY) MUST NEVER REACH THE GLOW */
+	if (any(isnan(col)) || any(isinf(col)))
+		col = vec3(0.0);
+	out_color = vec4(clamp(col, 0.0, 60.0) * u_weight, 1.0);
+}
+`;
+
+/* ONLY WHAT IS BRIGHTER THAN THE THRESHOLD GLOWS (SOFT KNEE) */
+const BRIGHT = `#version 300 es
+precision highp float;
+uniform sampler2D u_image;
+uniform float u_threshold;
+in vec2 v_uv;
+out vec4 out_color;
+void main()
+{
+	vec3 c = texture(u_image, v_uv).rgb;
+	float l = max(c.r, max(c.g, c.b));
+	float knee = 0.5;
+	float soft = clamp(l - u_threshold + knee, 0.0, 2.0 * knee);
+	soft = soft * soft / (4.0 * knee + 0.0001);
+	float keep = max(soft, l - u_threshold) / max(l, 0.0001);
+	out_color = vec4(c * keep, 1.0);
+}`;
+
+/* HALF THE SIZE, FOUR READS (A SMOOTH 4x4 BOX) */
+const DOWN = `#version 300 es
+precision highp float;
+uniform sampler2D u_image;
+uniform vec2 u_texel;
+in vec2 v_uv;
+out vec4 out_color;
+void main()
+{
+	vec3 c = texture(u_image, v_uv + u_texel * vec2(-1.0, -1.0)).rgb;
+	c += texture(u_image, v_uv + u_texel * vec2(1.0, -1.0)).rgb;
+	c += texture(u_image, v_uv + u_texel * vec2(-1.0, 1.0)).rgb;
+	c += texture(u_image, v_uv + u_texel * vec2(1.0, 1.0)).rgb;
+	out_color = vec4(c * 0.25, 1.0);
+}`;
+
+/* A SEPARABLE GAUSSIAN, 9 TAPS IN 5 LINEAR READS */
+const BLUR = `#version 300 es
+precision highp float;
+uniform sampler2D u_image;
+uniform vec2 u_step;
+in vec2 v_uv;
+out vec4 out_color;
+void main()
+{
+	vec3 c = texture(u_image, v_uv).rgb * 0.2270270270;
+	c += texture(u_image, v_uv + u_step * 1.3846153846).rgb * 0.3162162162;
+	c += texture(u_image, v_uv - u_step * 1.3846153846).rgb * 0.3162162162;
+	c += texture(u_image, v_uv + u_step * 3.2307692308).rgb * 0.0702702703;
+	c += texture(u_image, v_uv - u_step * 3.2307692308).rgb * 0.0702702703;
+	out_color = vec4(c, 1.0);
+}`;
+
+/* THE PICTURE AND ITS GLOWS, FILMIC TONE MAPPING, A TOUCH OF LENS COLOUR FRINGE, VIGNETTE, DITHER */
+const FINAL = `#version 300 es
+precision highp float;
+uniform sampler2D u_image;
+uniform sampler2D u_glow0;
+uniform sampler2D u_glow1;
+uniform sampler2D u_glow2;
+uniform sampler2D u_glow3;
+uniform sampler2D u_glow4;
+uniform sampler2D u_glow5;
+uniform float u_exposure;
+in vec2 v_uv;
+out vec4 out_color;
+vec3 aces(vec3 x)
+{
+	return clamp((x * (2.51 * x + 0.03)) / (x * (2.43 * x + 0.59) + 0.14), 0.0, 1.0);
+}
+void main()
+{
+	vec2 d = v_uv - 0.5;
+	float r2 = dot(d, d);
+	vec2 off = d * r2 * 0.004;
+	vec3 c = vec3(texture(u_image, v_uv + off).r, texture(u_image, v_uv).g, texture(u_image, v_uv - off).b);
+	vec3 glow = texture(u_glow0, v_uv).rgb * 0.20 + texture(u_glow1, v_uv).rgb * 0.20 + texture(u_glow2, v_uv).rgb * 0.17
+		+ texture(u_glow3, v_uv).rgb * 0.14 + texture(u_glow4, v_uv).rgb * 0.12 + texture(u_glow5, v_uv).rgb * 0.10;
+	c = aces((c + glow) * u_exposure);
+	c *= 1.0 - 0.32 * smoothstep(0.12, 0.62, r2 * 1.6);
+	c = pow(c, vec3(1.0 / 2.2));
+	c += (fract(sin(dot(gl_FragCoord.xy, vec2(12.9898, 78.233))) * 43758.5453) - 0.5) / 255.0;
+	out_color = vec4(c, 1.0);
+}`;
+
+/* PREVIEW: ROUGH AND QUICK. RENDER: TINY STEPS, MORE DETAIL */
+const QUALITY = {
+	preview: "#define STEPS 520\n#define H_FAR 0.05\n#define H_NEAR 0.014\n#define OCTAVES 5\n",
+	render: "#define STEPS 3200\n#define H_FAR 0.016\n#define H_NEAR 0.0045\n#define OCTAVES 7\n"
+};
+
+const canvas = document.getElementById("view");
+const gl = canvas.getContext("webgl2", { antialias: false, alpha: false, depth: false, preserveDrawingBuffer: true, powerPreference: "high-performance" });
+const canFloat = !!(gl && gl.getExtension("EXT_color_buffer_float"));
+
+function compile(type, source)
+{
+	const shader = gl.createShader(type);
+	gl.shaderSource(shader, source);
+	gl.compileShader(shader);
+	if (!gl.getShaderParameter(shader, gl.COMPILE_STATUS))
+		throw new Error(gl.getShaderInfoLog(shader));
+	return shader;
+}
+
+function program(fragment)
+{
+	const p = gl.createProgram();
+	gl.attachShader(p, compile(gl.VERTEX_SHADER, VERTEX));
+	gl.attachShader(p, compile(gl.FRAGMENT_SHADER, fragment));
+	gl.bindAttribLocation(p, 0, "position");
+	gl.linkProgram(p);
+	if (!gl.getProgramParameter(p, gl.LINK_STATUS))
+		throw new Error(gl.getProgramInfoLog(p));
+	const uniforms = {};
+	const count = gl.getProgramParameter(p, gl.ACTIVE_UNIFORMS);
+	for (let i = 0; i < count; i++)
+	{
+		const info = gl.getActiveUniform(p, i);
+		uniforms[info.name] = gl.getUniformLocation(p, info.name);
+	}
+	return { p, u: uniforms };
+}
+
+const head = "#version 300 es\nprecision highp float;\n";
+let programs = null;
+
+function buildPrograms()
+{
+	programs = {
+		preview: program(head + QUALITY.preview + COMMON + SCENE),
+		render: program(head + QUALITY.render + COMMON + SCENE),
+		bright: program(BRIGHT),
+		down: program(DOWN),
+		blur: program(BLUR),
+		final: program(FINAL)
+	};
+	gl.bindVertexArray(gl.createVertexArray());
+	gl.bindBuffer(gl.ARRAY_BUFFER, gl.createBuffer());
+	gl.bufferData(gl.ARRAY_BUFFER, new Float32Array([-1, -1, 3, -1, -1, 3]), gl.STATIC_DRAW);
+	gl.enableVertexAttribArray(0);
+	gl.vertexAttribPointer(0, 2, gl.FLOAT, false, 0, 0);
+}
+
+function target(w, h)
+{
+	const texture = gl.createTexture();
+	gl.bindTexture(gl.TEXTURE_2D, texture);
+	gl.texParameteri(gl.TEXTURE_2D, gl.TEXTURE_MIN_FILTER, gl.LINEAR);
+	gl.texParameteri(gl.TEXTURE_2D, gl.TEXTURE_MAG_FILTER, gl.LINEAR);
+	gl.texParameteri(gl.TEXTURE_2D, gl.TEXTURE_WRAP_S, gl.CLAMP_TO_EDGE);
+	gl.texParameteri(gl.TEXTURE_2D, gl.TEXTURE_WRAP_T, gl.CLAMP_TO_EDGE);
+	gl.texImage2D(gl.TEXTURE_2D, 0, gl.RGBA16F, w, h, 0, gl.RGBA, gl.HALF_FLOAT, null);
+	const buffer = gl.createFramebuffer();
+	gl.bindFramebuffer(gl.FRAMEBUFFER, buffer);
+	gl.framebufferTexture2D(gl.FRAMEBUFFER, gl.COLOR_ATTACHMENT0, gl.TEXTURE_2D, texture, 0);
+	return { texture, buffer, w, h };
+}
+
+function free(t)
+{
+	if (!t)
+		return;
+	gl.deleteTexture(t.texture);
+	gl.deleteFramebuffer(t.buffer);
+}
+
+/* THE PICTURE, AND SIX GLOW LEVELS, EACH HALF THE SIZE OF THE ONE BEFORE */
+let targets = null;
+
+function resizePipeline(w, h)
+{
+	canvas.width = w;
+	canvas.height = h;
+	if (targets && targets.w === w && targets.h === h)
+		return;
+	if (targets)
+	{
+		free(targets.image);
+		targets.levels.forEach(l => { free(l.a); free(l.b); });
+	}
+	const levels = [];
+	let lw = w;
+	let lh = h;
+	for (let i = 0; i < 6; i++)
+	{
+		lw = Math.max(4, lw >> 1);
+		lh = Math.max(4, lh >> 1);
+		levels.push({ a: target(lw, lh), b: target(lw, lh) });
+	}
+	targets = { w, h, image: target(w, h), levels };
+}
+
+function bind(t)
+{
+	gl.bindFramebuffer(gl.FRAMEBUFFER, t ? t.buffer : null);
+	gl.viewport(0, 0, t ? t.w : canvas.width, t ? t.h : canvas.height);
+}
+
+function draw(prog, t, textures, set)
+{
+	bind(t);
+	gl.useProgram(prog.p);
+	textures.forEach((tex, i) =>
+	{
+		gl.activeTexture(gl.TEXTURE0 + i);
+		gl.bindTexture(gl.TEXTURE_2D, tex[1].texture);
+		gl.uniform1i(prog.u[tex[0]], i);
+	});
+	if (set)
+		set(prog.u);
+	gl.drawArrays(gl.TRIANGLES, 0, 3);
+}
+
+/* THE CAMERA: A SLOW SWAY THAT COMES BACK TO WHERE IT STARTED EVERY LOOP */
+function camera(key, t)
+{
+	const s = SCENES[key];
+	const turn = 0.1 * Math.sin(TAU * t / LOOP);
+	const lift = (7.5 + 1.1 * Math.sin(TAU * t / LOOP + 1.3)) * Math.PI / 180;
+	const eye = [Math.cos(turn) * Math.cos(lift) * s.distance, Math.sin(lift) * s.distance, Math.sin(turn) * Math.cos(lift) * s.distance];
+	const len = Math.hypot(eye[0], eye[1], eye[2]);
+	const back = eye.map(v => v / len);
+	const r = [back[2], 0, -back[0]];
+	const rl = Math.hypot(r[0], r[2]);
+	const right = [r[0] / rl, 0, r[2] / rl];
+	const up = [back[1] * right[2] - back[2] * right[1], back[2] * right[0] - back[0] * right[2], back[0] * right[1] - back[1] * right[0]];
+	return { eye, back, right, up };
+}
+
+/* R2 SUB-PIXEL OFFSETS: EVEN COVERAGE FOR ANY NUMBER OF RAYS PER PIXEL */
+function jitter(i, n)
+{
+	if (n === 1)
+		return [0, 0];
+	const g = 1.32471795724474602596;
+	return [((0.5 + i / g) % 1) - 0.5, ((0.5 + i / (g * g)) % 1) - 0.5];
+}
+
+/*
+** ONE FRAME. THE RAYS ARE TRACED IN HORIZONTAL STRIPS, SO NO SINGLE DRAW
+** TAKES LONG ENOUGH FOR THE OPERATING SYSTEM TO THINK THE GPU HAS HUNG.
+*/
+async function drawAt(key, t, quality, samples)
+{
+	const s = SCENES[key];
+	const cam = camera(key, t);
+	const scene = programs[quality];
+	const img = targets.image;
+	const strips = quality === "render" ? Math.max(1, Math.ceil(img.h / 180)) : 1;
+
+	bind(img);
+	gl.clearColor(0, 0, 0, 1);
+	gl.clear(gl.COLOR_BUFFER_BIT);
+	gl.enable(gl.BLEND);
+	gl.blendFunc(gl.ONE, gl.ONE);
+	gl.enable(gl.SCISSOR_TEST);
+	gl.useProgram(scene.p);
+	gl.uniform2f(scene.u.u_size, img.w, img.h);
+	gl.uniform1f(scene.u.u_time, t);
+	gl.uniform1f(scene.u.u_life, LOOP);
+	gl.uniform3fv(scene.u.u_eye, cam.eye);
+	gl.uniform3fv(scene.u.u_right, cam.right);
+	gl.uniform3fv(scene.u.u_up, cam.up);
+	gl.uniform3fv(scene.u.u_back, cam.back);
+	gl.uniform1f(scene.u.u_zoom, s.zoom);
+	gl.uniform1f(scene.u.u_shift, s.shift);
+	gl.uniform1f(scene.u.u_weight, 1 / samples);
+	for (let i = 0; i < samples; i++)
+	{
+		const j = jitter(i, samples);
+		gl.uniform2f(scene.u.u_jitter, j[0], j[1]);
+		for (let k = 0; k < strips; k++)
+		{
+			const y0 = Math.floor(k * img.h / strips);
+			const y1 = Math.floor((k + 1) * img.h / strips);
+			gl.scissor(0, y0, img.w, y1 - y0);
+			gl.drawArrays(gl.TRIANGLES, 0, 3);
+			if (quality === "render")
+				gl.flush();
+		}
+	}
+	gl.disable(gl.SCISSOR_TEST);
+	gl.disable(gl.BLEND);
+
+	/* THE GLOW: BRIGHT PARTS, THEN DOWN THE LEVELS, EACH BLURRED */
+	const L = targets.levels;
+	draw(programs.bright, L[0].a, [["u_image", img]], u => gl.uniform1f(u.u_threshold, 1.25));
+	for (let i = 0; i < L.length; i++)
+	{
+		if (i > 0)
+			draw(programs.down, L[i].a, [["u_image", L[i - 1].a]], u => gl.uniform2f(u.u_texel, 0.5 / L[i - 1].a.w, 0.5 / L[i - 1].a.h));
+		draw(programs.blur, L[i].b, [["u_image", L[i].a]], u => gl.uniform2f(u.u_step, 1 / L[i].a.w, 0));
+		draw(programs.blur, L[i].a, [["u_image", L[i].b]], u => gl.uniform2f(u.u_step, 0, 1 / L[i].a.h));
+	}
+	draw(programs.final, null, [["u_image", img], ["u_glow0", L[0].a], ["u_glow1", L[1].a], ["u_glow2", L[2].a], ["u_glow3", L[3].a], ["u_glow4", L[4].a], ["u_glow5", L[5].a]], u => gl.uniform1f(u.u_exposure, 1.0));
+}
+
+/* ========================================================================== */
+/* PREVIEW                                                                    */
+/* ========================================================================== */
+
+let sceneKey = "BLACKHOLE_WIDE";
+let previewing = true;
+let busy = false;
+let started = performance.now();
+let previewBusy = false;
+
+function previewSize()
+{
+	const tall = SCENES[sceneKey].tall;
+	const stage = document.getElementById("stage");
+	stage.style.aspectRatio = tall ? "9 / 16" : "16 / 9";
+	stage.style.maxWidth = tall ? "420px" : "";
+	stage.style.margin = tall ? "0 auto" : "";
+	const r = stage.getBoundingClientRect();
+	const scale = 0.5;
+	return { w: Math.max(160, Math.round(r.width * scale / 2) * 2), h: Math.max(160, Math.round(r.height * scale / 2) * 2) };
+}
+
+async function previewLoop()
+{
+	requestAnimationFrame(previewLoop);
+	if (!previewing || busy || previewBusy || !programs)
+		return;
+	previewBusy = true;
+	const size = previewSize();
+	resizePipeline(size.w, size.h);
+	const t = ((performance.now() - started) / 1000) % LOOP;
+	await drawAt(sceneKey, t, "preview", 1);
+	previewBusy = false;
+}
+
+/* ========================================================================== */
+/* ENCODING                                                                   */
+/* ========================================================================== */
+
+async function pickCodec(list, w, h, bitrate, isMp4)
+{
+	if (typeof VideoEncoder === "undefined")
+		return null;
+	/*
+	** FIRST CHOICE: THE SAME QUALITY FOR EVERY FRAME ("QUANTIZER" MODE), SO
+	** THE FINE GRAIN NEVER JUMPS WHERE THE LOOP STARTS AGAIN. BROWSERS
+	** WITHOUT IT FALL BACK TO A BITRATE TARGET.
+	*/
+	for (const mode of ["quantizer", "variable"])
+	{
+		for (const codec of list)
+		{
+			const config = { codec, width: w, height: h, framerate: FPS, latencyMode: "quality", bitrateMode: mode };
+			if (mode !== "quantizer")
+				config.bitrate = bitrate;
+			if (isMp4)
+				config.avc = { format: "avc" };
+			try
+			{
+				const r = await VideoEncoder.isConfigSupported(config);
+				if (r.supported)
+					return config;
+			}
+			catch (e) {}
+		}
+	}
+	return null;
+}
+
+async function supportReport()
+{
+	const box = document.getElementById("support");
+	if (!gl || !canFloat)
+	{
+		box.innerHTML = "<span class='warn'>This browser cannot draw the black hole (it needs WebGL 2 with float render targets). Please use Chrome or Edge on a desktop.</span>";
+		document.getElementById("render").disabled = true;
+		document.getElementById("renderAll").disabled = true;
+		return;
+	}
+	if (typeof VideoEncoder === "undefined")
+	{
+		box.innerHTML = "<span class='warn'>This browser cannot encode video (no WebCodecs). Please use Chrome or Edge on a desktop.</span>";
+		document.getElementById("render").disabled = true;
+		document.getElementById("renderAll").disabled = true;
+		return;
+	}
+	const parts = [];
+	for (const res of [1440, 1080, 720])
+	{
+		for (const fmt of ["mp4", "webm"])
+		{
+			const o = OUT[res];
+			const ok = await pickCodec(o[fmt], o.long, o.short, o.bitrate[fmt], fmt === "mp4");
+			parts.push(`${res}p ${fmt.toUpperCase()} ${ok ? (ok.bitrateMode === "quantizer" ? "✓ steady quality" : "✓") : "<span class='warn'>not supported here</span>"}`);
+		}
+	}
+	box.innerHTML = parts.join(" · ");
+}
+
+const files = [];
+
+function addFile(name, blob)
+{
+	files.push({ name, blob });
+	const list = document.getElementById("files");
+	if (files.length === 1)
+		list.innerHTML = "";
+	const a = document.createElement("a");
+	a.href = URL.createObjectURL(blob);
+	a.download = name;
+	a.innerHTML = `<span>${name}</span><small>${(blob.size / 1048576).toFixed(2)} MB</small>`;
+	list.appendChild(a);
+	document.getElementById("download").disabled = false;
+}
+
+function setStatus(text, progress)
+{
+	document.getElementById("status").textContent = text;
+	if (progress !== undefined)
+		document.getElementById("bar").style.width = (progress * 100).toFixed(1) + "%";
+}
+
+const tick = () => new Promise(r => setTimeout(r, 0));
+const samples = () => Number(document.getElementById("samples").value);
+
+/* THE FIRST FRAME AT FULL QUALITY, AS THE STILL SHOWN WHILE THE VIDEO LOADS */
+async function renderPoster(key)
+{
+	const big = frameSize(key, 1080);
+	resizePipeline(big.w, big.h);
+	setStatus(`${SCENES[key].title}: drawing the poster…`);
+	await drawAt(key, 0, "render", samples());
+	addFile(`${key}_POSTER.webp`, await new Promise(r => canvas.toBlob(r, "image/webp", 0.9)));
+	const small = frameSize(key, 720);
+	const off = new OffscreenCanvas(small.w, small.h);
+	const octx = off.getContext("2d");
+	octx.imageSmoothingQuality = "high";
+	octx.drawImage(canvas, 0, 0, small.w, small.h);
+	addFile(`${key}_POSTER_720.webp`, await off.convertToBlob({ type: "image/webp", quality: 0.86 }));
+}
+
+async function renderScene(key, count = FRAMES)
+{
+	const quality = Number(document.getElementById("quality").value);
+	const want = [];
+	const sizes = [1440, 1080, 720].filter(res => document.getElementById("r" + res).checked);
+	if (!sizes.length)
+	{
+		setStatus("Pick at least one size.");
+		return;
+	}
+	/* DRAW ONCE AT THE BIGGEST SIZE; SMALLER FILES GET A HIGH-QUALITY SCALED COPY */
+	const top = frameSize(key, sizes[0]);
+	for (const res of sizes)
+	{
+		for (const fmt of ["mp4", "webm"])
+		{
+			if (!document.getElementById("f" + fmt).checked)
+				continue;
+			const size = frameSize(key, res);
+			const spec = OUT[res];
+			const config = await pickCodec(spec[fmt], size.w, size.h, Math.round(spec.bitrate[fmt] * quality), fmt === "mp4");
+			if (!config)
+				continue;
+			const tgt = fmt === "mp4" ? new Mp4Target() : new WebmTarget();
+			const muxer = fmt === "mp4"
+				? new Mp4Muxer({ target: tgt, video: { codec: "avc", width: size.w, height: size.h, frameRate: FPS }, fastStart: "in-memory", firstTimestampBehavior: "offset" })
+				: new WebmMuxer({ target: tgt, video: { codec: "V_VP9", width: size.w, height: size.h, frameRate: FPS }, firstTimestampBehavior: "offset" });
+			let failure = null;
+			const encoder = new VideoEncoder({ output: (chunk, meta) => muxer.addVideoChunk(chunk, meta), error: e => { failure = e; } });
+			encoder.configure(config);
+			/* QUANTIZER MODE: LOWER = SHARPER AND BIGGER. THE SLIDER MOVES IT. */
+			const q = fmt === "mp4"
+				? Math.max(12, Math.min(40, 22 - Math.round((quality - 1) * 6)))
+				: Math.max(8, Math.min(56, 28 - Math.round((quality - 1) * 10)));
+			const options = config.bitrateMode === "quantizer"
+				? (keyFrame => fmt === "mp4" ? { keyFrame, avc: { quantizer: q } } : { keyFrame, vp9: { quantizer: q } })
+				: (keyFrame => ({ keyFrame }));
+			const scaled = (size.w === top.w && size.h === top.h) ? null : new OffscreenCanvas(size.w, size.h);
+			const sctx = scaled ? scaled.getContext("2d") : null;
+			if (sctx)
+				sctx.imageSmoothingQuality = "high";
+			want.push({ res, fmt, size, tgt, muxer, encoder, options, scaled, sctx, get failure() { return failure; } });
+		}
+	}
+	if (!want.length)
+	{
+		setStatus("Nothing to render: pick a size and a format this browser supports.");
+		return;
+	}
+
+	resizePipeline(top.w, top.h);
+	const n = samples();
+	const t0 = performance.now();
+	for (let f = 0; f < count; f++)
+	{
+		await drawAt(key, f / FPS, "render", n);
+		const timestamp = Math.round(f * 1e6 / FPS);
+		const duration = Math.round((f + 1) * 1e6 / FPS) - timestamp;
+		/* ONE KEYFRAME PER LOOP: THE FINE GRAIN NEVER "BREATHES" */
+		const keyFrame = f === 0;
+		const full = new VideoFrame(canvas, { timestamp, duration });
+		for (const o of want)
+		{
+			if (o.failure)
+				throw o.failure;
+			if (o.scaled)
+			{
+				o.sctx.drawImage(canvas, 0, 0, o.size.w, o.size.h);
+				const frame = new VideoFrame(o.scaled, { timestamp, duration });
+				o.encoder.encode(frame, o.options(keyFrame));
+				frame.close();
+			}
+			else
+				o.encoder.encode(full, o.options(keyFrame));
+		}
+		full.close();
+		while (want.some(o => o.encoder.encodeQueueSize > 3))
+			await new Promise(r => setTimeout(r, 1));
+		const spent = (performance.now() - t0) / 1000;
+		const left = spent / (f + 1) * (count - f - 1);
+		setStatus(`${SCENES[key].title}: frame ${f + 1} / ${count} · about ${Math.ceil(left / 60)} min left`, (f + 1) / count);
+		await tick();
+	}
+	setStatus(`${SCENES[key].title}: finishing the files…`, 1);
+	for (const o of want)
+	{
+		await o.encoder.flush();
+		o.encoder.close();
+		o.muxer.finalize();
+		addFile(`${key}_${o.res}.${o.fmt}`, new Blob([o.tgt.buffer], { type: o.fmt === "mp4" ? "video/mp4" : "video/webm" }));
+	}
+	await renderPoster(key);
+	setStatus(`${SCENES[key].title}: done in ${Math.round((performance.now() - t0) / 60000)} min.`, 1);
+}
+
+async function run(keys)
+{
+	busy = true;
+	document.querySelectorAll("button").forEach(b => b.disabled = true);
+	document.getElementById("badge").textContent = "Rendering";
+	try
+	{
+		for (const key of keys)
+			await renderScene(key);
+	}
+	catch (e)
+	{
+		console.error(e);
+		setStatus("Something went wrong: " + (e && e.message ? e.message : e));
+	}
+	busy = false;
+	document.querySelectorAll("button").forEach(b => b.disabled = false);
+	document.getElementById("download").disabled = files.length === 0;
+	document.getElementById("badge").textContent = previewing ? "Preview" : "Paused";
+	started = performance.now();
+}
+
+/* ========================================================================== */
+/* UI                                                                         */
+/* ========================================================================== */
+
+{
+	const box = document.getElementById("scenes");
+	for (const [key, info] of Object.entries(SCENES))
+	{
+		const label = document.createElement("label");
+		label.className = "scene";
+		label.innerHTML = `<input type="radio" name="scene" value="${key}" ${key === sceneKey ? "checked" : ""}><b>${info.title}</b><small>${info.text}</small>`;
+		label.querySelector("input").addEventListener("change", () =>
+		{
+			sceneKey = key;
+			started = performance.now();
+		});
+		box.appendChild(label);
+	}
+	const q = document.getElementById("quality");
+	const showQ = () => { document.getElementById("qv").textContent = `×${Number(q.value).toFixed(1)}`; };
+	q.addEventListener("input", showQ);
+	showQ();
+	const s = document.getElementById("samples");
+	const showS = () => { document.getElementById("sv").textContent = `${s.value}`; };
+	s.addEventListener("input", showS);
+	showS();
+
+	document.getElementById("preview").onclick = e =>
+	{
+		previewing = !previewing;
+		e.target.textContent = previewing ? "Pause preview" : "Play preview";
+		document.getElementById("badge").textContent = previewing ? "Preview" : "Paused";
+	};
+	document.getElementById("render").onclick = () => run([sceneKey]);
+	document.getElementById("renderAll").onclick = () => run(Object.keys(SCENES));
+	document.getElementById("poster").onclick = async () =>
+	{
+		busy = true;
+		await renderPoster(sceneKey);
+		busy = false;
+		setStatus("Poster ready.");
+	};
+	document.getElementById("download").onclick = async () =>
+	{
+		for (const f of files)
+		{
+			const a = document.createElement("a");
+			a.href = URL.createObjectURL(f.blob);
+			a.download = f.name;
+			a.click();
+			await new Promise(r => setTimeout(r, 350));
+		}
+	};
+}
+
+if (gl && canFloat)
+{
+	try
+	{
+		buildPrograms();
+	}
+	catch (e)
+	{
+		console.error(e);
+		setStatus("The shaders did not compile: " + e.message);
+	}
+}
+supportReport();
+previewLoop();
+
+/* FOR AUTOMATION (HEADLESS TESTS / FRAME DUMPS) */
+window.RECORDER = {
+	FRAMES, FPS, LOOP, SCENES,
+	use(key, w, h) { previewing = false; busy = true; sceneKey = key; const s = w ? { w, h } : frameSize(key, 1080); resizePipeline(s.w, s.h); },
+	async frame(f, quality = "render", n = samples()) { await drawAt(sceneKey, f / FPS, quality, n); },
+	async png() { return await new Promise(r => canvas.toBlob(b => { const fr = new FileReader(); fr.onload = () => r(fr.result); fr.readAsDataURL(b); }, "image/png")); },
+	renderScene, renderPoster, files
+};
+</script>
+</body>
+</html>

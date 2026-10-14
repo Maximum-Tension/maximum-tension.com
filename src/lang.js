@@ -173,6 +173,12 @@ const	lang_table = {
 		702: "Our code on GitHub",
 
 		800: "All rights reserved.",
+
+		900: "Page not found - Maximum Tension",
+		901: "This page fell into a black hole.",
+		902: "Whatever was here crossed the event horizon. Nothing comes back out from there, but you still can.",
+		903: "Back to the homepage",
+		904: "Ray traced frame by frame: every pixel follows rays of light around a black hole. The disc glows hotter and bluer on the side that moves towards you.",
 		801: "Back to the top"
 	}, /* en */
 	"tr": {
@@ -332,6 +338,12 @@ const	lang_table = {
 		702: "Kodumuz GitHub'da",
 
 		800: "Tüm hakları saklıdır.",
+
+		900: "Sayfa bulunamadı - Maximum Tension",
+		901: "Bu sayfa bir kara deliğe düştü.",
+		902: "Burada ne varsa olay ufkunu geçti. Oradan hiçbir şey geri dönmez, ama siz hâlâ dönebilirsiniz.",
+		903: "Ana sayfaya dön",
+		904: "Kare kare ışın izlemeyle hesaplandı: her piksel, bir kara deliğin etrafında bükülen ışık ışınlarını izler. Disk, size doğru dönen tarafta daha sıcak ve daha mavi parlar.",
 		801: "Başa dön"
 	} /* tr */
 };

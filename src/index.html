@@ -21,7 +21,7 @@
 <!--#|___________|_________________|#-->
 <!--#|    Create | 2026/10/14      |#-->
 <!--#|___________|_________________|#-->
-<!--#|    Update | 2026/10/14      |#-->
+<!--#|    Update | 2026/10/15      |#-->
 <!--#|___________|_________________|#-->
 <!--#################################-->
 <html lang="en" data-mode="glass">
@@ -137,6 +137,26 @@
   <!--[if !IE]>-->
    <script type="text/javascript" src="js/JS.js"></script>
   <!--<![endif]-->
+  <SCRIPT TYPE="text/javascript">
+if (
+	(
+		window.matchMedia &&
+		window.matchMedia("(prefers-color-scheme: dark)").matches
+	) === true
+)
+{
+	DOM.GET.ID("favicon").href =
+		"${MW_URL}/FAVICONS/favicon-dark.ico";
+	DOM.GET.ID("FAVICON_16").href =
+		"${MW_URL}/FAVICONS/favicon-16x16-DARK.png";
+	DOM.GET.ID("FAVICON_16_SHORTCUT").href =
+		"${MW_URL}/FAVICONS/favicon-16x16-DARK.png";
+	DOM.GET.ID("FAVICON_16_SIZES").href =
+		"${MW_URL}/FAVICONS/favicon-16x16-DARK.png";
+	DOM.GET.ID("FAVICON_32").href =
+		"${MW_URL}/FAVICONS/favicon-32x32-DARK.png";
+}
+  </SCRIPT>
   <script type="text/javascript" src="lang.js"></script>
   <link rel="stylesheet" href="style.css"/>
  </head>
@@ -673,6 +693,7 @@ int main(void)
     </div>
    </div>
   </footer>
+  <script src="js/smooth_scroll.js"></script>
   <script src="pumpkin.js"></script>
   <script src="zip.js"></script>
   <script src="script.js"></script>

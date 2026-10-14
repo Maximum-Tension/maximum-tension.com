@@ -58,7 +58,7 @@ function minifyCss(css)
 
 async function main()
 {
-	for (const name of ["script.js", "lang.js", "pumpkin.js", "zip.js", "js/JS.js", "js/IE.js"])
+	for (const name of ["script.js", "lang.js", "pumpkin.js", "zip.js", "blackhole.js", "js/JS.js", "js/IE.js", "js/smooth_scroll.js"])
 	{
 		const text = fs.readFileSync(path.join(src, name), "utf8");
 		const [head, body] = header(text);
@@ -73,8 +73,9 @@ async function main()
 		fs.writeFileSync(path.join(root, "style.css"), head + minifyCss(body) + "\n");
 	}
 
+	for (const page of ["index.html", "404.html"])
 	{
-		const text = fs.readFileSync(path.join(src, "index.html"), "utf8");
+		const text = fs.readFileSync(path.join(src, page), "utf8");
 		const result = await minifyHtml(text, {
 			collapseWhitespace: true,
 			removeComments: true,
@@ -87,7 +88,7 @@ async function main()
 		});
 		/* THE ASCII HEADER STAYS LINE BY LINE, EXACTLY AS IN src/ */
 		const head = text.slice(0, text.indexOf("<html"));
-		fs.writeFileSync(path.join(root, "index.html"), head + result.slice(result.indexOf("<html")) + "\n");
+		fs.writeFileSync(path.join(root, page), head + result.slice(result.indexOf("<html")) + "\n");
 	}
 
 }

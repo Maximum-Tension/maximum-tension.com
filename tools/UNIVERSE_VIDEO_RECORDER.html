@@ -398,7 +398,7 @@ import { Muxer as WebmMuxer, ArrayBufferTarget as WebmTarget } from "webm-muxer"
 /* CONSTANTS                                                                  */
 /* ========================================================================== */
 
-const FPS = 30;
+const FPS = 60;
 const LOOP = 20;                      /* SECONDS - EVERY MOTION REPEATS EXACTLY */
 const FRAMES = FPS * LOOP;
 const TAU = Math.PI * 2;
@@ -618,7 +618,8 @@ function makeSky()
 				float a = fbm(d * 1.8 + vec3(3.0, 1.0, 7.0));
 				float b = fbm(d * 3.6 + vec3(11.0, 2.0, 5.0));
 				float c = fbm(d * 7.0 + vec3(2.0, 8.0, 1.0));
-				float lane = exp(-pow(dot(d, normalize(vec3(0.42, 0.85, -0.3))) * 2.6, 2.0));
+				float across = dot(d, normalize(vec3(0.42, 0.85, -0.3))) * 2.6;
+				float lane = exp(-across * across);
 				vec3 col = vec3(0.0035, 0.004, 0.011);
 				col += vec3(0.30, 0.10, 0.60) * pow(smoothstep(-0.1, 0.8, a), 2.0) * 0.22;
 				col += vec3(0.06, 0.28, 0.55) * pow(smoothstep(0.0, 0.8, b), 2.0) * 0.18;
@@ -857,8 +858,8 @@ function makeGiant(o)
 				col = mix(col, vec3(0.58, 0.32, 0.18), smoothstep(0.65, 0.95, b2) * 0.55);
 				col = mix(col, vec3(0.70, 0.48, 0.30), smoothstep(0.55, 0.9, abs(lat)) * 0.7);
 				/* THE STORM */
-				vec2 spot = vec2(atan(q.z, q.x) - 1.2, (q.y + 0.34) * 2.6);
-				float storm = smoothstep(0.32, 0.0, length(spot * vec2(1.0, 1.6)));
+				vec2 spot = vec2(atan(q.z, q.x + 1e-5) - 1.2, (q.y + 0.34) * 2.6);
+				float storm = 1.0 - smoothstep(0.0, 0.32, length(spot * vec2(1.0, 1.6)));
 				col = mix(col, vec3(0.78, 0.30, 0.16), storm * 0.85);
 				col *= 0.92 + 0.16 * fbm(q * 9.0);
 				vec3 N = normalize(vNormal);
@@ -873,10 +874,10 @@ function makeGiant(o)
 					if (tt > 0.0)
 					{
 						float rr = length(vWorld + uLight * tt - uCenterV) / uRadiusV;
-						lit *= 1.0 - 0.75 * smoothstep(uRingIn, uRingIn + 0.05, rr) * smoothstep(uRingOut, uRingOut - 0.05, rr);
+						lit *= 1.0 - 0.75 * smoothstep(uRingIn, uRingIn + 0.05, rr) * (1.0 - smoothstep(uRingOut - 0.05, uRingOut, rr));
 					}
 				}
-				float rim = pow(1.0 - max(dot(N, V), 0.0), 2.5);
+				float rim = pow(1.0 - clamp(dot(N, V), 0.0, 1.0), 2.5);
 				vec3 haze = vec3(1.0, 0.78, 0.5) * rim * smoothstep(-0.3, 0.6, ndl) * 0.9;
 				vec3 outCol = col * lit * 0.7 + haze * 0.5 + col * 0.01;
 				gl_FragColor = vec4(outCol, 1.0);
@@ -918,7 +919,7 @@ function makeGiant(o)
 		bg.fillRect(x, 0, 1, 1);
 	}
 	const bandTexture = new THREE.CanvasTexture(bands);
-	const ringUniforms = { uBands: { value: bandTexture }, uLight: { value: LIGHT.clone() }, uIn: { value: o.ring[0] }, uOut: { value: o.ring[1] }, uCenterV: uniforms.uCenterV, uRadiusV: uniforms.uRadiusV };
+	const ringUniforms = { uBands: { value: bandTexture }, uLight: { value: LIGHT.clone() }, uIn: { value: o.ring[0] }, uOut: { value: o.ring[1] }, uCenterV: uniforms.uCenterV, uRadiusV: uniforms.uRadiusV, uRingNormal: uniforms.uRingNormal };
 	const ring = new THREE.Mesh(new THREE.RingGeometry(o.ring[0], o.ring[1], 384, 1), new THREE.ShaderMaterial({
 		uniforms: ringUniforms,
 		transparent: true,
@@ -934,7 +935,7 @@ function makeGiant(o)
 				gl_Position = projectionMatrix * viewMatrix * w;
 			}`,
 		fragmentShader: `
-			uniform sampler2D uBands; uniform vec3 uLight; uniform float uIn, uOut; uniform vec3 uCenterV; uniform float uRadiusV;
+			uniform sampler2D uBands; uniform vec3 uLight; uniform float uIn, uOut; uniform vec3 uCenterV; uniform float uRadiusV; uniform vec3 uRingNormal;
 			varying vec3 vWorld; varying vec2 vLocal;
 			void main()
 			{
@@ -947,7 +948,7 @@ function makeGiant(o)
 				float c = dot(oc, oc) - uRadiusV * uRadiusV;
 				float h = b * b - c;
 				float shadow = (h > 0.0 && -b - sqrt(h) > 0.0) ? 0.12 : 1.0;
-				float lit = 0.35 + 0.65 * abs(dot(normalize(cross(dFdx(vWorld), dFdy(vWorld))), uLight));
+				float lit = 0.35 + 0.65 * abs(dot(uRingNormal, uLight));
 				vec3 col = mix(vec3(0.62, 0.48, 0.34), vec3(0.90, 0.82, 0.68), d) * (0.2 + 0.8 * d) * shadow * lit;
 				gl_FragColor = vec4(col * 0.62, d * 0.85);
 			}`
@@ -1009,7 +1010,7 @@ function makeWorld(o)
 				/* CITY LIGHTS ON THE NIGHT SIDE */
 				float city = smoothstep(0.55, 0.85, snoise(q * 38.0)) * smoothstep(0.1, 0.3, snoise(q * 6.0)) * land * (1.0 - polar);
 				lit += vec3(1.0, 0.62, 0.25) * city * (1.0 - day) * (1.0 - clouds) * 1.6;
-				float rim = pow(1.0 - max(dot(N, V), 0.0), 3.0);
+				float rim = pow(1.0 - clamp(dot(N, V), 0.0, 1.0), 3.0);
 				lit += vec3(0.30, 0.55, 1.0) * rim * smoothstep(-0.35, 0.5, ndl) * 1.4;
 				gl_FragColor = vec4(lit, 1.0);
 			}`
@@ -1030,7 +1031,7 @@ function makeWorld(o)
 			{
 				vec3 N = normalize(vNormal);
 				vec3 V = normalize(cameraPosition - vWorld);
-				float d = max(dot(N, V), 0.0);
+				float d = clamp(dot(N, V), 0.0, 1.0);
 				float glow = pow(1.0 - d, 4.0) * smoothstep(0.0, 0.22, d);
 				float lit = smoothstep(-0.35, 0.55, dot(N, uLight));
 				gl_FragColor = vec4(vec3(0.28, 0.55, 1.0) * glow * lit * 2.6, 1.0);
@@ -1197,6 +1198,25 @@ renderer.setPixelRatio(1);
 renderer.toneMapping = THREE.ACESFilmicToneMapping;
 renderer.outputColorSpace = THREE.SRGBColorSpace;
 
+/*
+** RIGHT AFTER THE SCENE, BEFORE THE GLOW: ANY BROKEN PIXEL (NaN OR INFINITY)
+** BECOMES BLACK, AND VERY HOT ONES ARE CAPPED. LEFT ALONE, THE BLOOM BLURS ONE
+** BROKEN PIXEL INTO A BLACK SQUARE FOR A FRAME.
+*/
+const CleanShader = {
+	uniforms: { tDiffuse: { value: null } },
+	vertexShader: `varying vec2 vUv; void main() { vUv = uv; gl_Position = projectionMatrix * modelViewMatrix * vec4(position, 1.0); }`,
+	fragmentShader: `
+		uniform sampler2D tDiffuse; varying vec2 vUv;
+		void main()
+		{
+			vec4 c = texture2D(tDiffuse, vUv);
+			if (any(isnan(c)) || any(isinf(c)))
+				c = vec4(0.0, 0.0, 0.0, 1.0);
+			gl_FragColor = vec4(clamp(c.rgb, 0.0, 48.0), 1.0);
+		}`
+};
+
 /* LAST STEP, ON THE FINISHED PICTURE: A SOFT VIGNETTE, A TOUCH OF COLOUR
 ** FRINGE AT THE EDGES, AND A STILL DITHER SO DARK GRADIENTS DO NOT BAND */
 const FinishShader = {
@@ -1231,6 +1251,7 @@ function buildPipeline(key, w, h)
 	const target = new THREE.WebGLRenderTarget(w, h, { type: THREE.HalfFloatType, samples: 4 });
 	const composer = new EffectComposer(renderer, target);
 	composer.addPass(new RenderPass(s.scene, s.camera));
+	composer.addPass(new ShaderPass(CleanShader));
 	const bloom = new UnrealBloomPass(new THREE.Vector2(w, h), s.bloom.strength, s.bloom.radius, s.bloom.threshold);
 	composer.addPass(bloom);
 	composer.addPass(new OutputPass());
