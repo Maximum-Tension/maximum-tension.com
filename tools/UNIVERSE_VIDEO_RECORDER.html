@@ -1,0 +1,1581 @@
+<!DOCTYPE html>
+<!--
+  Maximum Tension - Visual Universe background recorder
+  -----------------------------------------------------
+  Open this file in Chrome or Edge (desktop). Press "Render".
+  Every frame is drawn on a fixed clock (frame N = N / FPS s) and encoded in
+  the browser (WebCodecs), so the video is smooth however slow a frame is to
+  draw. The scene is a seamless 20 second loop: the galaxies turn half a turn
+  (every star has a twin half a turn away), planets and the moon turn once,
+  stars twinkle a whole number of times. Change FPS below to 60 for a
+  smoother video (twice the size).
+
+  Output:  UNIVERSE_1080.mp4 / .webm,  UNIVERSE_720.mp4 / .webm,
+           UNIVERSE_POSTER.webp / UNIVERSE_POSTER_720.webp (the first frame)
+  Put them in videos/ at the root of the site (the names already match;
+  the page picks 1080p or 720p, WebM or MP4, by itself).
+-->
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Maximum Tension universe recorder</title>
+<style>
+	:root
+	{
+		--bg: #000000;
+		--panel: rgba(236, 230, 216, 0.05);
+		--line: rgba(236, 230, 216, 0.14);
+		--text: #ECE6D8;
+		--muted: rgba(236, 230, 216, 0.6);
+		--pink: #FF7A1A;
+	}
+
+	*
+	{
+		box-sizing: border-box;
+	}
+
+	html, body
+	{
+		margin: 0;
+		min-height: 100%;
+		color: var(--text);
+		background:
+			radial-gradient(60% 50% at 20% 0%, rgba(122, 140, 255, 0.12), transparent 70%),
+			radial-gradient(50% 50% at 90% 100%, rgba(255, 122, 26, 0.10), transparent 70%),
+			var(--bg);
+		font: 15px/1.45 system-ui, -apple-system, "Segoe UI", Roboto, sans-serif;
+	}
+
+	main
+	{
+		gap: 24px;
+		display: grid;
+		padding: 24px;
+		grid-template-columns: minmax(0, 1fr) 360px;
+		align-items: start;
+	}
+
+	@media (max-width: 1100px)
+	{
+		main
+		{
+			grid-template-columns: minmax(0, 1fr);
+		}
+	}
+
+	h1
+	{
+		margin: 0 0 4px 0;
+		font-size: 22px;
+		font-weight: 600;
+	}
+
+	.sub
+	{
+		color: var(--muted);
+		margin: 0 0 18px 0;
+	}
+
+	.stage
+	{
+		position: relative;
+		overflow: hidden;
+		aspect-ratio: 16 / 9;
+		border-radius: 14px;
+		background: #000;
+		box-shadow: 0 0 0 1px var(--line), 0 30px 60px -30px rgba(0, 0, 0, 0.9);
+	}
+
+	.stage canvas
+	{
+		width: 100%;
+		height: 100%;
+		display: block;
+	}
+
+	.stage .badge
+	{
+		top: 12px;
+		left: 12px;
+		padding: 4px 10px;
+		position: absolute;
+		font-size: 12.5px;
+		border-radius: 999px;
+		background: rgba(0, 0, 0, 0.45);
+		backdrop-filter: blur(8px);
+		color: var(--muted);
+	}
+
+	.card
+	{
+		padding: 18px;
+		border-radius: 16px;
+		background: var(--panel);
+		box-shadow: inset 0 0 0 1px var(--line);
+		backdrop-filter: blur(14px);
+	}
+
+	.card + .card
+	{
+		margin-top: 14px;
+	}
+
+	.card h2
+	{
+		margin: 0 0 12px 0;
+		font-size: 13px;
+		font-weight: 600;
+		letter-spacing: 0.1em;
+		text-transform: uppercase;
+		color: var(--muted);
+	}
+
+	.scenes
+	{
+		gap: 8px;
+		display: grid;
+	}
+
+	.scene
+	{
+		gap: 2px;
+		display: flex;
+		cursor: pointer;
+		padding: 10px 12px;
+		border-radius: 12px;
+		flex-direction: column;
+		box-shadow: inset 0 0 0 1px var(--line);
+		transition: box-shadow 0.2s ease, background 0.2s ease;
+	}
+
+	.scene input
+	{
+		display: none;
+	}
+
+	.scene small
+	{
+		color: var(--muted);
+	}
+
+	.scene:has(input:checked)
+	{
+		background: rgba(255, 122, 26, 0.12);
+		box-shadow: inset 0 0 0 1.5px var(--pink);
+	}
+
+	.row
+	{
+		gap: 10px;
+		display: flex;
+		flex-wrap: wrap;
+		align-items: center;
+	}
+
+	.check
+	{
+		gap: 8px;
+		display: inline-flex;
+		cursor: pointer;
+		padding: 6px 12px;
+		border-radius: 999px;
+		align-items: center;
+		box-shadow: inset 0 0 0 1px var(--line);
+	}
+
+	.check input
+	{
+		accent-color: var(--pink);
+	}
+
+	label.slider
+	{
+		display: block;
+		margin-top: 12px;
+	}
+
+	label.slider span
+	{
+		float: right;
+		color: var(--muted);
+		font-variant-numeric: tabular-nums;
+	}
+
+	input[type="range"]
+	{
+		width: 100%;
+		accent-color: var(--pink);
+	}
+
+	button
+	{
+		color: #fff;
+		border: 0;
+		cursor: pointer;
+		padding: 11px 18px;
+		font: inherit;
+		font-weight: 600;
+		border-radius: 12px;
+		background: rgba(255, 255, 255, 0.08);
+		box-shadow: inset 0 0 0 1px var(--line);
+		transition: filter 0.2s ease, background 0.2s ease;
+	}
+
+	button:hover
+	{
+		filter: brightness(1.15);
+	}
+
+	button.primary
+	{
+		background: linear-gradient(135deg, #f0569a, #b83ad8);
+		box-shadow: 0 8px 24px -10px rgba(255, 122, 26, 0.8);
+	}
+
+	button:disabled
+	{
+		opacity: 0.45;
+		cursor: default;
+		filter: none;
+	}
+
+	.buttons
+	{
+		gap: 8px;
+		display: grid;
+		grid-template-columns: 1fr 1fr;
+	}
+
+	.buttons .wide
+	{
+		grid-column: 1 / -1;
+	}
+
+	.progress
+	{
+		height: 8px;
+		overflow: hidden;
+		margin-top: 14px;
+		border-radius: 999px;
+		background: rgba(255, 255, 255, 0.08);
+	}
+
+	.progress div
+	{
+		width: 0%;
+		height: 100%;
+		background: linear-gradient(90deg, #f0569a, #b83ad8);
+		transition: width 0.15s linear;
+	}
+
+	.status
+	{
+		color: var(--muted);
+		margin-top: 8px;
+		min-height: 1.4em;
+		font-variant-numeric: tabular-nums;
+	}
+
+	.files
+	{
+		gap: 6px;
+		display: grid;
+	}
+
+	.files a
+	{
+		gap: 10px;
+		display: flex;
+		color: var(--text);
+		padding: 8px 12px;
+		border-radius: 10px;
+		text-decoration: none;
+		justify-content: space-between;
+		background: rgba(255, 255, 255, 0.05);
+	}
+
+	.files a:hover
+	{
+		background: rgba(255, 122, 26, 0.15);
+	}
+
+	.files a small
+	{
+		color: var(--muted);
+	}
+
+	.note
+	{
+		color: var(--muted);
+		font-size: 13px;
+		margin: 10px 0 0 0;
+	}
+
+	.warn
+	{
+		color: #ffb3c9;
+	}
+</style>
+</head>
+<body>
+<main>
+	<section>
+		<h1>Visual Universe background</h1>
+		<p class="sub">Galaxies, planets and stars behind the Visual Universe section. A seamless 20 second loop, rendered frame by frame.</p>
+		<div class="stage">
+			<canvas id="view"></canvas>
+			<span class="badge" id="badge">Preview</span>
+		</div>
+		<p class="note">The preview runs in real time at screen size, so it can stutter on slower machines. The rendered video never does: every frame is drawn at full size and saved, one by one.</p>
+	</section>
+
+	<aside>
+		<div class="card">
+			<h2>Scene</h2>
+			<div class="scenes" id="scenes"></div>
+		</div>
+
+		<div class="card">
+			<h2>Output</h2>
+			<div class="row">
+				<label class="check"><input type="checkbox" id="r1080" checked> 1080p</label>
+				<label class="check"><input type="checkbox" id="r720" checked> 720p (phones)</label>
+			</div>
+			<div class="row" style="margin-top: 8px">
+				<label class="check"><input type="checkbox" id="fmp4" checked> MP4 (H.264)</label>
+				<label class="check"><input type="checkbox" id="fwebm" checked> WebM (VP9)</label>
+			</div>
+			<label class="slider">Quality / size <span id="qv"></span>
+				<input type="range" id="quality" min="0.5" max="2" step="0.1" value="1">
+			</label>
+			<p class="note" id="support"></p>
+		</div>
+
+		<div class="card">
+			<div class="buttons">
+				<button id="preview">Pause preview</button>
+				<button id="poster">Poster only</button>
+				<button id="render" class="primary">Render this scene</button>
+				<button id="renderAll">Render all</button>
+				<button id="download" class="wide" disabled>Download all files</button>
+			</div>
+			<div class="progress"><div id="bar"></div></div>
+			<div class="status" id="status">Ready.</div>
+		</div>
+
+		<div class="card">
+			<h2>Files</h2>
+			<div class="files" id="files"><small style="color: var(--muted)">Rendered files show up here.</small></div>
+		</div>
+	</aside>
+</main>
+
+<script type="importmap">
+{
+	"imports":
+	{
+		"three": "https://cdn.jsdelivr.net/npm/three@0.170.0/build/three.module.js",
+		"three/addons/": "https://cdn.jsdelivr.net/npm/three@0.170.0/examples/jsm/",
+		"mp4-muxer": "https://cdn.jsdelivr.net/npm/mp4-muxer@5.2.2/build/mp4-muxer.mjs",
+		"webm-muxer": "https://cdn.jsdelivr.net/npm/webm-muxer@5.1.4/build/webm-muxer.mjs"
+	}
+}
+</script>
+
+<script type="module">
+import * as THREE from "three";
+import { EffectComposer } from "three/addons/postprocessing/EffectComposer.js";
+import { RenderPass } from "three/addons/postprocessing/RenderPass.js";
+import { UnrealBloomPass } from "three/addons/postprocessing/UnrealBloomPass.js";
+import { OutputPass } from "three/addons/postprocessing/OutputPass.js";
+import { ShaderPass } from "three/addons/postprocessing/ShaderPass.js";
+import { Muxer as Mp4Muxer, ArrayBufferTarget as Mp4Target } from "mp4-muxer";
+import { Muxer as WebmMuxer, ArrayBufferTarget as WebmTarget } from "webm-muxer";
+
+/* ========================================================================== */
+/* CONSTANTS                                                                  */
+/* ========================================================================== */
+
+const FPS = 30;
+const LOOP = 20;                      /* SECONDS - EVERY MOTION REPEATS EXACTLY */
+const FRAMES = FPS * LOOP;
+const TAU = Math.PI * 2;
+const FULL = { w: 1920, h: 1080 };
+
+/* A WAVE THAT REPEATS K TIMES PER LOOP (K WHOLE -> SEAMLESS) */
+const wave = (t, k, phase = 0) => Math.sin(TAU * k * t / LOOP + phase);
+const wave2 = (t, k, phase = 0) => Math.cos(TAU * k * t / LOOP + phase);
+/* t - start, WRAPPED INTO THE LOOP: EVENTS NEAR THE END CONTINUE AFTER 0 */
+const since = (t, start) => ((t - start) % LOOP + LOOP) % LOOP;
+const ease = x => x <= 0 ? 0 : x >= 1 ? 1 : x * x * (3 - 2 * x);
+const easeOut = x => x <= 0 ? 0 : x >= 1 ? 1 : 1 - Math.pow(1 - x, 3);
+const clamp01 = x => Math.min(1, Math.max(0, x));
+
+/* ========================================================================== */
+/* SHADER PIECES                                                              */
+/* ========================================================================== */
+
+/* 3D SIMPLEX NOISE (ASHIMA ARTS, MIT) AND A FEW OCTAVES OF IT */
+const NOISE = `
+vec3 mod289(vec3 x) { return x - floor(x * (1.0 / 289.0)) * 289.0; }
+vec4 mod289(vec4 x) { return x - floor(x * (1.0 / 289.0)) * 289.0; }
+vec4 permute(vec4 x) { return mod289(((x * 34.0) + 1.0) * x); }
+vec4 taylorInvSqrt(vec4 r) { return 1.79284291400159 - 0.85373472095314 * r; }
+float snoise(vec3 v)
+{
+	const vec2 C = vec2(1.0 / 6.0, 1.0 / 3.0);
+	const vec4 D = vec4(0.0, 0.5, 1.0, 2.0);
+	vec3 i = floor(v + dot(v, C.yyy));
+	vec3 x0 = v - i + dot(i, C.xxx);
+	vec3 g = step(x0.yzx, x0.xyz);
+	vec3 l = 1.0 - g;
+	vec3 i1 = min(g.xyz, l.zxy);
+	vec3 i2 = max(g.xyz, l.zxy);
+	vec3 x1 = x0 - i1 + C.xxx;
+	vec3 x2 = x0 - i2 + C.yyy;
+	vec3 x3 = x0 - D.yyy;
+	i = mod289(i);
+	vec4 p = permute(permute(permute(i.z + vec4(0.0, i1.z, i2.z, 1.0)) + i.y + vec4(0.0, i1.y, i2.y, 1.0)) + i.x + vec4(0.0, i1.x, i2.x, 1.0));
+	float n_ = 0.142857142857;
+	vec3 ns = n_ * D.wyz - D.xzx;
+	vec4 j = p - 49.0 * floor(p * ns.z * ns.z);
+	vec4 x_ = floor(j * ns.z);
+	vec4 y_ = floor(j - 7.0 * x_);
+	vec4 x = x_ * ns.x + ns.yyyy;
+	vec4 y = y_ * ns.x + ns.yyyy;
+	vec4 h = 1.0 - abs(x) - abs(y);
+	vec4 b0 = vec4(x.xy, y.xy);
+	vec4 b1 = vec4(x.zw, y.zw);
+	vec4 s0 = floor(b0) * 2.0 + 1.0;
+	vec4 s1 = floor(b1) * 2.0 + 1.0;
+	vec4 sh = -step(h, vec4(0.0));
+	vec4 a0 = b0.xzyw + s0.xzyw * sh.xxyy;
+	vec4 a1 = b1.xzyw + s1.xzyw * sh.zzww;
+	vec3 p0 = vec3(a0.xy, h.x);
+	vec3 p1 = vec3(a0.zw, h.y);
+	vec3 p2 = vec3(a1.xy, h.z);
+	vec3 p3 = vec3(a1.zw, h.w);
+	vec4 norm = taylorInvSqrt(vec4(dot(p0, p0), dot(p1, p1), dot(p2, p2), dot(p3, p3)));
+	p0 *= norm.x; p1 *= norm.y; p2 *= norm.z; p3 *= norm.w;
+	vec4 m = max(0.6 - vec4(dot(x0, x0), dot(x1, x1), dot(x2, x2), dot(x3, x3)), 0.0);
+	m = m * m;
+	return 42.0 * dot(m * m, vec4(dot(p0, x0), dot(p1, x1), dot(p2, x2), dot(p3, x3)));
+}
+float fbm(vec3 p)
+{
+	float sum = 0.0;
+	float amp = 0.5;
+	for (int i = 0; i < 6; i++)
+	{
+		sum += amp * snoise(p);
+		p = p * 2.02 + vec3(1.7, 9.2, 3.1);
+		amp *= 0.5;
+	}
+	return sum;
+}
+`;
+
+/* A SEEDED RANDOM NUMBER, THE SAME EVERY RUN (SO EVERY RENDER MATCHES) */
+function seeded(seed)
+{
+	let s = seed;
+	return () => (s = (s * 16807) % 2147483647) / 2147483647;
+}
+
+function gauss(rand)
+{
+	return Math.sqrt(-2 * Math.log(Math.max(1e-9, rand()))) * Math.cos(TAU * rand());
+}
+
+/* A SOFT ROUND GLOW, DRAWN ONCE, USED BY THE CORES AND THE BRIGHT STARS */
+function glowTexture(spikes)
+{
+	const size = 256;
+	const c = document.createElement("canvas");
+	c.width = c.height = size;
+	const g = c.getContext("2d");
+	const r = g.createRadialGradient(size / 2, size / 2, 0, size / 2, size / 2, size / 2);
+	r.addColorStop(0, "rgba(255,255,255,1)");
+	r.addColorStop(0.08, "rgba(255,255,255,0.75)");
+	r.addColorStop(0.25, "rgba(255,255,255,0.22)");
+	r.addColorStop(0.6, "rgba(255,255,255,0.05)");
+	r.addColorStop(1, "rgba(255,255,255,0)");
+	g.fillStyle = r;
+	g.fillRect(0, 0, size, size);
+	if (spikes)
+	{
+		/* FOUR THIN DIFFRACTION SPIKES, LIKE A TELESCOPE PHOTO */
+		g.globalCompositeOperation = "lighter";
+		for (const angle of [0, Math.PI / 2])
+		{
+			g.save();
+			g.translate(size / 2, size / 2);
+			g.rotate(angle);
+			const s = g.createLinearGradient(-size / 2, 0, size / 2, 0);
+			s.addColorStop(0, "rgba(255,255,255,0)");
+			s.addColorStop(0.5, "rgba(255,255,255,0.9)");
+			s.addColorStop(1, "rgba(255,255,255,0)");
+			g.fillStyle = s;
+			g.fillRect(-size / 2, -1.2, size, 2.4);
+			g.restore();
+		}
+	}
+	const texture = new THREE.CanvasTexture(c);
+	return texture;
+}
+
+/* POINTS THAT STAY SMOOTH: NEVER SMALLER THAN 1.6 PX, DIMMER INSTEAD */
+function pointsMaterial(blending, extra)
+{
+	return new THREE.ShaderMaterial({
+		transparent: true,
+		depthWrite: false,
+		blending,
+		uniforms: Object.assign({ uScale: { value: 1 }, uRes: { value: 1 }, uPhase: { value: 0 }, uGain: { value: 1 } }, extra || {}),
+		vertexShader: `
+			attribute float size; attribute vec3 color; attribute float twinkle;
+			uniform float uScale, uRes, uPhase, uGain;
+			varying vec3 vColor; varying float vAlpha;
+			void main()
+			{
+				vec4 mv = modelViewMatrix * vec4(position, 1.0);
+				float want = size * uScale * uRes * (300.0 / -mv.z);
+				float px = max(1.6, want);
+				float twk = twinkle > 0.0 ? 0.72 + 0.28 * sin(uPhase * floor(twinkle) + fract(twinkle) * 6.2832) : 1.0;
+				vColor = color * uGain * twk * min(1.0, (want * want) / (px * px));
+				vAlpha = min(1.0, (want * want) / (px * px));
+				gl_PointSize = px;
+				gl_Position = projectionMatrix * mv;
+			}`,
+		fragmentShader: `
+			varying vec3 vColor; varying float vAlpha;
+			void main()
+			{
+				float d = length(gl_PointCoord - 0.5) * 2.0;
+				float a = exp(-d * d * 4.5);
+				gl_FragColor = vec4(vColor * a, a * vAlpha);
+			}`
+	});
+}
+
+function pointCloud(list, material)
+{
+	const n = list.length;
+	const position = new Float32Array(n * 3);
+	const color = new Float32Array(n * 3);
+	const size = new Float32Array(n);
+	const twinkle = new Float32Array(n);
+	list.forEach((p, i) =>
+	{
+		position.set(p.position, i * 3);
+		color.set(p.color, i * 3);
+		size[i] = p.size;
+		twinkle[i] = p.twinkle || 0;
+	});
+	const geometry = new THREE.BufferGeometry();
+	geometry.setAttribute("position", new THREE.BufferAttribute(position, 3));
+	geometry.setAttribute("color", new THREE.BufferAttribute(color, 3));
+	geometry.setAttribute("size", new THREE.BufferAttribute(size, 1));
+	geometry.setAttribute("twinkle", new THREE.BufferAttribute(twinkle, 1));
+	const points = new THREE.Points(geometry, material);
+	points.frustumCulled = false;
+	return points;
+}
+
+/* STAR COLOURS BY TEMPERATURE, HOT BLUE TO COOL ORANGE */
+const STAR_COLORS = ["#9BB0FF", "#AABFFF", "#CAD7FF", "#F8F7FF", "#FFF4EA", "#FFD2A1", "#FFB56C"];
+
+function hexRgb(hex, k)
+{
+	const c = new THREE.Color(hex);
+	return [c.r * k, c.g * k, c.b * k];
+}
+
+/* ========================================================================== */
+/* THE SKY: NEBULA CLOUDS AND THOUSANDS OF STARS                              */
+/* ========================================================================== */
+
+function makeSky()
+{
+	const material = new THREE.ShaderMaterial({
+		side: THREE.BackSide,
+		depthWrite: false,
+		vertexShader: `
+			varying vec3 vDir;
+			void main()
+			{
+				vDir = position;
+				vec4 p = projectionMatrix * modelViewMatrix * vec4(position, 1.0);
+				gl_Position = p.xyww;
+			}`,
+		fragmentShader: NOISE + `
+			varying vec3 vDir;
+			void main()
+			{
+				vec3 d = normalize(vDir);
+				float a = fbm(d * 1.8 + vec3(3.0, 1.0, 7.0));
+				float b = fbm(d * 3.6 + vec3(11.0, 2.0, 5.0));
+				float c = fbm(d * 7.0 + vec3(2.0, 8.0, 1.0));
+				float lane = exp(-pow(dot(d, normalize(vec3(0.42, 0.85, -0.3))) * 2.6, 2.0));
+				vec3 col = vec3(0.0035, 0.004, 0.011);
+				col += vec3(0.30, 0.10, 0.60) * pow(smoothstep(-0.1, 0.8, a), 2.0) * 0.22;
+				col += vec3(0.06, 0.28, 0.55) * pow(smoothstep(0.0, 0.8, b), 2.0) * 0.18;
+				col += vec3(0.90, 0.32, 0.08) * pow(max(0.0, a * b * 2.4 + c * 0.25), 2.2) * 0.22;
+				col *= 0.45 + 1.1 * lane;
+				col *= 0.85 + 0.3 * c;
+				gl_FragColor = vec4(col, 1.0);
+			}`
+	});
+	return new THREE.Mesh(new THREE.SphereGeometry(150, 96, 48), material);
+}
+
+function makeStars()
+{
+	const rand = seeded(7);
+	const list = [];
+	for (let i = 0; i < 9000; i++)
+	{
+		const u = rand() * 2 - 1;
+		const a = rand() * TAU;
+		const r = Math.sqrt(1 - u * u);
+		const bright = Math.pow(rand(), 9);
+		const k = 0.7 + bright * 6;
+		list.push({
+			position: [r * Math.cos(a) * 120, u * 120, r * Math.sin(a) * 120],
+			color: hexRgb(STAR_COLORS[Math.floor(rand() * STAR_COLORS.length)], k),
+			size: 0.5 + bright * 2.4,
+			/* WHOLE NUMBER OF TWINKLES PER LOOP, SO THE LOOP IS SEAMLESS */
+			twinkle: rand() < 0.5 ? 1 + Math.floor(rand() * 4) + rand() * 0.999 : 0
+		});
+	}
+	const material = pointsMaterial(THREE.AdditiveBlending);
+	material.uniforms.uScale.value = 1.0 * 120 / 300;
+	return { points: pointCloud(list, material), material };
+}
+
+/* A FEW BRIGHT NEARBY STARS WITH SPIKES */
+function makeBrightStars(texture)
+{
+	const group = new THREE.Group();
+	const spots = [
+		[-3.6, 2.6, -8, "#CAD7FF", 1.0, 2, 0.2],
+		[6.4, -0.6, -9, "#FFF4EA", 0.8, 3, 1.4],
+		[-0.6, -3.2, -12, "#FFD2A1", 0.7, 1, 2.6],
+		[1.8, 3.6, -14, "#AABFFF", 0.6, 2, 3.9],
+		[-8.5, -0.5, -12, "#F8F7FF", 0.65, 1, 5.1]
+	];
+	const items = spots.map(s =>
+	{
+		const material = new THREE.SpriteMaterial({ map: texture, color: new THREE.Color(s[3]).multiplyScalar(2.2), blending: THREE.AdditiveBlending, depthWrite: false, transparent: true });
+		const sprite = new THREE.Sprite(material);
+		sprite.position.set(s[0], s[1], s[2]);
+		group.add(sprite);
+		return { sprite, size: s[4], k: s[5], phase: s[6] };
+	});
+	return {
+		group,
+		update(t)
+		{
+			for (const it of items)
+				it.sprite.scale.setScalar(it.size * (0.9 + 0.1 * wave(t, it.k, it.phase)));
+		}
+	};
+}
+
+/* ========================================================================== */
+/* A SPIRAL GALAXY                                                            */
+/* ========================================================================== */
+
+/*
+** EVERY STAR HAS A TWIN HALF A TURN AWAY, SO THE GALAXY LOOKS THE SAME AFTER
+** HALF A TURN: IT TURNS HALF A TURN PER LOOP AND THE LOOP IS SEAMLESS.
+*/
+function makeGalaxy(o)
+{
+	const rand = seeded(o.seed);
+	const stars = [];
+	const dust = [];
+	const pitch = o.pitch;
+	const add = (list, x, y, z, color, size, twinkle) =>
+	{
+		list.push({ position: [x, y, z], color, size, twinkle });
+		list.push({ position: [-x, y, -z], color, size, twinkle });
+	};
+	for (let i = 0; i < o.count; i++)
+	{
+		const kind = rand();
+		if (kind < 0.16)
+		{
+			/* THE BULGE: OLD WARM STARS IN A SQUASHED BALL */
+			const r = Math.abs(gauss(rand)) * o.radius * 0.13;
+			const a = rand() * TAU;
+			const u = rand() * 2 - 1;
+			const s = Math.sqrt(1 - u * u);
+			add(stars, Math.cos(a) * s * r, u * r * 0.55, Math.sin(a) * s * r, hexRgb(rand() < 0.5 ? "#FFD9A6" : "#FFE9C8", 0.9 + rand() * 0.6), 0.5 + rand() * 0.7, 0);
+			continue;
+		}
+		const r = o.radius * (0.05 + -Math.log(1 - rand() * 0.96) * 0.26);
+		const spread = (kind < 0.8 ? 0.34 : 1.1) * (0.4 + 0.6 * r / o.radius);
+		const angle = Math.log(r / (o.radius * 0.05)) / Math.tan(pitch) + gauss(rand) * spread;
+		const y = gauss(rand) * o.radius * 0.018 * (1.4 - r / o.radius);
+		const t = r / o.radius;
+		let color;
+		let size = 0.45 + Math.pow(rand(), 3) * 1.1;
+		const pick = rand();
+		if (kind < 0.8 && pick < 0.05)
+		{
+			/* GLOWING PINK GAS WHERE NEW STARS ARE BORN */
+			color = hexRgb("#FF5F9E", 1.6 + rand());
+			size *= 1.15;
+		}
+		else if (kind < 0.8 && pick < 0.22)
+			color = hexRgb("#8FB4FF", 1.2 + rand() * 0.8);
+		else
+			color = hexRgb(t < 0.25 ? "#FFE0B8" : (t < 0.55 ? "#F4F1FF" : "#B9CCFF"), 0.55 + rand() * 0.7);
+		add(stars, Math.cos(angle) * r, y, Math.sin(angle) * r, color, size, rand() < 0.04 ? 1 + Math.floor(rand() * 3) + rand() * 0.99 : 0);
+		/* DARK DUST ALONG THE INSIDE EDGE OF EACH ARM */
+		if (kind < 0.8 && t > 0.08 && t < 0.85 && rand() < 0.55)
+		{
+			const da = angle - 0.3 + gauss(rand) * 0.12;
+			add(dust, Math.cos(da) * r, y * 0.5, Math.sin(da) * r, [0, 0, 0], 2.6 + rand() * 2.4, 0);
+		}
+	}
+
+	const group = new THREE.Group();
+	const spin = new THREE.Group();
+	group.add(spin);
+
+	const starMaterial = pointsMaterial(THREE.AdditiveBlending);
+	starMaterial.uniforms.uScale.value = o.pointScale;
+	starMaterial.uniforms.uGain.value = o.gain;
+	const starPoints = pointCloud(stars, starMaterial);
+	starPoints.renderOrder = 2;
+
+	/* THE SAME STARS AGAIN, BIG AND FAINT: THE SOFT GLOW OF THE ARMS */
+	const mistMaterial = pointsMaterial(THREE.AdditiveBlending);
+	mistMaterial.uniforms.uScale.value = o.pointScale * 6;
+	mistMaterial.uniforms.uGain.value = o.gain * 0.035;
+	const mist = new THREE.Points(starPoints.geometry, mistMaterial);
+	mist.frustumCulled = false;
+	mist.renderOrder = 1;
+
+	/* DUST: DARK, SOFT, NORMAL BLENDING, DRAWN OVER THE STARS */
+	const dustMaterial = new THREE.ShaderMaterial({
+		transparent: true,
+		depthWrite: false,
+		depthTest: false,
+		uniforms: { uScale: { value: o.pointScale }, uRes: { value: 1 } },
+		vertexShader: `
+			attribute float size; uniform float uScale, uRes;
+			void main()
+			{
+				vec4 mv = modelViewMatrix * vec4(position, 1.0);
+				gl_PointSize = max(2.0, size * uScale * uRes * (300.0 / -mv.z));
+				gl_Position = projectionMatrix * mv;
+			}`,
+		fragmentShader: `
+			void main()
+			{
+				float d = length(gl_PointCoord - 0.5) * 2.0;
+				gl_FragColor = vec4(0.012, 0.006, 0.004, exp(-d * d * 3.0) * 0.07);
+			}`
+	});
+	const dustPoints = pointCloud(dust, dustMaterial);
+	dustPoints.renderOrder = 3;
+
+	/* A WARM GLOW ACROSS THE CORE, LYING IN THE DISC */
+	const coreMaterial = new THREE.MeshBasicMaterial({ map: o.glow, color: new THREE.Color(o.coreColor).multiplyScalar(o.coreGain), transparent: true, blending: THREE.AdditiveBlending, depthWrite: false, side: THREE.DoubleSide });
+	const core = new THREE.Mesh(new THREE.PlaneGeometry(o.radius * 1.1, o.radius * 1.1), coreMaterial);
+	core.rotation.x = -Math.PI / 2;
+	core.renderOrder = 1;
+	const halo = new THREE.Mesh(new THREE.PlaneGeometry(o.radius * 3.2, o.radius * 3.2), new THREE.MeshBasicMaterial({ map: o.glow, color: new THREE.Color(o.haloColor).multiplyScalar(o.haloGain), transparent: true, blending: THREE.AdditiveBlending, depthWrite: false, side: THREE.DoubleSide }));
+	halo.rotation.x = -Math.PI / 2;
+	halo.renderOrder = 0;
+	const nucleus = new THREE.Sprite(new THREE.SpriteMaterial({ map: o.glow, color: new THREE.Color("#FFF1D6").multiplyScalar(o.nucleusGain), blending: THREE.AdditiveBlending, depthWrite: false, transparent: true }));
+	nucleus.scale.setScalar(o.radius * 0.32);
+	nucleus.renderOrder = 4;
+
+	spin.add(halo, core, mist, starPoints, dustPoints);
+	group.add(nucleus);
+	group.position.set(...o.position);
+	group.rotation.set(...o.tilt);
+
+	return {
+		group,
+		materials: [starMaterial, mistMaterial, dustMaterial],
+		update(t)
+		{
+			spin.rotation.y = -Math.PI * t / LOOP * o.turns + o.phase;
+			starMaterial.uniforms.uPhase.value = TAU * t / LOOP;
+		}
+	};
+}
+
+/* ========================================================================== */
+/* PLANETS                                                                    */
+/* ========================================================================== */
+
+const LIGHT = new THREE.Vector3(0.75, 0.35, -0.42).normalize();
+
+const PLANET_VERTEX = `
+	varying vec3 vObj; varying vec3 vNormal; varying vec3 vWorld;
+	void main()
+	{
+		vObj = position;
+		vNormal = normalize(mat3(modelMatrix) * normal);
+		vec4 w = modelMatrix * vec4(position, 1.0);
+		vWorld = w.xyz;
+		gl_Position = projectionMatrix * viewMatrix * w;
+	}`;
+
+/* A BANDED GAS GIANT WITH A STORM, SOFT TERMINATOR AND HAZY LIMB */
+function makeGiant(o)
+{
+	const group = new THREE.Group();
+	const tilt = new THREE.Group();
+	group.add(tilt);
+	tilt.rotation.set(o.tilt[0], 0, o.tilt[1]);
+
+	const uniforms = { uSpin: { value: 0 }, uLight: { value: LIGHT.clone() }, uRingIn: { value: o.ring[0] }, uRingOut: { value: o.ring[1] }, uRingNormal: { value: new THREE.Vector3() }, uCenterV: { value: new THREE.Vector3() }, uRadiusV: { value: o.radius } };
+	const planet = new THREE.Mesh(new THREE.SphereGeometry(1, 160, 120), new THREE.ShaderMaterial({
+		uniforms,
+		vertexShader: PLANET_VERTEX,
+		fragmentShader: NOISE + `
+			uniform float uSpin; uniform vec3 uLight; uniform float uRingIn, uRingOut; uniform vec3 uRingNormal; uniform vec3 uCenterV; uniform float uRadiusV;
+			varying vec3 vObj; varying vec3 vNormal; varying vec3 vWorld;
+			void main()
+			{
+				float c = cos(uSpin), s = sin(uSpin);
+				vec3 q = vec3(c * vObj.x + s * vObj.z, vObj.y, -s * vObj.x + c * vObj.z);
+				float warp = fbm(q * vec3(1.6, 5.0, 1.6)) * 0.09 + fbm(q * vec3(5.0, 14.0, 5.0)) * 0.025;
+				float lat = q.y + warp;
+				float b1 = sin(lat * 23.0) * 0.5 + 0.5;
+				float b2 = sin(lat * 57.0 + 1.3) * 0.5 + 0.5;
+				vec3 col = mix(vec3(0.80, 0.62, 0.40), vec3(0.95, 0.88, 0.72), smoothstep(0.25, 0.75, b1));
+				col = mix(col, vec3(0.58, 0.32, 0.18), smoothstep(0.65, 0.95, b2) * 0.55);
+				col = mix(col, vec3(0.70, 0.48, 0.30), smoothstep(0.55, 0.9, abs(lat)) * 0.7);
+				/* THE STORM */
+				vec2 spot = vec2(atan(q.z, q.x) - 1.2, (q.y + 0.34) * 2.6);
+				float storm = smoothstep(0.32, 0.0, length(spot * vec2(1.0, 1.6)));
+				col = mix(col, vec3(0.78, 0.30, 0.16), storm * 0.85);
+				col *= 0.92 + 0.16 * fbm(q * 9.0);
+				vec3 N = normalize(vNormal);
+				vec3 V = normalize(cameraPosition - vWorld);
+				float ndl = dot(N, uLight);
+				float lit = smoothstep(-0.12, 0.45, ndl) * (0.25 + 0.75 * max(ndl, 0.0));
+				/* THE RINGS' SHADOW ON THE PLANET */
+				float denom = dot(uLight, uRingNormal);
+				if (abs(denom) > 0.001)
+				{
+					float tt = -dot(vWorld - uCenterV, uRingNormal) / denom;
+					if (tt > 0.0)
+					{
+						float rr = length(vWorld + uLight * tt - uCenterV) / uRadiusV;
+						lit *= 1.0 - 0.75 * smoothstep(uRingIn, uRingIn + 0.05, rr) * smoothstep(uRingOut, uRingOut - 0.05, rr);
+					}
+				}
+				float rim = pow(1.0 - max(dot(N, V), 0.0), 2.5);
+				vec3 haze = vec3(1.0, 0.78, 0.5) * rim * smoothstep(-0.3, 0.6, ndl) * 0.9;
+				vec3 outCol = col * lit * 0.7 + haze * 0.5 + col * 0.01;
+				gl_FragColor = vec4(outCol, 1.0);
+			}`
+	}));
+	tilt.add(planet);
+
+	/* RINGS: A STRIP OF BANDS AND GAPS, LIT, WITH THE PLANET'S SHADOW */
+	const bands = document.createElement("canvas");
+	bands.width = 1024;
+	bands.height = 1;
+	const bg = bands.getContext("2d");
+	const rand = seeded(o.seed);
+	const waves = [];
+	for (let i = 0; i < 14; i++)
+		waves.push([8 + rand() * 160, rand() * TAU, 0.2 + rand() * 0.8]);
+	let smooth = 0.5;
+	for (let x = 0; x < 1024; x++)
+	{
+		const t = x / 1023;
+		let d = 0;
+		let total = 0;
+		for (const w of waves)
+		{
+			d += w[2] * Math.sin(t * w[0] + w[1]);
+			total += w[2];
+		}
+		d = 0.55 + 0.45 * d / total * 1.8;
+		smooth += (rand() - smooth) * 0.35;
+		d *= 0.75 + 0.25 * smooth;
+		d = Math.max(0, Math.min(1, d));
+		if (t > 0.58 && t < 0.63)
+			d *= 0.08;
+		if (t > 0.86 && t < 0.88)
+			d *= 0.3;
+		d *= Math.min(1, t * 8) * Math.min(1, (1 - t) * 10);
+		const v = Math.max(0, Math.min(255, Math.round(d * 255)));
+		bg.fillStyle = `rgb(${v},${v},${v})`;
+		bg.fillRect(x, 0, 1, 1);
+	}
+	const bandTexture = new THREE.CanvasTexture(bands);
+	const ringUniforms = { uBands: { value: bandTexture }, uLight: { value: LIGHT.clone() }, uIn: { value: o.ring[0] }, uOut: { value: o.ring[1] }, uCenterV: uniforms.uCenterV, uRadiusV: uniforms.uRadiusV };
+	const ring = new THREE.Mesh(new THREE.RingGeometry(o.ring[0], o.ring[1], 384, 1), new THREE.ShaderMaterial({
+		uniforms: ringUniforms,
+		transparent: true,
+		depthWrite: false,
+		side: THREE.DoubleSide,
+		vertexShader: `
+			varying vec3 vWorld; varying vec2 vLocal;
+			void main()
+			{
+				vLocal = position.xy;
+				vec4 w = modelMatrix * vec4(position, 1.0);
+				vWorld = w.xyz;
+				gl_Position = projectionMatrix * viewMatrix * w;
+			}`,
+		fragmentShader: `
+			uniform sampler2D uBands; uniform vec3 uLight; uniform float uIn, uOut; uniform vec3 uCenterV; uniform float uRadiusV;
+			varying vec3 vWorld; varying vec2 vLocal;
+			void main()
+			{
+				float r = length(vLocal);
+				float t = (r - uIn) / (uOut - uIn);
+				float d = texture2D(uBands, vec2(t, 0.5)).r;
+				/* IS THE PLANET BETWEEN THIS BIT OF RING AND THE SUN? */
+				vec3 oc = vWorld - uCenterV;
+				float b = dot(oc, uLight);
+				float c = dot(oc, oc) - uRadiusV * uRadiusV;
+				float h = b * b - c;
+				float shadow = (h > 0.0 && -b - sqrt(h) > 0.0) ? 0.12 : 1.0;
+				float lit = 0.35 + 0.65 * abs(dot(normalize(cross(dFdx(vWorld), dFdy(vWorld))), uLight));
+				vec3 col = mix(vec3(0.62, 0.48, 0.34), vec3(0.90, 0.82, 0.68), d) * (0.2 + 0.8 * d) * shadow * lit;
+				gl_FragColor = vec4(col * 0.62, d * 0.85);
+			}`
+	}));
+	ring.rotation.x = -Math.PI / 2;
+	ring.renderOrder = 5;
+	tilt.add(ring);
+
+	group.position.set(...o.position);
+	group.scale.setScalar(o.radius);
+
+	return {
+		group,
+		update(t)
+		{
+			uniforms.uSpin.value = TAU * t / LOOP * o.spins;
+			group.updateMatrixWorld(true);
+			uniforms.uCenterV.value.setFromMatrixPosition(planet.matrixWorld);
+			uniforms.uRingNormal.value.set(0, 1, 0).applyQuaternion(tilt.getWorldQuaternion(new THREE.Quaternion())).normalize();
+		}
+	};
+}
+
+/* A BLUE WORLD: OCEANS THAT CATCH THE SUN, LAND, CLOUDS, CITY LIGHTS AT NIGHT */
+function makeWorld(o)
+{
+	const group = new THREE.Group();
+	const uniforms = { uSpin: { value: 0 }, uDrift: { value: 0 }, uLight: { value: LIGHT.clone() } };
+	const surface = new THREE.Mesh(new THREE.SphereGeometry(1, 160, 120), new THREE.ShaderMaterial({
+		uniforms,
+		vertexShader: PLANET_VERTEX,
+		fragmentShader: NOISE + `
+			uniform float uSpin, uDrift; uniform vec3 uLight;
+			varying vec3 vObj; varying vec3 vNormal; varying vec3 vWorld;
+			vec3 spinY(vec3 p, float a) { float c = cos(a), s = sin(a); return vec3(c * p.x + s * p.z, p.y, -s * p.x + c * p.z); }
+			void main()
+			{
+				vec3 q = spinY(normalize(vObj), uSpin);
+				float h = fbm(q * 1.9 + vec3(4.0, 1.0, 2.0));
+				float land = smoothstep(0.02, 0.06, h);
+				float polar = smoothstep(0.78, 0.86, abs(q.y) + h * 0.12);
+				vec3 ocean = mix(vec3(0.010, 0.045, 0.14), vec3(0.03, 0.14, 0.30), smoothstep(-0.4, 0.05, h));
+				vec3 ground = mix(vec3(0.13, 0.22, 0.08), vec3(0.42, 0.33, 0.20), smoothstep(0.08, 0.32, h));
+				ground = mix(ground, vec3(0.62, 0.52, 0.36), smoothstep(0.3, 0.5, h));
+				vec3 col = mix(ocean, ground, land);
+				col = mix(col, vec3(0.92, 0.95, 1.0), polar);
+				/* CLOUDS SWIRL ON A CIRCLE IN NOISE SPACE, SO THEY LOOP TOO */
+				vec3 cq = spinY(normalize(vObj), uSpin * 1.0 + 0.6);
+				float cl = fbm(cq * 3.2 + vec3(cos(uDrift), sin(uDrift), 0.0) * 0.35);
+				float clouds = smoothstep(0.0, 0.45, cl) * 0.9;
+				vec3 N = normalize(vNormal);
+				vec3 V = normalize(cameraPosition - vWorld);
+				float ndl = dot(N, uLight);
+				float day = smoothstep(-0.08, 0.25, ndl);
+				vec3 H = normalize(uLight + V);
+				float spec = pow(max(dot(N, H), 0.0), 60.0) * (1.0 - land) * (1.0 - clouds) * day * 2.2;
+				vec3 lit = col * max(ndl, 0.0) * 1.4 + vec3(1.0, 0.92, 0.8) * spec;
+				lit = mix(lit, vec3(1.0) * max(ndl, 0.0) * 1.25, clouds);
+				/* CITY LIGHTS ON THE NIGHT SIDE */
+				float city = smoothstep(0.55, 0.85, snoise(q * 38.0)) * smoothstep(0.1, 0.3, snoise(q * 6.0)) * land * (1.0 - polar);
+				lit += vec3(1.0, 0.62, 0.25) * city * (1.0 - day) * (1.0 - clouds) * 1.6;
+				float rim = pow(1.0 - max(dot(N, V), 0.0), 3.0);
+				lit += vec3(0.30, 0.55, 1.0) * rim * smoothstep(-0.35, 0.5, ndl) * 1.4;
+				gl_FragColor = vec4(lit, 1.0);
+			}`
+	}));
+	group.add(surface);
+
+	/* THE THIN BLUE AIR AROUND IT */
+	const air = new THREE.Mesh(new THREE.SphereGeometry(1.07, 96, 64), new THREE.ShaderMaterial({
+		uniforms: { uLight: { value: LIGHT.clone() } },
+		transparent: true,
+		depthWrite: false,
+		blending: THREE.AdditiveBlending,
+		vertexShader: PLANET_VERTEX,
+		fragmentShader: `
+			uniform vec3 uLight;
+			varying vec3 vObj; varying vec3 vNormal; varying vec3 vWorld;
+			void main()
+			{
+				vec3 N = normalize(vNormal);
+				vec3 V = normalize(cameraPosition - vWorld);
+				float d = max(dot(N, V), 0.0);
+				float glow = pow(1.0 - d, 4.0) * smoothstep(0.0, 0.22, d);
+				float lit = smoothstep(-0.35, 0.55, dot(N, uLight));
+				gl_FragColor = vec4(vec3(0.28, 0.55, 1.0) * glow * lit * 2.6, 1.0);
+			}`
+	}));
+	group.add(air);
+
+	group.position.set(...o.position);
+	group.scale.setScalar(o.radius);
+	group.rotation.z = o.tilt;
+	return {
+		group,
+		update(t)
+		{
+			uniforms.uSpin.value = TAU * t / LOOP * o.spins;
+			uniforms.uDrift.value = TAU * t / LOOP;
+		}
+	};
+}
+
+/* A SMALL GREY MOON ON A TILTED ORBIT AROUND THE GIANT */
+function makeMoon(o)
+{
+	const uniforms = { uLight: { value: LIGHT.clone() }, uSpin: { value: 0 } };
+	const mesh = new THREE.Mesh(new THREE.SphereGeometry(1, 96, 64), new THREE.ShaderMaterial({
+		uniforms,
+		vertexShader: PLANET_VERTEX,
+		fragmentShader: NOISE + `
+			uniform vec3 uLight; uniform float uSpin;
+			varying vec3 vObj; varying vec3 vNormal; varying vec3 vWorld;
+			void main()
+			{
+				float c = cos(uSpin), s = sin(uSpin);
+				vec3 q = vec3(c * vObj.x + s * vObj.z, vObj.y, -s * vObj.x + c * vObj.z);
+				float n = fbm(q * 3.0) * 0.5 + 0.5;
+				float craters = smoothstep(0.55, 0.75, snoise(q * 9.0)) * 0.25;
+				vec3 col = mix(vec3(0.32, 0.30, 0.29), vec3(0.62, 0.60, 0.57), n) - craters;
+				vec3 N = normalize(vNormal);
+				float ndl = max(dot(N, uLight), 0.0);
+				gl_FragColor = vec4(col * (ndl * 1.3 + 0.008), 1.0);
+			}`
+	}));
+	mesh.scale.setScalar(o.radius);
+	return {
+		mesh,
+		update(t, center)
+		{
+			const a = TAU * t / LOOP + o.phase;
+			const p = new THREE.Vector3(Math.cos(a) * o.orbit, 0, Math.sin(a) * o.orbit).applyAxisAngle(new THREE.Vector3(1, 0, 0), o.incline).applyAxisAngle(new THREE.Vector3(0, 0, 1), o.roll);
+			mesh.position.copy(center).add(p);
+			uniforms.uSpin.value = a;
+		}
+	};
+}
+
+/* ONE SHOOTING STAR PER LOOP */
+function makeMeteor(texture)
+{
+	const material = new THREE.MeshBasicMaterial({ map: texture, color: new THREE.Color("#DCE8FF").multiplyScalar(2.4), transparent: true, blending: THREE.AdditiveBlending, depthWrite: false });
+	const mesh = new THREE.Mesh(new THREE.PlaneGeometry(1, 1), material);
+	mesh.renderOrder = 9;
+	const from = new THREE.Vector3(-1.5, 3.4, -4);
+	const to = new THREE.Vector3(-6.5, 1.4, -4);
+	const direction = to.clone().sub(from);
+	return {
+		mesh,
+		update(t)
+		{
+			const k = since(t, 9.0) / 1.1;
+			if (k > 1)
+			{
+				mesh.visible = false;
+				return;
+			}
+			mesh.visible = true;
+			const e = 1 - Math.pow(1 - k, 2);
+			mesh.position.copy(from).addScaledVector(direction, e);
+			mesh.rotation.z = Math.atan2(direction.y, direction.x);
+			mesh.scale.set(2.2 * Math.sin(Math.PI * k) + 0.2, 0.06, 1);
+			material.opacity = Math.sin(Math.PI * k);
+		}
+	};
+}
+
+/* ========================================================================== */
+/* THE SCENE                                                                  */
+/* ========================================================================== */
+
+function universeScene(renderer)
+{
+	const scene = new THREE.Scene();
+	const camera = new THREE.PerspectiveCamera(40, 16 / 9, 0.1, 400);
+	scene.add(camera);
+
+	const glow = glowTexture(false);
+	const spiky = glowTexture(true);
+
+	scene.add(makeSky());
+	const stars = makeStars();
+	scene.add(stars.points);
+	const bright = makeBrightStars(spiky);
+	scene.add(bright.group);
+
+	const galaxy = makeGalaxy({
+		seed: 11, count: 70000, radius: 4.4, pitch: 0.36, position: [4.2, 1.7, -7], tilt: [-1.08, 0.25, 0.32],
+		turns: 1, phase: 0.4, pointScale: 0.12, gain: 1.15, glow,
+		coreColor: "#FFC98A", coreGain: 0.55, haloColor: "#5C74FF", haloGain: 0.1, nucleusGain: 2.0
+	});
+	scene.add(galaxy.group);
+
+	const far = makeGalaxy({
+		seed: 23, count: 16000, radius: 1.6, pitch: 0.3, position: [-7.8, 3.4, -16], tilt: [-1.42, 0.6, -0.4],
+		turns: 1, phase: 1.3, pointScale: 0.12, gain: 0.9, glow,
+		coreColor: "#FFD8A8", coreGain: 0.45, haloColor: "#9C7BFF", haloGain: 0.08, nucleusGain: 1.3
+	});
+	scene.add(far.group);
+
+	const giant = makeGiant({ seed: 5, radius: 2.3, position: [-5.6, -3.1, -1.6], tilt: [0.42, 0.33], ring: [1.32, 2.35], spins: 1 });
+	scene.add(giant.group);
+
+	const moon = makeMoon({ radius: 0.2, orbit: 4.1, incline: 0.3, roll: 0.25, phase: 0.8 });
+	scene.add(moon.mesh);
+
+	const world = makeWorld({ radius: 0.78, position: [4.9, -2.2, 0.6], tilt: 0.38, spins: 1 });
+	scene.add(world.group);
+
+	const meteor = makeMeteor(glow);
+	scene.add(meteor.mesh);
+
+	const giantCenter = new THREE.Vector3(-5.6, -3.1, -1.6);
+
+	return {
+		scene,
+		camera,
+		bloom: { strength: 0.7, radius: 0.5, threshold: 0.62 },
+		exposure: 1.0,
+		update(t)
+		{
+			camera.position.set(0.35 * wave(t, 1), 0.16 * wave2(t, 1), 11);
+			camera.lookAt(0.2 * wave(t, 1, 0.6), 0, 0);
+			stars.material.uniforms.uPhase.value = TAU * t / LOOP;
+			bright.update(t);
+			galaxy.update(t);
+			far.update(t);
+			giant.update(t);
+			moon.update(t, giantCenter);
+			world.update(t);
+			meteor.update(t);
+		}
+	};
+}
+
+/* ========================================================================== */
+/* RENDERER, POST EFFECTS                                                     */
+/* ========================================================================== */
+
+const SCENES = {
+	UNIVERSE: { title: "Universe", text: "A turning spiral galaxy, a ringed giant with its moon, a blue world, nebula and stars", make: universeScene }
+};
+
+const canvas = document.getElementById("view");
+const renderer = new THREE.WebGLRenderer({ canvas, antialias: false, preserveDrawingBuffer: true, powerPreference: "high-performance", alpha: false });
+renderer.setPixelRatio(1);
+renderer.toneMapping = THREE.ACESFilmicToneMapping;
+renderer.outputColorSpace = THREE.SRGBColorSpace;
+
+/* LAST STEP, ON THE FINISHED PICTURE: A SOFT VIGNETTE, A TOUCH OF COLOUR
+** FRINGE AT THE EDGES, AND A STILL DITHER SO DARK GRADIENTS DO NOT BAND */
+const FinishShader = {
+	uniforms: { tDiffuse: { value: null }, uVignette: { value: 0.32 } },
+	vertexShader: `varying vec2 vUv; void main() { vUv = uv; gl_Position = projectionMatrix * modelViewMatrix * vec4(position, 1.0); }`,
+	fragmentShader: `
+		uniform sampler2D tDiffuse; uniform float uVignette; varying vec2 vUv;
+		float hash(vec2 p) { return fract(sin(dot(p, vec2(12.9898, 78.233))) * 43758.5453); }
+		void main()
+		{
+			vec2 c = vUv - 0.5;
+			float d = dot(c, c);
+			vec2 off = c * d * 0.006;
+			vec3 col = vec3(texture2D(tDiffuse, vUv + off).r, texture2D(tDiffuse, vUv).g, texture2D(tDiffuse, vUv - off).b);
+			col *= 1.0 - uVignette * smoothstep(0.08, 0.5, d);
+			col += (hash(gl_FragCoord.xy) - 0.5) / 255.0;
+			gl_FragColor = vec4(col, 1.0);
+		}`
+};
+
+let current = null;       /* { key, s: scene object, composer, bloom } */
+
+function buildPipeline(key, w, h)
+{
+	if (current && current.key === key)
+	{
+		resizePipeline(w, h);
+		return current;
+	}
+	const s = SCENES[key].make(renderer);
+	renderer.toneMappingExposure = s.exposure;
+	const target = new THREE.WebGLRenderTarget(w, h, { type: THREE.HalfFloatType, samples: 4 });
+	const composer = new EffectComposer(renderer, target);
+	composer.addPass(new RenderPass(s.scene, s.camera));
+	const bloom = new UnrealBloomPass(new THREE.Vector2(w, h), s.bloom.strength, s.bloom.radius, s.bloom.threshold);
+	composer.addPass(bloom);
+	composer.addPass(new OutputPass());
+	composer.addPass(new ShaderPass(FinishShader));
+	current = { key, s, composer, bloom };
+	resizePipeline(w, h);
+	return current;
+}
+
+function resizePipeline(w, h)
+{
+	renderer.setSize(w, h, false);
+	current.composer.setPixelRatio(1);
+	current.composer.setSize(w, h);
+	/* DOTS OF LIGHT KEEP THEIR SIZE RELATIVE TO THE PICTURE (PREVIEW = VIDEO) */
+	current.s.scene.traverse(o => { if (o.isPoints && o.material.uniforms && o.material.uniforms.uRes) o.material.uniforms.uRes.value = h / 1080; });
+	current.s.camera.aspect = w / h;
+	current.s.camera.updateProjectionMatrix();
+}
+
+function drawAt(t)
+{
+	current.s.update(t);
+	current.composer.render();
+}
+
+/* ========================================================================== */
+/* PREVIEW                                                                    */
+/* ========================================================================== */
+
+let sceneKey = "UNIVERSE";
+let previewing = true;
+let busy = false;
+let started = performance.now();
+
+function previewSize()
+{
+	const r = canvas.parentElement.getBoundingClientRect();
+	const dpr = Math.min(window.devicePixelRatio || 1, 1.5);
+	return { w: Math.max(320, Math.round(r.width * dpr / 2) * 2), h: Math.max(180, Math.round(r.width * dpr * 9 / 16 / 2) * 2) };
+}
+
+function previewLoop()
+{
+	requestAnimationFrame(previewLoop);
+	if (!previewing || busy)
+		return;
+	const size = previewSize();
+	if (renderer.domElement.width !== size.w || renderer.domElement.height !== size.h || !current || current.key !== sceneKey)
+		buildPipeline(sceneKey, size.w, size.h);
+	const t = ((performance.now() - started) / 1000) % LOOP;
+	drawAt(t);
+}
+
+/* ========================================================================== */
+/* ENCODING                                                                   */
+/* ========================================================================== */
+
+const OUT = {
+	1080: { w: 1920, h: 1080, mp4: ["avc1.64002A", "avc1.4D402A", "avc1.640033"], webm: ["vp09.00.41.08", "vp09.00.40.08", "vp09.00.50.08"], bitrate: { mp4: 5.0e6, webm: 3.8e6 } },
+	720: { w: 1280, h: 720, mp4: ["avc1.640020", "avc1.4D4020", "avc1.42E020"], webm: ["vp09.00.31.08", "vp09.00.40.08"], bitrate: { mp4: 2.4e6, webm: 1.9e6 } }
+};
+
+async function pickCodec(list, w, h, bitrate, isMp4)
+{
+	if (typeof VideoEncoder === "undefined")
+		return null;
+	/*
+	** FIRST CHOICE: THE SAME QUALITY FOR EVERY FRAME ("QUANTIZER" MODE). WITH A
+	** BITRATE TARGET THE ENCODER SHARPENS THE KEYFRAME AND SOFTENS THE REST, SO
+	** THE PICTURE'S FINE GRAIN WOULD JUMP A LITTLE WHERE THE LOOP STARTS AGAIN.
+	** BROWSERS WITHOUT IT FALL BACK TO A BITRATE TARGET.
+	*/
+	for (const mode of ["quantizer", "variable"])
+	{
+		for (const codec of list)
+		{
+			const config = { codec, width: w, height: h, framerate: FPS, latencyMode: "quality", bitrateMode: mode };
+			if (mode !== "quantizer")
+				config.bitrate = bitrate;
+			if (isMp4)
+				config.avc = { format: "avc" };
+			try
+			{
+				const r = await VideoEncoder.isConfigSupported(config);
+				if (r.supported)
+					return config;
+			}
+			catch (e) {}
+		}
+	}
+	return null;
+}
+
+async function supportReport()
+{
+	const box = document.getElementById("support");
+	if (typeof VideoEncoder === "undefined")
+	{
+		box.innerHTML = "<span class='warn'>This browser cannot encode video (no WebCodecs). Please use Chrome or Edge on a desktop.</span>";
+		document.getElementById("render").disabled = true;
+		document.getElementById("renderAll").disabled = true;
+		return;
+	}
+	const parts = [];
+	for (const res of [1080, 720])
+	{
+		for (const fmt of ["mp4", "webm"])
+		{
+			const ok = await pickCodec(OUT[res][fmt], OUT[res].w, OUT[res].h, OUT[res].bitrate[fmt], fmt === "mp4");
+			parts.push(`${res}p ${fmt.toUpperCase()} ${ok ? (ok.bitrateMode === "quantizer" ? "✓ steady quality" : "✓") : "<span class='warn'>not supported here</span>"}`);
+		}
+	}
+	box.innerHTML = parts.join(" · ");
+}
+
+const files = [];
+
+function addFile(name, blob)
+{
+	files.push({ name, blob });
+	const list = document.getElementById("files");
+	if (files.length === 1)
+		list.innerHTML = "";
+	const a = document.createElement("a");
+	a.href = URL.createObjectURL(blob);
+	a.download = name;
+	a.innerHTML = `<span>${name}</span><small>${(blob.size / 1048576).toFixed(2)} MB</small>`;
+	list.appendChild(a);
+	document.getElementById("download").disabled = false;
+}
+
+function setStatus(text, progress)
+{
+	document.getElementById("status").textContent = text;
+	if (progress !== undefined)
+		document.getElementById("bar").style.width = (progress * 100).toFixed(1) + "%";
+}
+
+const tick = () => new Promise(r => setTimeout(r, 0));
+
+async function renderPoster(key)
+{
+	buildPipeline(key, FULL.w, FULL.h);
+	drawAt(0);
+	const blob = await new Promise(r => canvas.toBlob(r, "image/webp", 0.88));
+	addFile(`${key}_POSTER.webp`, blob);
+	/* A SMALLER ONE FOR PHONES */
+	const small = new OffscreenCanvas(1280, 720);
+	const sctx = small.getContext("2d");
+	sctx.imageSmoothingQuality = "high";
+	sctx.drawImage(canvas, 0, 0, 1280, 720);
+	addFile(`${key}_POSTER_720.webp`, await small.convertToBlob({ type: "image/webp", quality: 0.85 }));
+}
+
+async function renderScene(key, count = FRAMES)
+{
+	const want = [];
+	const quality = Number(document.getElementById("quality").value);
+	for (const res of [1080, 720])
+	{
+		if (!document.getElementById("r" + res).checked)
+			continue;
+		for (const fmt of ["mp4", "webm"])
+		{
+			if (!document.getElementById("f" + fmt).checked)
+				continue;
+			const spec = OUT[res];
+			const config = await pickCodec(spec[fmt], spec.w, spec.h, Math.round(spec.bitrate[fmt] * quality), fmt === "mp4");
+			if (!config)
+				continue;
+			const target = fmt === "mp4" ? new Mp4Target() : new WebmTarget();
+			const muxer = fmt === "mp4"
+				? new Mp4Muxer({ target, video: { codec: "avc", width: spec.w, height: spec.h, frameRate: FPS }, fastStart: "in-memory", firstTimestampBehavior: "offset" })
+				: new WebmMuxer({ target, video: { codec: "V_VP9", width: spec.w, height: spec.h, frameRate: FPS }, firstTimestampBehavior: "offset" });
+			let failure = null;
+			const encoder = new VideoEncoder({
+				output: (chunk, meta) => muxer.addVideoChunk(chunk, meta),
+				error: e => { failure = e; }
+			});
+			encoder.configure(config);
+			/* QUANTIZER MODE: LOWER = SHARPER AND BIGGER. THE SLIDER MOVES IT. */
+			const q = fmt === "mp4"
+				? Math.max(14, Math.min(40, (res === 1080 ? 24 : 25) - Math.round((quality - 1) * 6)))
+				: Math.max(10, Math.min(56, (res === 1080 ? 31 : 33) - Math.round((quality - 1) * 10)));
+			const options = config.bitrateMode === "quantizer"
+				? (keyFrame => fmt === "mp4" ? { keyFrame, avc: { quantizer: q } } : { keyFrame, vp9: { quantizer: q } })
+				: (keyFrame => ({ keyFrame }));
+			want.push({ res, fmt, spec, target, muxer, encoder, options, mode: config.bitrateMode, get failure() { return failure; } });
+		}
+	}
+	if (!want.length)
+	{
+		setStatus("Nothing to render: pick at least one size and one format that this browser supports.");
+		return;
+	}
+
+	buildPipeline(key, FULL.w, FULL.h);
+	const small = want.some(o => o.res === 720) ? new OffscreenCanvas(1280, 720) : null;
+	const sctx = small ? small.getContext("2d") : null;
+	if (sctx)
+		sctx.imageSmoothingQuality = "high";
+
+	const t0 = performance.now();
+	for (let f = 0; f < count; f++)
+	{
+		drawAt(f / FPS);
+		const timestamp = Math.round(f * 1e6 / FPS);
+		const duration = Math.round((f + 1) * 1e6 / FPS) - timestamp;
+		/* ONE KEYFRAME PER LOOP: A KEYFRAME EVERY FEW SECONDS MAKES THE PICTURE'S
+		** FINE GRAIN JUMP A LITTLE EACH TIME (A FAINT "BREATHING" ON DARK
+		** GRADIENTS). A LOOPING BACKGROUND NEVER NEEDS TO SEEK, SO ONE IS ENOUGH. */
+		const keyFrame = f === 0;
+
+		const big = new VideoFrame(canvas, { timestamp, duration });
+		let little = null;
+		if (sctx)
+		{
+			sctx.drawImage(canvas, 0, 0, 1280, 720);
+			little = new VideoFrame(small, { timestamp, duration });
+		}
+		for (const o of want)
+		{
+			if (o.failure)
+				throw o.failure;
+			o.encoder.encode(o.res === 1080 ? big : little, o.options(keyFrame));
+		}
+		big.close();
+		if (little)
+			little.close();
+
+		/* DO NOT RUN AHEAD OF THE ENCODERS */
+		while (want.some(o => o.encoder.encodeQueueSize > 3))
+			await new Promise(r => setTimeout(r, 1));
+
+		if (f % 3 === 0)
+		{
+			const spent = (performance.now() - t0) / 1000;
+			const left = spent / (f + 1) * (count - f - 1);
+			setStatus(`${SCENES[key].title}: frame ${f + 1} / ${count} · about ${Math.ceil(left)} s left`, (f + 1) / count);
+			await tick();
+		}
+	}
+	setStatus(`${SCENES[key].title}: finishing the files…`, 1);
+	for (const o of want)
+	{
+		await o.encoder.flush();
+		o.encoder.close();
+		o.muxer.finalize();
+		const type = o.fmt === "mp4" ? "video/mp4" : "video/webm";
+		addFile(`${key}_${o.res}.${o.fmt}`, new Blob([o.target.buffer], { type }));
+	}
+	await renderPoster(key);
+	setStatus(`${SCENES[key].title}: done in ${Math.round((performance.now() - t0) / 1000)} s.`, 1);
+}
+
+async function run(keys)
+{
+	busy = true;
+	document.querySelectorAll("button").forEach(b => b.disabled = true);
+	document.getElementById("badge").textContent = "Rendering at 1920 × 1080";
+	try
+	{
+		for (const key of keys)
+			await renderScene(key);
+	}
+	catch (e)
+	{
+		console.error(e);
+		setStatus("Something went wrong: " + (e && e.message ? e.message : e));
+	}
+	busy = false;
+	document.querySelectorAll("button").forEach(b => b.disabled = false);
+	document.getElementById("download").disabled = files.length === 0;
+	document.getElementById("badge").textContent = previewing ? "Preview" : "Paused";
+	started = performance.now();
+}
+
+/* ========================================================================== */
+/* UI                                                                         */
+/* ========================================================================== */
+
+{
+	const box = document.getElementById("scenes");
+	for (const [key, info] of Object.entries(SCENES))
+	{
+		const label = document.createElement("label");
+		label.className = "scene";
+		label.innerHTML = `<input type="radio" name="scene" value="${key}" ${key === sceneKey ? "checked" : ""}><b>${info.title}</b><small>${info.text}</small>`;
+		label.querySelector("input").addEventListener("change", () =>
+		{
+			sceneKey = key;
+			started = performance.now();
+		});
+		box.appendChild(label);
+	}
+	const q = document.getElementById("quality");
+	const showQ = () =>
+	{
+		const v = Number(q.value);
+		const mb = (OUT[1080].bitrate.mp4 * v * LOOP / 8 / 1048576).toFixed(1);
+		document.getElementById("qv").textContent = `×${v.toFixed(1)} · ~${mb} MB per 1080p MP4`;
+	};
+	q.addEventListener("input", showQ);
+	showQ();
+
+	document.getElementById("preview").onclick = e =>
+	{
+		previewing = !previewing;
+		e.target.textContent = previewing ? "Pause preview" : "Play preview";
+		document.getElementById("badge").textContent = previewing ? "Preview" : "Paused";
+	};
+	document.getElementById("render").onclick = () => run([sceneKey]);
+	document.getElementById("renderAll").onclick = () => run(Object.keys(SCENES));
+	document.getElementById("poster").onclick = async () =>
+	{
+		busy = true;
+		await renderPoster(sceneKey);
+		busy = false;
+		setStatus("Poster ready.");
+	};
+	document.getElementById("download").onclick = async () =>
+	{
+		for (const f of files)
+		{
+			const a = document.createElement("a");
+			a.href = URL.createObjectURL(f.blob);
+			a.download = f.name;
+			a.click();
+			await new Promise(r => setTimeout(r, 350));
+		}
+	};
+}
+
+supportReport();
+previewLoop();
+
+/* FOR AUTOMATION (HEADLESS TESTS / FRAME DUMPS) */
+window.RECORDER = {
+	FRAMES, FPS, LOOP,
+	use(key, w = FULL.w, h = FULL.h) { previewing = false; busy = true; sceneKey = key; buildPipeline(key, w, h); },
+	frame(f) { drawAt(f / FPS); },
+	async png() { return await new Promise(r => canvas.toBlob(b => { const fr = new FileReader(); fr.onload = () => r(fr.result); fr.readAsDataURL(b); }, "image/png")); },
+	renderScene, renderPoster, files
+};
+</script>
+</body>
+</html>

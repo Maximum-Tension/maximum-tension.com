@@ -1,0 +1,945 @@
+<!DOCTYPE html>
+<!--
+  Maximum Tension - hero pumpkin video recorder
+  ---------------------------------------------
+  Open this file in Chrome or Edge (desktop), straight from the repository
+  (it loads ../src/js/JS.js and ../src/pumpkin.js, the same engine as the site).
+  Pick a scene, press "Render". Every frame is drawn on a fixed clock
+  (frame N = N / 60 s) and encoded in the browser (WebCodecs), so the video is
+  a true 60 FPS however slow a frame is to draw. Each scene is a seamless
+  8 second loop: one full turn of the pumpkin, whole-number candle flickers.
+
+  Output, per scene:  PUMPKIN_<SCENE>_1080.mp4 / .webm,  PUMPKIN_<SCENE>_720.mp4 / .webm,
+                      PUMPKIN_<SCENE>_SQUARE.mp4 / .webm (1080 x 1080, optional),
+                      PUMPKIN_<SCENE>_POSTER.webp (the first frame)
+-->
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Maximum Tension video recorder</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Martian+Mono:wdth,wght@75..112.5,100..800&display=swap">
+<style>
+	:root
+	{
+		--bg: #000000;
+		--panel: rgba(236, 230, 216, 0.05);
+		--line: rgba(236, 230, 216, 0.14);
+		--text: #ECE6D8;
+		--muted: rgba(236, 230, 216, 0.6);
+		--ember: #FF7A1A;
+		--wick: #FFD08A;
+	}
+
+	*
+	{
+		box-sizing: border-box;
+	}
+
+	html, body
+	{
+		margin: 0;
+		min-height: 100%;
+		color: var(--text);
+		background:
+			radial-gradient(60% 50% at 20% 0%, rgba(255, 122, 26, 0.12), transparent 70%),
+			var(--bg);
+		font: 15px/1.45 system-ui, -apple-system, "Segoe UI", Roboto, sans-serif;
+	}
+
+	main
+	{
+		gap: 24px;
+		display: grid;
+		padding: 24px;
+		grid-template-columns: minmax(0, 1fr) 360px;
+		align-items: start;
+	}
+
+	@media (max-width: 1100px)
+	{
+		main
+		{
+			grid-template-columns: minmax(0, 1fr);
+		}
+	}
+
+	h1
+	{
+		margin: 0 0 4px 0;
+		font-size: 22px;
+		font-weight: 600;
+	}
+
+	.sub
+	{
+		color: var(--muted);
+		margin: 0 0 18px 0;
+	}
+
+	.stage
+	{
+		position: relative;
+		overflow: hidden;
+		aspect-ratio: 16 / 9;
+		border-radius: 14px;
+		background: #000;
+		box-shadow: 0 0 0 1px var(--line), 0 30px 60px -30px rgba(0, 0, 0, 0.9);
+	}
+
+	.stage.square
+	{
+		aspect-ratio: 1 / 1;
+		max-width: 720px;
+	}
+
+	.stage canvas
+	{
+		width: 100%;
+		height: 100%;
+		display: block;
+	}
+
+	.stage .badge
+	{
+		top: 12px;
+		left: 12px;
+		padding: 4px 10px;
+		position: absolute;
+		font-size: 12.5px;
+		border-radius: 999px;
+		background: rgba(0, 0, 0, 0.45);
+		backdrop-filter: blur(8px);
+		color: var(--muted);
+	}
+
+	.card
+	{
+		padding: 18px;
+		border-radius: 16px;
+		background: var(--panel);
+		box-shadow: inset 0 0 0 1px var(--line);
+		backdrop-filter: blur(14px);
+	}
+
+	.card + .card
+	{
+		margin-top: 14px;
+	}
+
+	.card h2
+	{
+		margin: 0 0 12px 0;
+		font-size: 13px;
+		font-weight: 600;
+		letter-spacing: 0.1em;
+		text-transform: uppercase;
+		color: var(--muted);
+	}
+
+	.scenes
+	{
+		gap: 8px;
+		display: grid;
+	}
+
+	.scene
+	{
+		gap: 2px;
+		display: flex;
+		cursor: pointer;
+		padding: 10px 12px;
+		border-radius: 12px;
+		flex-direction: column;
+		box-shadow: inset 0 0 0 1px var(--line);
+		transition: box-shadow 0.2s ease, background 0.2s ease;
+	}
+
+	.scene input
+	{
+		display: none;
+	}
+
+	.scene small
+	{
+		color: var(--muted);
+	}
+
+	.scene:has(input:checked)
+	{
+		background: rgba(255, 122, 26, 0.10);
+		box-shadow: inset 0 0 0 1.5px var(--ember);
+	}
+
+	.row
+	{
+		gap: 10px;
+		display: flex;
+		flex-wrap: wrap;
+		align-items: center;
+	}
+
+	.check
+	{
+		gap: 8px;
+		display: inline-flex;
+		cursor: pointer;
+		padding: 6px 12px;
+		border-radius: 999px;
+		align-items: center;
+		box-shadow: inset 0 0 0 1px var(--line);
+	}
+
+	.check input
+	{
+		accent-color: var(--ember);
+	}
+
+	label.slider
+	{
+		display: block;
+		margin-top: 12px;
+	}
+
+	label.slider span
+	{
+		float: right;
+		color: var(--muted);
+		font-variant-numeric: tabular-nums;
+	}
+
+	input[type="range"]
+	{
+		width: 100%;
+		accent-color: var(--ember);
+	}
+
+	button
+	{
+		color: #fff;
+		border: 0;
+		cursor: pointer;
+		padding: 11px 18px;
+		font: inherit;
+		font-weight: 600;
+		border-radius: 12px;
+		background: rgba(255, 255, 255, 0.08);
+		box-shadow: inset 0 0 0 1px var(--line);
+		transition: filter 0.2s ease, background 0.2s ease;
+	}
+
+	button:hover
+	{
+		filter: brightness(1.15);
+	}
+
+	button.primary
+	{
+		color: #000;
+		background: linear-gradient(135deg, var(--wick), var(--ember));
+		box-shadow: 0 8px 24px -10px rgba(255, 122, 26, 0.8);
+	}
+
+	button:disabled
+	{
+		opacity: 0.45;
+		cursor: default;
+		filter: none;
+	}
+
+	.buttons
+	{
+		gap: 8px;
+		display: grid;
+		grid-template-columns: 1fr 1fr;
+	}
+
+	.buttons .wide
+	{
+		grid-column: 1 / -1;
+	}
+
+	.progress
+	{
+		height: 8px;
+		overflow: hidden;
+		margin-top: 14px;
+		border-radius: 999px;
+		background: rgba(255, 255, 255, 0.08);
+	}
+
+	.progress div
+	{
+		width: 0%;
+		height: 100%;
+		background: linear-gradient(90deg, var(--ember), var(--wick));
+		transition: width 0.15s linear;
+	}
+
+	.status
+	{
+		color: var(--muted);
+		margin-top: 8px;
+		min-height: 1.4em;
+		font-variant-numeric: tabular-nums;
+	}
+
+	.files
+	{
+		gap: 6px;
+		display: grid;
+	}
+
+	.files a
+	{
+		gap: 10px;
+		display: flex;
+		color: var(--text);
+		padding: 8px 12px;
+		border-radius: 10px;
+		text-decoration: none;
+		justify-content: space-between;
+		background: rgba(255, 255, 255, 0.05);
+	}
+
+	.files a:hover
+	{
+		background: rgba(255, 122, 26, 0.15);
+	}
+
+	.files a small
+	{
+		color: var(--muted);
+	}
+
+	.note
+	{
+		color: var(--muted);
+		font-size: 13px;
+		margin: 10px 0 0 0;
+	}
+
+	.warn
+	{
+		color: #ffc69a;
+	}
+</style>
+</head>
+<body>
+<main>
+	<section>
+		<h1>Maximum Tension video recorder</h1>
+		<p class="sub">The hero pumpkin, drawn by the same engine as the site. 60 FPS, seamless 8 second loops, rendered frame by frame.</p>
+		<div class="stage" id="stage">
+			<canvas id="view"></canvas>
+			<span class="badge" id="badge">Preview</span>
+		</div>
+		<p class="note">The preview runs in real time at screen size, so it can stutter on slower machines. The rendered video never does: every frame is drawn at full size (glass supersampled) and saved, one by one.</p>
+	</section>
+
+	<aside>
+		<div class="card">
+			<h2>Scene</h2>
+			<div class="scenes" id="scenes"></div>
+		</div>
+
+		<div class="card">
+			<h2>Output</h2>
+			<div class="row">
+				<label class="check"><input type="checkbox" id="r1080" checked> 1080p</label>
+				<label class="check"><input type="checkbox" id="r720" checked> 720p (phones)</label>
+				<label class="check"><input type="checkbox" id="rSQUARE"> 1080 × 1080 (social)</label>
+			</div>
+			<div class="row" style="margin-top: 8px">
+				<label class="check"><input type="checkbox" id="fmp4" checked> MP4 (H.264)</label>
+				<label class="check"><input type="checkbox" id="fwebm" checked> WebM (VP9)</label>
+			</div>
+			<div class="row" style="margin-top: 8px">
+				<label class="check"><input type="checkbox" id="supersample" checked> Supersample glass (2×)</label>
+			</div>
+			<label class="slider">Quality / size <span id="qv"></span>
+				<input type="range" id="quality" min="0.5" max="2" step="0.1" value="1">
+			</label>
+			<p class="note" id="support"></p>
+		</div>
+
+		<div class="card">
+			<div class="buttons">
+				<button id="preview">Pause preview</button>
+				<button id="poster">Poster only</button>
+				<button id="render" class="primary">Render this scene</button>
+				<button id="renderAll">Render all 4</button>
+				<button id="download" class="wide" disabled>Download all files</button>
+			</div>
+			<div class="progress"><div id="bar"></div></div>
+			<div class="status" id="status">Ready.</div>
+		</div>
+
+		<div class="card">
+			<h2>Files</h2>
+			<div class="files" id="files"><small style="color: var(--muted)">Rendered files show up here.</small></div>
+		</div>
+	</aside>
+</main>
+
+<!-- THE SITE'S OWN ENGINE -->
+<script src="../src/js/JS.js"></script>
+<script src="../src/pumpkin.js"></script>
+
+<script type="importmap">
+{
+	"imports":
+	{
+		"mp4-muxer": "https://cdn.jsdelivr.net/npm/mp4-muxer@5.2.2/build/mp4-muxer.mjs",
+		"webm-muxer": "https://cdn.jsdelivr.net/npm/webm-muxer@5.1.4/build/webm-muxer.mjs"
+	}
+}
+</script>
+
+<script type="module">
+import { Muxer as Mp4Muxer, ArrayBufferTarget as Mp4Target } from "mp4-muxer";
+import { Muxer as WebmMuxer, ArrayBufferTarget as WebmTarget } from "webm-muxer";
+
+/* ========================================================================== */
+/* CONSTANTS                                                                  */
+/* ========================================================================== */
+
+const FPS = 60;
+const LOOP = pumpkin_loop;            /* SECONDS - ONE TURN OF THE PUMPKIN */
+const FRAMES = FPS * LOOP;
+const TAU = Math.PI * 2;
+const FULL = { w: 1920, h: 1080 };
+const MONO = "\"Martian Mono\", Menlo, Consolas, monospace";
+const ASCII_COLORS = ["#77705F", "#ECE6D8", "#B04A12", "#FF8A2A", "#FFE2A6"];
+
+/* ========================================================================== */
+/* SCENES                                                                     */
+/* ========================================================================== */
+
+/*
+** SPLIT: THE SITE'S HERO. TEXT | WIREFRAME | GLASS, CUT BY TWO DIAGONAL SEAMS
+** THAT SWEEP ONCE LEFT AND RIGHT PER LOOP, SO EVERY STYLE GETS ITS MOMENT.
+** THE OTHER THREE ARE ONE STYLE EACH, FULL FRAME.
+*/
+const SCENES = {
+	SPLIT: { title: "Hero split", text: "Text, wireframe and glass in one pumpkin; the seams sweep across", parts: "split" },
+	TEXT: { title: "Text", text: "The ASCII pumpkin on its own", parts: "text" },
+	WIRE: { title: "Wireframe", text: "Triangle edges and the carved cut", parts: "wire" },
+	GLASS: { title: "Glass", text: "Smoked glass, candle-lit carved edges", parts: "glass" }
+};
+
+const canvas = document.getElementById("view");
+const ctx = canvas.getContext("2d", { alpha: false });
+const wireCanvas = document.createElement("canvas");
+const wireCtx = wireCanvas.getContext("2d");
+const glassCanvas = document.createElement("canvas");
+
+let models = null;
+let wire = null;
+let glass = null;
+let ascii = null;
+let charRatio = 0.62;
+let noise = null;
+
+/* A STILL GRAIN SO THE DARK GLOW DOES NOT BAND IN THE VIDEO (NEVER MOVES) */
+function makeNoise()
+{
+	const c = document.createElement("canvas");
+	c.width = c.height = 256;
+	const x = c.getContext("2d");
+	const img = x.createImageData(256, 256);
+	let s = 7;
+	for (let i = 0; i < img.data.length; i += 4)
+	{
+		s = (s * 16807) % 2147483647;
+		const v = (s / 2147483647) * 255;
+		img.data[i] = img.data[i + 1] = img.data[i + 2] = v;
+		img.data[i + 3] = 255;
+	}
+	x.putImageData(img, 0, 0);
+	return c;
+}
+
+async function prepare()
+{
+	if (models)
+		return;
+	await document.fonts.load("500 40px \"Martian Mono\"");
+	ctx.font = "500 100px " + MONO;
+	charRatio = ctx.measureText("@").width / 100 || 0.62;
+	models = pumpkin_build({ ascii: [80, 160], wire: [26, 52], glass: [200, 320] });
+	wire = wire_create(models.wire);
+	glass = glass_create(models.glass, glassCanvas, true);
+	noise = makeNoise();
+	if (!glass)
+		throw new Error("WebGL is not available, so the glass scene cannot be drawn.");
+}
+
+let size = { w: 0, h: 0, ss: 0 };
+
+function resize(w, h, supersample)
+{
+	const ss = supersample ? 2 : 1;
+	if (size.w === w && size.h === h && size.ss === ss)
+		return;
+	size = { w, h, ss };
+	canvas.width = w;
+	canvas.height = h;
+	wireCanvas.width = w;
+	wireCanvas.height = h;
+	glassCanvas.width = w * ss;
+	glassCanvas.height = h * ss;
+	const columns = Math.round(w / 8);
+	const font = w / (columns * charRatio);
+	const rows = Math.round(h / font);
+	ascii = { grid: ascii_create(models.ascii, columns, rows, 1), font, cellW: font * charRatio, cellH: h / rows };
+}
+
+/* THE TWO SEAMS: PARALLEL DIAGONALS LIKE THE SITE (SLOPE 0.6, BAND 20% WIDE) */
+function seams(t, w, h)
+{
+	const center = (0.5 + 0.2 * Math.sin(TAU * t / LOOP)) * w;
+	const half = w * 0.1;
+	const reach = h / 2 * 0.6;
+	return {
+		a: [center - half - reach, center - half + reach],
+		b: [center + half - reach, center + half + reach]
+	};
+}
+
+function clipPolygon(points)
+{
+	ctx.beginPath();
+	ctx.moveTo(points[0][0], points[0][1]);
+	for (let i = 1; i < points.length; i++)
+		ctx.lineTo(points[i][0], points[i][1]);
+	ctx.closePath();
+	ctx.clip();
+}
+
+function drawAt(t, key, w, h, supersample)
+{
+	const parts = SCENES[key].parts;
+	resize(w, h, supersample);
+	const pose = pumpkin_pose(t, 0, w / h);
+
+	ctx.setTransform(1, 0, 0, 1, 0, 0);
+	ctx.fillStyle = "#000";
+	ctx.fillRect(0, 0, w, h);
+
+	/* THE CANDLE'S GLOW BEHIND EVERYTHING */
+	const g = ctx.createRadialGradient(w * 0.5, h * 0.55, 0, w * 0.5, h * 0.55, Math.max(w, h) * 0.42);
+	const a = Math.min(1, 0.16 * (0.6 + (pose.flicker - 1) * 2.4 + 0.4));
+	g.addColorStop(0, "rgba(255, 122, 26, " + a.toFixed(3) + ")");
+	g.addColorStop(0.55, "rgba(255, 122, 26, " + (a * 0.3).toFixed(3) + ")");
+	g.addColorStop(1, "rgba(255, 122, 26, 0)");
+	ctx.fillStyle = g;
+	ctx.fillRect(0, 0, w, h);
+
+	const cut = parts === "split" ? seams(t, w, h) : null;
+	const show = name => parts === "split" || parts === name;
+
+	if (show("text"))
+	{
+		ctx.save();
+		if (cut)
+			clipPolygon([[0, 0], [cut.a[0], 0], [cut.a[1], h], [0, h]]);
+		ascii_render(ascii.grid, pose);
+		const limit = cut ? Math.ceil(Math.max(cut.a[0], cut.a[1]) / ascii.cellW) + 2 : undefined;
+		ascii_draw(ascii.grid, ctx, 0, (ascii.cellH - ascii.font) / 2, ascii.cellW, ascii.cellH, "500 " + ascii.font.toFixed(2) + "px " + MONO, ASCII_COLORS, limit);
+		ctx.restore();
+	}
+
+	if (show("wire"))
+	{
+		wire_render(wire, wireCtx, w, h, pose, h / 700);
+		ctx.save();
+		if (cut)
+			clipPolygon([[cut.a[0], 0], [cut.b[0], 0], [cut.b[1], h], [cut.a[1], h]]);
+		ctx.drawImage(wireCanvas, 0, 0);
+		ctx.restore();
+	}
+
+	if (show("glass"))
+	{
+		glass_render(glass, pose, glassCanvas.width, glassCanvas.height, cut ? Math.min(cut.b[0], cut.b[1]) * size.ss - 4 : 0);
+		ctx.save();
+		if (cut)
+			clipPolygon([[cut.b[0], 0], [w, 0], [w, h], [cut.b[1], h]]);
+		ctx.imageSmoothingQuality = "high";
+		ctx.drawImage(glassCanvas, 0, 0, w, h);
+		ctx.restore();
+	}
+
+	if (cut)
+	{
+		/* THE SEAMS THEMSELVES, FADING OUT AT THE TOP AND BOTTOM */
+		const line = ctx.createLinearGradient(0, 0, 0, h);
+		line.addColorStop(0, "rgba(236, 230, 216, 0)");
+		line.addColorStop(0.22, "rgba(236, 230, 216, 0.28)");
+		line.addColorStop(0.78, "rgba(236, 230, 216, 0.28)");
+		line.addColorStop(1, "rgba(236, 230, 216, 0)");
+		ctx.strokeStyle = line;
+		ctx.lineWidth = Math.max(1, h / 700);
+		for (const s of [cut.a, cut.b])
+		{
+			ctx.beginPath();
+			ctx.moveTo(s[0], 0);
+			ctx.lineTo(s[1], h);
+			ctx.stroke();
+		}
+	}
+
+	ctx.globalAlpha = 0.025;
+	ctx.fillStyle = ctx.createPattern(noise, "repeat");
+	ctx.fillRect(0, 0, w, h);
+	ctx.globalAlpha = 1;
+}
+
+/* ========================================================================== */
+/* PREVIEW                                                                    */
+/* ========================================================================== */
+
+let sceneKey = "SPLIT";
+let previewing = true;
+let busy = false;
+let started = performance.now();
+let ready = false;
+
+function previewSize()
+{
+	const r = canvas.parentElement.getBoundingClientRect();
+	const dpr = Math.min(window.devicePixelRatio || 1, 1.5);
+	return { w: Math.max(320, Math.round(r.width * dpr / 2) * 2), h: Math.max(180, Math.round(r.height * dpr / 2) * 2) };
+}
+
+function previewLoop()
+{
+	requestAnimationFrame(previewLoop);
+	if (!ready || !previewing || busy)
+		return;
+	const s = previewSize();
+	const t = ((performance.now() - started) / 1000) % LOOP;
+	drawAt(t, sceneKey, s.w, s.h, false);
+}
+
+/* ========================================================================== */
+/* ENCODING                                                                   */
+/* ========================================================================== */
+
+const OUT = {
+	1080: { w: 1920, h: 1080, mp4: ["avc1.64002A", "avc1.4D402A", "avc1.640033"], webm: ["vp09.00.41.08", "vp09.00.40.08", "vp09.00.50.08"], bitrate: { mp4: 6.0e6, webm: 4.4e6 } },
+	720: { w: 1280, h: 720, mp4: ["avc1.640020", "avc1.4D4020", "avc1.42E020"], webm: ["vp09.00.31.08", "vp09.00.40.08"], bitrate: { mp4: 2.8e6, webm: 2.1e6 } },
+	SQUARE: { w: 1080, h: 1080, mp4: ["avc1.64002A", "avc1.4D402A", "avc1.640033"], webm: ["vp09.00.41.08", "vp09.00.40.08", "vp09.00.50.08"], bitrate: { mp4: 4.6e6, webm: 3.4e6 } }
+};
+
+async function pickCodec(list, w, h, bitrate, isMp4)
+{
+	if (typeof VideoEncoder === "undefined")
+		return null;
+	/*
+	** FIRST CHOICE: THE SAME QUALITY FOR EVERY FRAME ("QUANTIZER" MODE). WITH A
+	** BITRATE TARGET THE ENCODER SHARPENS THE KEYFRAME AND SOFTENS THE REST, SO
+	** THE PICTURE'S FINE GRAIN WOULD JUMP A LITTLE WHERE THE LOOP STARTS AGAIN.
+	** BROWSERS WITHOUT IT FALL BACK TO A BITRATE TARGET.
+	*/
+	for (const mode of ["quantizer", "variable"])
+	{
+		for (const codec of list)
+		{
+			const config = { codec, width: w, height: h, framerate: FPS, latencyMode: "quality", bitrateMode: mode };
+			if (mode !== "quantizer")
+				config.bitrate = bitrate;
+			if (isMp4)
+				config.avc = { format: "avc" };
+			try
+			{
+				const r = await VideoEncoder.isConfigSupported(config);
+				if (r.supported)
+					return config;
+			}
+			catch (e) {}
+		}
+	}
+	return null;
+}
+
+async function supportReport()
+{
+	const box = document.getElementById("support");
+	if (typeof VideoEncoder === "undefined")
+	{
+		box.innerHTML = "<span class='warn'>This browser cannot encode video (no WebCodecs). Please use Chrome or Edge on a desktop.</span>";
+		document.getElementById("render").disabled = true;
+		document.getElementById("renderAll").disabled = true;
+		return;
+	}
+	const parts = [];
+	for (const res of [1080, 720])
+	{
+		for (const fmt of ["mp4", "webm"])
+		{
+			const ok = await pickCodec(OUT[res][fmt], OUT[res].w, OUT[res].h, OUT[res].bitrate[fmt], fmt === "mp4");
+			parts.push(`${res}p ${fmt.toUpperCase()} ${ok ? (ok.bitrateMode === "quantizer" ? "✓ steady quality" : "✓") : "<span class='warn'>not supported here</span>"}`);
+		}
+	}
+	box.innerHTML = parts.join(" · ");
+}
+
+const files = [];
+
+function addFile(name, blob)
+{
+	files.push({ name, blob });
+	const list = document.getElementById("files");
+	if (files.length === 1)
+		list.innerHTML = "";
+	const a = document.createElement("a");
+	a.href = URL.createObjectURL(blob);
+	a.download = name;
+	a.innerHTML = `<span>${name}</span><small>${(blob.size / 1048576).toFixed(2)} MB</small>`;
+	list.appendChild(a);
+	document.getElementById("download").disabled = false;
+}
+
+function setStatus(text, progress)
+{
+	document.getElementById("status").textContent = text;
+	if (progress !== undefined)
+		document.getElementById("bar").style.width = (progress * 100).toFixed(1) + "%";
+}
+
+const tick = () => new Promise(r => setTimeout(r, 0));
+const supersample = () => document.getElementById("supersample").checked;
+
+async function renderPoster(key)
+{
+	drawAt(0, key, FULL.w, FULL.h, supersample());
+	const blob = await new Promise(r => canvas.toBlob(r, "image/webp", 0.9));
+	addFile(`PUMPKIN_${key}_POSTER.webp`, blob);
+	/* A SMALLER ONE FOR PHONES, AND A PNG FOR SOCIAL PREVIEWS (og:image) */
+	const small = new OffscreenCanvas(1280, 720);
+	const sctx = small.getContext("2d");
+	sctx.imageSmoothingQuality = "high";
+	sctx.drawImage(canvas, 0, 0, 1280, 720);
+	addFile(`PUMPKIN_${key}_POSTER_720.webp`, await small.convertToBlob({ type: "image/webp", quality: 0.86 }));
+	addFile(`PUMPKIN_${key}_THUMBNAIL.png`, await small.convertToBlob({ type: "image/png" }));
+}
+
+/* ONE PASS PER OUTPUT SHAPE: 16:9 FEEDS 1080P AND 720P, SQUARE IS ITS OWN */
+async function encodePass(key, shape, outputs, quality, t0, done, total)
+{
+	const want = [];
+	for (const res of outputs)
+	{
+		for (const fmt of ["mp4", "webm"])
+		{
+			if (!document.getElementById("f" + fmt).checked)
+				continue;
+			const spec = OUT[res];
+			const config = await pickCodec(spec[fmt], spec.w, spec.h, Math.round(spec.bitrate[fmt] * quality), fmt === "mp4");
+			if (!config)
+				continue;
+			const target = fmt === "mp4" ? new Mp4Target() : new WebmTarget();
+			const muxer = fmt === "mp4"
+				? new Mp4Muxer({ target, video: { codec: "avc", width: spec.w, height: spec.h, frameRate: FPS }, fastStart: "in-memory", firstTimestampBehavior: "offset" })
+				: new WebmMuxer({ target, video: { codec: "V_VP9", width: spec.w, height: spec.h, frameRate: FPS }, firstTimestampBehavior: "offset" });
+			let failure = null;
+			const encoder = new VideoEncoder({
+				output: (chunk, meta) => muxer.addVideoChunk(chunk, meta),
+				error: e => { failure = e; }
+			});
+			encoder.configure(config);
+			/* QUANTIZER MODE: LOWER = SHARPER AND BIGGER. THE SLIDER MOVES IT. */
+			const q = fmt === "mp4"
+				? Math.max(14, Math.min(40, (res === 720 ? 25 : 23) - Math.round((quality - 1) * 6)))
+				: Math.max(10, Math.min(56, (res === 720 ? 33 : 30) - Math.round((quality - 1) * 10)));
+			const options = config.bitrateMode === "quantizer"
+				? (keyFrame => fmt === "mp4" ? { keyFrame, avc: { quantizer: q } } : { keyFrame, vp9: { quantizer: q } })
+				: (keyFrame => ({ keyFrame }));
+			want.push({ res, fmt, spec, target, muxer, encoder, options, get failure() { return failure; } });
+		}
+	}
+	if (!want.length)
+		return done;
+
+	const small = want.some(o => o.res === 720) ? new OffscreenCanvas(1280, 720) : null;
+	const sctx = small ? small.getContext("2d") : null;
+	if (sctx)
+		sctx.imageSmoothingQuality = "high";
+
+	for (let f = 0; f < FRAMES; f++)
+	{
+		drawAt(f / FPS, key, shape.w, shape.h, supersample());
+		const timestamp = Math.round(f * 1e6 / FPS);
+		const duration = Math.round((f + 1) * 1e6 / FPS) - timestamp;
+		/* ONE KEYFRAME PER LOOP (A LOOPING VIDEO NEVER NEEDS TO SEEK) */
+		const keyFrame = f === 0;
+
+		const big = new VideoFrame(canvas, { timestamp, duration });
+		let little = null;
+		if (sctx)
+		{
+			sctx.drawImage(canvas, 0, 0, 1280, 720);
+			little = new VideoFrame(small, { timestamp, duration });
+		}
+		for (const o of want)
+		{
+			if (o.failure)
+				throw o.failure;
+			o.encoder.encode(o.res === 720 ? little : big, o.options(keyFrame));
+		}
+		big.close();
+		if (little)
+			little.close();
+
+		/* DO NOT RUN AHEAD OF THE ENCODERS */
+		while (want.some(o => o.encoder.encodeQueueSize > 3))
+			await new Promise(r => setTimeout(r, 1));
+
+		done++;
+		if (f % 3 === 0)
+		{
+			const spent = (performance.now() - t0) / 1000;
+			const left = spent / done * (total - done);
+			setStatus(`${SCENES[key].title}: frame ${done} / ${total} · about ${Math.ceil(left)} s left`, done / total);
+			await tick();
+		}
+	}
+	for (const o of want)
+	{
+		await o.encoder.flush();
+		o.encoder.close();
+		o.muxer.finalize();
+		const type = o.fmt === "mp4" ? "video/mp4" : "video/webm";
+		const name = o.res === "SQUARE" ? "SQUARE" : o.res;
+		addFile(`PUMPKIN_${key}_${name}.${o.fmt}`, new Blob([o.target.buffer], { type }));
+	}
+	return done;
+}
+
+async function renderScene(key)
+{
+	const quality = Number(document.getElementById("quality").value);
+	const wide = [1080, 720].filter(r => document.getElementById("r" + r).checked);
+	const square = document.getElementById("rSQUARE").checked;
+	const total = (wide.length ? FRAMES : 0) + (square ? FRAMES : 0);
+	if (!total || (!document.getElementById("fmp4").checked && !document.getElementById("fwebm").checked))
+	{
+		setStatus("Nothing to render: pick at least one size and one format that this browser supports.");
+		return;
+	}
+	const t0 = performance.now();
+	let done = 0;
+	if (wide.length)
+		done = await encodePass(key, FULL, wide, quality, t0, done, total);
+	if (square)
+		done = await encodePass(key, { w: 1080, h: 1080 }, ["SQUARE"], quality, t0, done, total);
+	setStatus(`${SCENES[key].title}: finishing…`, 1);
+	await renderPoster(key);
+	setStatus(`${SCENES[key].title}: done in ${Math.round((performance.now() - t0) / 1000)} s.`, 1);
+}
+
+async function run(keys)
+{
+	busy = true;
+	document.querySelectorAll("button").forEach(b => b.disabled = true);
+	document.getElementById("badge").textContent = "Rendering";
+	try
+	{
+		for (const key of keys)
+			await renderScene(key);
+	}
+	catch (e)
+	{
+		console.error(e);
+		setStatus("Something went wrong: " + (e && e.message ? e.message : e));
+	}
+	busy = false;
+	document.querySelectorAll("button").forEach(b => b.disabled = false);
+	document.getElementById("download").disabled = files.length === 0;
+	document.getElementById("badge").textContent = previewing ? "Preview" : "Paused";
+	size = { w: 0, h: 0, ss: 0 };
+	started = performance.now();
+}
+
+/* ========================================================================== */
+/* UI                                                                         */
+/* ========================================================================== */
+
+{
+	const box = document.getElementById("scenes");
+	for (const [key, info] of Object.entries(SCENES))
+	{
+		const label = document.createElement("label");
+		label.className = "scene";
+		label.innerHTML = `<input type="radio" name="scene" value="${key}" ${key === sceneKey ? "checked" : ""}><b>${info.title}</b><small>${info.text}</small>`;
+		label.querySelector("input").addEventListener("change", () =>
+		{
+			sceneKey = key;
+			started = performance.now();
+		});
+		box.appendChild(label);
+	}
+	const q = document.getElementById("quality");
+	const showQ = () =>
+	{
+		const v = Number(q.value);
+		const mb = (OUT[1080].bitrate.mp4 * v * LOOP / 8 / 1048576).toFixed(1);
+		document.getElementById("qv").textContent = `×${v.toFixed(1)} · ~${mb} MB per 1080p MP4`;
+	};
+	q.addEventListener("input", showQ);
+	showQ();
+
+	document.getElementById("preview").onclick = e =>
+	{
+		previewing = !previewing;
+		e.target.textContent = previewing ? "Pause preview" : "Play preview";
+		document.getElementById("badge").textContent = previewing ? "Preview" : "Paused";
+	};
+	document.getElementById("render").onclick = () => run([sceneKey]);
+	document.getElementById("renderAll").onclick = () => run(Object.keys(SCENES));
+	document.getElementById("poster").onclick = async () =>
+	{
+		busy = true;
+		await renderPoster(sceneKey);
+		busy = false;
+		size = { w: 0, h: 0, ss: 0 };
+		setStatus("Poster ready.");
+	};
+	document.getElementById("download").onclick = async () =>
+	{
+		for (const f of files)
+		{
+			const a = document.createElement("a");
+			a.href = URL.createObjectURL(f.blob);
+			a.download = f.name;
+			a.click();
+			await new Promise(r => setTimeout(r, 350));
+		}
+	};
+}
+
+supportReport();
+prepare().then(() =>
+{
+	ready = true;
+	previewLoop();
+}).catch(e =>
+{
+	setStatus("Could not start: " + (e && e.message ? e.message : e));
+});
+
+/* FOR AUTOMATION (HEADLESS TESTS / FRAME DUMPS) */
+window.RECORDER = {
+	FRAMES, FPS, LOOP,
+	async use(key, w = FULL.w, h = FULL.h, ss = true) { previewing = false; busy = true; sceneKey = key; await prepare(); size = { w: 0, h: 0, ss: 0 }; window.RECORDER.shape = { w, h, ss }; },
+	frame(f) { const s = window.RECORDER.shape; drawAt(f / FPS, sceneKey, s.w, s.h, s.ss); },
+	async png() { return await new Promise(r => canvas.toBlob(b => { const fr = new FileReader(); fr.onload = () => r(fr.result); fr.readAsDataURL(b); }, "image/png")); },
+	renderScene, renderPoster, files
+};
+</script>
+</body>
+</html>

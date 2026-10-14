@@ -1,0 +1,14 @@
+{
+	"version": "5.5.0",
+	"name": "Maximum Tension",
+	"description": "Maximum Tension is a small group of legacy systems engineers. We build software, algorithms and circuits from the lowest level up, and design websites with Apple-level care at small-studio prices.",
+	"icons": {
+		"60": "firefox_app_60x60.png",
+		"128": "firefox_app_128x128.png",
+		"512": "firefox_app_512x512.png"
+	},
+	"developer": {
+		"name": "Teoman Deniz",
+		"url": "maximum-tension.com"
+	}
+}
