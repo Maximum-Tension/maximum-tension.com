@@ -1274,8 +1274,8 @@ html[data-mode="text"] .seams line
 	stroke-dasharray: 4 5;
 }
 
-/* WHAT THE THREE STRIPS MEAN. THE SCRIPT PLACES THEM AND ADDS .fits WHILE
-** THEIR STRIP COVERS THEM; EACH ONE ALSO WAITS FOR ITS STRIP TO APPEAR */
+/* WHAT THE THREE STRIPS MEAN. THE SCRIPT PLACES THEM AND CUTS EACH ONE BY
+** ITS OWN STRIP (clip-path), LIKE THE ART; EACH WAITS FOR ITS STRIP TO APPEAR */
 
 .strip_label
 {
@@ -1296,20 +1296,14 @@ html[data-mode="text"] .seams line
 	   pointer-events: none;
 	   text-transform: uppercase;
 
-	-webkit-transform: translateY(6px);
-	   -moz-transform: translateY(6px);
-	    -ms-transform: translateY(6px);
-	     -o-transform: translateY(6px);
-	        transform: translateY(6px);
-
-	-webkit-transition: opacity .45s cubic-bezier(.22, .7, .2, 1), -webkit-transform .45s cubic-bezier(.22, .7, .2, 1); /* FALLBACK */
-	-webkit-transition: opacity .45s var(--ease), -webkit-transform .45s var(--ease);
-	   -moz-transition: opacity .45s cubic-bezier(.22, .7, .2, 1), -moz-transform .45s cubic-bezier(.22, .7, .2, 1); /* FALLBACK */
-	   -moz-transition: opacity .45s var(--ease), -moz-transform .45s var(--ease);
-	     -o-transition: opacity .45s cubic-bezier(.22, .7, .2, 1), -o-transform .45s cubic-bezier(.22, .7, .2, 1); /* FALLBACK */
-	     -o-transition: opacity .45s var(--ease), -o-transform .45s var(--ease);
-	        transition: opacity .45s cubic-bezier(.22, .7, .2, 1), transform .45s cubic-bezier(.22, .7, .2, 1); /* FALLBACK */
-	        transition: opacity .45s var(--ease), transform .45s var(--ease);
+	-webkit-transition: opacity .6s cubic-bezier(.22, .7, .2, 1); /* FALLBACK */
+	-webkit-transition: opacity .6s var(--ease);
+	   -moz-transition: opacity .6s cubic-bezier(.22, .7, .2, 1); /* FALLBACK */
+	   -moz-transition: opacity .6s var(--ease);
+	     -o-transition: opacity .6s cubic-bezier(.22, .7, .2, 1); /* FALLBACK */
+	     -o-transition: opacity .6s var(--ease);
+	        transition: opacity .6s cubic-bezier(.22, .7, .2, 1); /* FALLBACK */
+	        transition: opacity .6s var(--ease);
 }
 
 .strip_label::before
@@ -1324,17 +1318,11 @@ html[data-mode="text"] .seams line
 	  vertical-align: middle;
 }
 
-.layer_ascii.ready ~ .strip_soul.fits,
-.layer_wire.ready ~ .strip_mind.fits,
-.layer_glass.ready ~ .strip_eyes.fits
+.layer_ascii.ready ~ .strip_soul,
+.layer_wire.ready ~ .strip_mind,
+.layer_glass.ready ~ .strip_eyes
 {
 	                 opacity: 1;
-
-	       -webkit-transform: translateY(0);
-	          -moz-transform: translateY(0);
-	           -ms-transform: translateY(0);
-	            -o-transform: translateY(0);
-	               transform: translateY(0);
 
 	-webkit-transition-delay: .4s;
 	   -moz-transition-delay: .4s;
@@ -1344,7 +1332,7 @@ html[data-mode="text"] .seams line
 
 /* SCROLLED BEHIND THE PAGE: THE LABELS STEP OUT OF THE WAY */
 
-.stage.behind .layer.ready ~ .strip_label.fits
+.stage.behind .layer.ready ~ .strip_label
 {
 	                 opacity: 0;
 
@@ -9348,6 +9336,28 @@ html[data-mode="text"] .project_name
 	.footer_text
 	{
 		text-align: left;
+	}
+}
+
+/* PHONES: THE PUMPKIN'S STRIPS ARE NARROW (hero_cut), SO THE STRIP LABELS
+** TAKE TWO LINES, THE DASH HANGING IN FRONT OF THE FIRST */
+
+@media (max-width: 599px)
+{
+	.strip_label
+	{
+		     max-width: 92px;
+		     font-size: 9.5px;
+		   white-space: normal;
+		   text-indent: -16px;
+		  padding-left: 16px;
+		letter-spacing: 0.12em;
+	}
+
+	.strip_label::before
+	{
+		       width: 10px;
+		margin-right: 6px;
 	}
 }
 

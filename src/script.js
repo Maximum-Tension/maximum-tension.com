@@ -482,10 +482,11 @@ function
 
 /*
 ** WHAT THE STRIPS MEAN: "OPEN YOUR SOUL" UNDER THE TEXT, "OPEN YOUR MIND"
-** OVER THE WIREFRAME, "OPEN YOUR EYES" UNDER THE GLASS. THEY SIT AROUND THE
-** BOX THE CAMERA KEEPS IN VIEW (pumpkin_fit), SLIDE ALONG WITH THEIR STRIP
-** WHEN THE SEAMS MOVE AND HIDE WHEN THEIR STRIP NO LONGER COVERS THEM. THE
-** CSS ALSO WAITS FOR EACH STRIP TO APPEAR BEFORE ITS LABEL DOES.
+** OVER THE WIREFRAME, "OPEN YOUR EYES" UNDER THE GLASS. THEY STAY WHERE THEY
+** ARE (PLACED FOR THE SEAMS AT REST, AROUND THE BOX THE CAMERA KEEPS IN
+** VIEW, pumpkin_fit) AND EACH ONE IS CUT BY ITS OWN STRIP, LIKE THE ART:
+** MOVE THE SEAMS OVER A LABEL AND IT DISAPPEARS BEHIND THEM. THE CSS ALSO
+** WAITS FOR EACH STRIP TO APPEAR BEFORE ITS LABEL DOES.
 */
 function
 	hero_measure_labels()
@@ -496,14 +497,15 @@ function
 	hero_state.labels = [label_soul, label_mind, label_eyes].map(
 		function(label)
 		{
-			return ({width: label.offsetWidth, height: label.offsetHeight});
+			return ({width: label.offsetWidth, height: label.offsetHeight, left: 0, top: 0});
 		}
 	);
+	hero_place_labels();
 	hero_state.cut_key = "";
 }
 
 function
-	hero_labels(a_top, a_bottom, b_top, b_bottom)
+	hero_place_labels()
 {
 	const	state = hero_state;
 	const	width = state.width;
@@ -514,18 +516,18 @@ function
 	const	box_right = width / 2 + pumpkin_fit[0] * scale;
 	const	box_top = height / 2 - pumpkin_fit[1] * scale;
 	const	box_bottom = height / 2 + pumpkin_fit[1] * scale;
-	const	soul = state.labels ? state.labels[0] : null;
-	const	mind = state.labels ? state.labels[1] : null;
-	const	eyes = state.labels ? state.labels[2] : null;
+	/* THE SEAMS AT REST, AS hero_cut() DRAWS THEM WITH THE SPLIT AT 0.5 */
+	const	half = width * (width < 600 ? 0.13 : 0.1);
+	const	reach = height / 2 * 0.6;
+	const	soul = state.labels[0];
+	const	mind = state.labels[1];
+	const	eyes = state.labels[2];
 	var		side;
 	var		low;
 	var		high;
 	var		x;
-	var		y;
-	var		mind_at;
-	var		eyes_row = -1;
 
-	if (!soul || width === 0 || height === 0)
+	if (width === 0 || height === 0)
 		return ;
 
 	/* THE HERO'S TEXT AND BUTTONS, IN STAGE PIXELS (THE STAGE MAY BE SCALED) */
@@ -542,11 +544,11 @@ function
 		};
 	}
 
-	/* WHERE A STRIP'S EDGE IS AT HEIGHT y (THE SEAMS ARE SLANTED) */
+	/* WHERE A SEAM AT REST IS AT HEIGHT y: -1 THE FIRST, 1 THE SECOND */
 	function
-		seam(top, bottom, y)
+		seam(which, y)
 	{
-		return (Math.min(width * 2, top + (bottom - top) * y / height));
+		return (width / 2 + which * half - reach + 2 * reach * y / height);
 	}
 
 	function
@@ -556,11 +558,12 @@ function
 	}
 
 	function
-		place(label, left, top, fits)
+		place(label, size, left, top)
 	{
+		size.left = left;
+		size.top = top;
 		label.style.left = round_2(left) + "px";
 		label.style.top = round_2(top) + "px";
-		set_class(label, "fits", fits);
 	}
 
 	/* BELOW THE PUMPKIN WHEN THERE IS ROOM (PHONES), BESIDE ITS LOWER HALF
@@ -572,41 +575,57 @@ function
 
 	high = Math.max(edge, box_top - mind.height - 6);
 
-	/* SOUL: AT THE BOX'S LEFT EDGE, PUSHED LEFT BY THE FIRST SEAM */
-	y = low + soul.height / 2;
-	x = Math.min(Math.max(edge, box_left), seam(a_top, a_bottom, y) - 8 - soul.width / 2);
-	place(label_soul, x, low, x >= edge);
+	/* SOUL: THE BOX'S LEFT EDGE, LEFT OF THE FIRST SEAM */
+	place(label_soul, soul, Math.max(edge, Math.min(box_left, seam(-1, low) - 8 - soul.width)), low);
 
-	/* MIND: CENTRED ON THE WIREFRAME STRIP (NO GLASS YET: UP TO THE EDGE) */
-	y = high + mind.height / 2;
-	x = clamp((seam(a_top, a_bottom, y) + Math.min(width, seam(b_top, b_bottom, y))) / 2 - mind.width / 2, edge, width - edge - mind.width);
+	/* MIND: THE MIDDLE OF THE WIREFRAME STRIP, CLEAR OF THE HERO'S TEXT */
+	x = clamp(seam(0, high + mind.height / 2) - mind.width / 2, edge, width - edge - mind.width);
 
-	/* UNDER THE HERO'S TEXT: SLIDE LEFT OF IT, IF IT STAYS ON ITS STRIP */
 	if (over_text(x, high, mind))
 		x = Math.max(edge, side.left - mind.width);
 
-	mind_at = x + mind.width / 2 >= seam(a_top, a_bottom, y) + 8 && x + mind.width / 2 <= Math.min(width, seam(b_top, b_bottom, y)) - 8 && !over_text(x, high, mind) ? x : -1;
-	place(label_mind, x, high, mind_at >= 0);
+	place(label_mind, mind, x, high);
 
-	/* EYES: AT THE BOX'S RIGHT EDGE, PUSHED RIGHT BY THE SECOND SEAM. WHERE
-	** THE GLASS IS TOO NARROW DOWN THERE (PHONES), THE TOP RIGHT INSTEAD */
+	/* EYES: THE BOX'S RIGHT EDGE, RIGHT OF THE SECOND SEAM. WHERE THE GLASS
+	** IS TOO NARROW DOWN THERE (PHONES), THE TOP RIGHT INSTEAD */
+	x = Math.max(Math.min(width - edge, box_right) - eyes.width, seam(1, low + eyes.height) + 8);
+
+	if (x + eyes.width <= width - edge)
+		place(label_eyes, eyes, x, low);
+	else
+		place(label_eyes, eyes, Math.max(seam(1, high) + 8, width - edge - eyes.width), high);
+}
+
+/* EACH LABEL GETS ITS STRIP'S OUTLINE, MOVED INTO THE LABEL'S OWN PIXELS */
+function
+	hero_clip_labels(a_top, a_bottom, b_top, b_bottom)
+{
+	const	state = hero_state;
+	const	width = state.width;
+	const	height = state.height;
+	const	strips = [
+		[[0, 0], [a_top, 0], [a_bottom, height], [0, height]],
+		[[a_top, 0], [b_top, 0], [b_bottom, height], [a_bottom, height]],
+		[[b_top, 0], [width, 0], [width, height], [b_bottom, height]]
+	];
+
+	if (!state.labels)
+		return ;
+
 	JS.ITERATE(
-		[low, high],
-		function(row)
+		[label_soul, label_mind, label_eyes],
+		function(label, index)
 		{
-			const	middle = row + eyes.height / 2;
-			const	left = Math.max(Math.min(width - edge, box_right) - eyes.width, seam(b_top, b_bottom, middle) + 8 - eyes.width / 2);
+			const	spot = state.labels[index];
 
-			if (eyes_row < 0 && left + eyes.width <= width - edge && !over_text(left, row, eyes) && !(row === high && mind_at >= 0 && left < mind_at + mind.width + 24))
-			{
-				place(label_eyes, left, row, true);
-				eyes_row = row;
-			}
+			label.style.clipPath = "polygon(" + strips[index].map(
+				function(point)
+				{
+					return (round_2(point[0] - spot.left) + "px " + round_2(point[1] - spot.top) + "px");
+				}
+			).join(", ") + ")";
 		}
 	);
-
-	if (eyes_row < 0)
-		set_class(label_eyes, "fits", false);
 }
 
 /* THE TWO DIAGONAL SEAMS: TEXT | WIREFRAME | GLASS */
@@ -646,7 +665,7 @@ function
 				DOM.ATTRIBUTE.SET(line, "y2", height);
 			}
 		);
-		hero_labels(a_top, a_bottom, b_top, b_bottom);
+		hero_clip_labels(a_top, a_bottom, b_top, b_bottom);
 	}
 
 	return (

@@ -762,9 +762,9 @@ int main(void)
       <a class="contact_mail" href="mailto:teo@maximum-tension.com">teo@maximum-tension.com</a>
       <a class="link" href="https://github.com/TeomanDeniz" target="_blank" rel="noopener" data-lang="702">Our code on GitHub</a>
      </div>
-     <!-- A POSTCARD TO FILL IN. SEND STAMPS IT AND OPENS THE MAIL APP WITH THE LETTER WRITTEN (WITHOUT JS, THE FORM ITSELF IS A mailto:) -->
+     <!-- A POSTCARD TO FILL IN. SEND STAMPS IT AND OPENS THE MAIL APP WITH THE LETTER WRITTEN (NO action="mailto:": BROWSERS FLAG IT AS AN INSECURE FORM; WITHOUT JS, THE E-MAIL LINK BESIDE IT DOES THE JOB) -->
      <div class="tilt_zone postcard_zone">
-      <form class="postcard tilt" id="postcard" action="mailto:teo@maximum-tension.com" method="post" enctype="text/plain" aria-label="Postcard to Maximum Tension" data-lang-aria="725">
+      <form class="postcard tilt" id="postcard" aria-label="Postcard to Maximum Tension" data-lang-aria="725">
        <div class="pc_side pc_message">
         <p class="pc_hello" data-lang="710">Hi Maximum Tension,</p>
         <fieldset class="pc_kinds">
