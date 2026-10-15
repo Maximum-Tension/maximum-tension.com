@@ -8,7 +8,7 @@
 # +.....................++.....................+ #   :!:: :!:!1:!:!::1:::!!!:  #
 # : C - Maximum Tension :: Create - 2026/10/14 : #   ::!::!!1001010!:!11!!::   #
 # :---------------------::---------------------: #   :!1!!11000000000011!!:    #
-# : License - MIT       :: Update - 2026/10/14 : #    ::::!!!1!!1!!!1!!!::     #
+# : License - MIT       :: Update - 2026/10/15 : #    ::::!!!1!!1!!!1!!!::     #
 # +.....................++.....................+ #       ::::!::!:::!::::      #
 \******************************************************************************/
 
@@ -16,7 +16,7 @@
 {
 	          --ash: #A39D90; /* secondary text */
 	          --dim: #6B665D; /* quiet text */
-	         --void: #000000; /* page */
+	         --void: #000; /* page */
 	         --bone: #ECE6D8; /* text */
 	         --wick: #FFD08A; /* hot light */
 	         --coal: #3A1606;
@@ -42,7 +42,7 @@
 	     --radius-s: 12px;
 	     --header-h: 68px;
 	 --surface-edge: rgba(236, 230, 216, 0.14);
-	--surface-shine: rgba(255, 255, 255, 0.10);
+	--surface-shine: rgba(255, 255, 255, 0.1);
 }
 
 html[data-mode="text"]
@@ -75,7 +75,7 @@ h1.seo_header
 
 html
 {
-	              background: #000000;
+	              background: #000;
 	         scroll-behavior: smooth;
 	      scroll-padding-top: 68px; /* FALLBACK */
 	      scroll-padding-top: var(--header-h);
@@ -88,7 +88,7 @@ body
 	                 color: var(--bone);
 	                margin: 0;
 	             font-size: 17px;
-	            background: #000000; /* FALLBACK */
+	            background: #000; /* FALLBACK */
 	            background: var(--void);
 	            overflow-x: hidden;
 	           font-family: "Mona Sans", "Helvetica Neue", Arial, sans-serif; /* FALLBACK */
@@ -108,8 +108,8 @@ html[data-mode="text"] body
 
 html[data-mode="text"] body::after
 {
-	         inset: 0;
 	       content: "";
+	         inset: 0;
 	       z-index: 90;
 	      position: fixed;
 	    background: -webkit-repeating-linear-gradient(top, rgba(255, 255, 255, 0.03) 0, rgba(255, 255, 255, 0.03) 1px, transparent 1px, transparent 3px);
@@ -141,7 +141,7 @@ button
 
 ::selection
 {
-	     color: #000000;
+	     color: #000;
 	background: #FFD08A; /* FALLBACK */
 	background: var(--wick);
 }
@@ -171,9 +171,9 @@ button
 {
 	            top: -80px;
 	           left: 12px;
-	          color: #000000;
-	        z-index: 200;
+	          color: #000;
 	        padding: 10px 16px;
+	        z-index: 200;
 	       position: absolute;
 	     background: #ECE6D8; /* FALLBACK */
 	     background: var(--bone);
@@ -289,14 +289,14 @@ html[data-mode="text"] .lead
 
 .button.primary
 {
-	     color: #000000;
+	     color: #000;
 	background: #ECE6D8; /* FALLBACK */
 	background: var(--bone);
 }
 
 .button.primary:hover
 {
-	background: #FFFFFF;
+	background: #FFF;
 }
 
 .button.quiet
@@ -354,7 +354,7 @@ html[data-mode="text"] .button::after
 
 html[data-mode="text"] .button.quiet:hover
 {
-	     color: #000000;
+	     color: #000;
 	background: #ECE6D8; /* FALLBACK */
 	background: var(--bone);
 }
@@ -375,6 +375,8 @@ html[data-mode="text"] .button.quiet:hover
 	                   width: 100%;
 	                  height: 100%;
 	                 display: block;
+	              background: -webkit-gradient(linear, left top, right top, from(#FF7A1A), to(#FFD08A)); /* FALLBACK */
+	              background: -webkit-gradient(linear, left top, right top, from(var(--ember)), to(var(--wick)));
 	              background: -webkit-linear-gradient(0deg, #FF7A1A, #FFD08A); /* FALLBACK */
 	              background: -webkit-linear-gradient(0deg, var(--ember), var(--wick));
 	              background: -moz-linear-gradient(0deg, #FF7A1A, #FFD08A); /* FALLBACK */
@@ -450,7 +452,7 @@ html[data-mode="text"] .button.quiet:hover
 
 html[data-mode="text"] .header.scrolled
 {
-	background: #000000;
+	background: #000;
 }
 
 .brand
@@ -502,9 +504,9 @@ html[data-mode="text"] .brand_name
 
 html[data-mode="text"] .brand_name::after
 {
+	          content: "";
 	            width: .62em;
 	           height: 1.1em;
-	          content: "";
 	          display: inline-block;
 	       background: #ECE6D8; /* FALLBACK */
 	       background: var(--bone);
@@ -573,7 +575,7 @@ html[data-mode="text"] .nav_link
 
 html[data-mode="text"] .nav_link:hover
 {
-	     color: #000000;
+	     color: #000;
 	background: #ECE6D8; /* FALLBACK */
 	background: var(--bone);
 }
@@ -596,12 +598,12 @@ html[data-mode="text"] .nav_link:hover
 
 .switch
 {
-	              padding: 3px;
 	              display: -webkit-inline-box;
 	              display: -webkit-inline-flex;
 	              display: -moz-inline-box;
 	              display: -ms-inline-flexbox;
 	              display: inline-flex;
+	              padding: 3px;
 	           background: rgba(236, 230, 216, 0.045); /* FALLBACK */
 	           background: var(--surface);
 
@@ -661,7 +663,7 @@ html[data-mode="text"] .nav_link:hover
 
 .switch_option.active
 {
-	     color: #000000;
+	     color: #000;
 	background: #ECE6D8; /* FALLBACK */
 	background: var(--bone);
 }
@@ -778,18 +780,18 @@ html[data-mode="text"] .switch_option
 	                    top: calc(100% + 8px);
 	                  right: 0;
 	                 margin: 0;
-	                z-index: 70;
 	                padding: 6px;
+	                z-index: 70;
 	               position: absolute;
 	              min-width: 196px;
-	             list-style: none;
 	             background: rgba(14, 13, 12, 0.94);
+	             list-style: none;
 
-	     -webkit-box-shadow: inset 0 0 0 1px rgba(236, 230, 216, 0.14), inset 0 1px 0 rgba(255, 255, 255, 0.10), 0 24px 48px -16px rgba(0, 0, 0, 0.9); /* FALLBACK */
+	     -webkit-box-shadow: inset 0 0 0 1px rgba(236, 230, 216, 0.14), inset 0 1px 0 rgba(255, 255, 255, 0.1), 0 24px 48px -16px rgba(0, 0, 0, 0.9); /* FALLBACK */
 	     -webkit-box-shadow: inset 0 0 0 1px var(--surface-edge), inset 0 1px 0 var(--surface-shine), 0 24px 48px -16px rgba(0, 0, 0, 0.9);
-	        -moz-box-shadow: inset 0 0 0 1px rgba(236, 230, 216, 0.14), inset 0 1px 0 rgba(255, 255, 255, 0.10), 0 24px 48px -16px rgba(0, 0, 0, 0.9); /* FALLBACK */
+	        -moz-box-shadow: inset 0 0 0 1px rgba(236, 230, 216, 0.14), inset 0 1px 0 rgba(255, 255, 255, 0.1), 0 24px 48px -16px rgba(0, 0, 0, 0.9); /* FALLBACK */
 	        -moz-box-shadow: inset 0 0 0 1px var(--surface-edge), inset 0 1px 0 var(--surface-shine), 0 24px 48px -16px rgba(0, 0, 0, 0.9);
-	             box-shadow: inset 0 0 0 1px rgba(236, 230, 216, 0.14), inset 0 1px 0 rgba(255, 255, 255, 0.10), 0 24px 48px -16px rgba(0, 0, 0, 0.9); /* FALLBACK */
+	             box-shadow: inset 0 0 0 1px rgba(236, 230, 216, 0.14), inset 0 1px 0 rgba(255, 255, 255, 0.1), 0 24px 48px -16px rgba(0, 0, 0, 0.9); /* FALLBACK */
 	             box-shadow: inset 0 0 0 1px var(--surface-edge), inset 0 1px 0 var(--surface-shine), 0 24px 48px -16px rgba(0, 0, 0, 0.9);
 
 	  -webkit-border-radius: 16px;
@@ -886,9 +888,9 @@ html[data-mode="text"] .lang_option
 .burger
 {
 	     width: 40px;
-	    height: 40px;
 	    border: 0;
 	    cursor: pointer;
+	    height: 40px;
 	   display: none;
 	  position: relative;
 	background: transparent;
@@ -998,8 +1000,8 @@ body.menu_open .burger span:last-child
 	            min-height: 100svh;
 	           padding-top: calc(68px + clamp(20px, 4.5vh, 56px)); /* FALLBACK */
 	           padding-top: calc(var(--header-h) + clamp(20px, 4.5vh, 56px));
-	        pointer-events: none;
 	        padding-bottom: clamp(24px, 5vh, 64px);
+	        pointer-events: none;
 
 	    -webkit-box-orient: vertical;
 	 -webkit-box-direction: normal;
@@ -1013,9 +1015,9 @@ body.menu_open .burger span:last-child
 .hero_copy
 {
 	                  gap: 0 clamp(24px, 4vw, 64px);
-	              z-index: 2;
 	              display: -ms-grid;
 	              display: grid;
+	              z-index: 2;
 	             position: relative;
 	       pointer-events: none;
 	grid-template-columns: minmax(0, 7fr) minmax(0, 5fr);
@@ -1031,10 +1033,10 @@ body.menu_open .burger span:last-child
 	     font-size: calc(clamp(44px, 5.8vw, 96px) * 1); /* FALLBACK */
 	     font-size: calc(clamp(44px, 5.8vw, 96px) * var(--scale));
 	     text-wrap: balance;
-	   white-space: pre-line;
-	   grid-column: 1 / -1;
 	   font-weight: 740;
+	   grid-column: 1 / -1;
 	   line-height: .93;
+	   white-space: pre-line;
 	  font-stretch: 118%;
 	letter-spacing: -0.04em;
 }
@@ -1090,10 +1092,10 @@ html[data-mode="text"] .hero_lead
 	          margin: calc(clamp(40px, 9vh, 110px) * -1) auto 0;
 	       max-width: 1680px;
 	      min-height: clamp(380px, 70vh, 860px);
+	   -moz-box-flex: 1;
 
 	-webkit-box-flex: 1;
 	    -webkit-flex: 1;
-	   -moz-box-flex: 1;
 	        -ms-flex: 1;
 	            flex: 1;
 }
@@ -1103,8 +1105,10 @@ html[data-mode="text"] .hero_lead
 	                     top: 0;
 	                    left: 0;
 	                   width: 100%;
-	                  height: 70vh;
+	                  cursor: -webkit-grab;
+	                  cursor: -moz-grab;
 	                  cursor: grab;
+	                  height: 70vh;
 	                position: absolute;
 	             will-change: transform, opacity;
 	            touch-action: pan-y;
@@ -1125,6 +1129,8 @@ html[data-mode="text"] .hero_lead
 
 .stage.dragging
 {
+	cursor: -webkit-grabbing;
+	cursor: -moz-grabbing;
 	cursor: grabbing;
 }
 
@@ -1134,9 +1140,9 @@ html[data-mode="text"] .hero_lead
 	             left: 50%;
 	            width: min(76vw, 1000px);
 	         position: absolute;
-	       background: -webkit-radial-gradient(center, closest-side, rgba(255, 122, 26, 0.16), rgba(255, 122, 26, 0.05) 55%, rgba(255, 122, 26, 0));
-	       background: -moz-radial-gradient(center, closest-side, rgba(255, 122, 26, 0.16), rgba(255, 122, 26, 0.05) 55%, rgba(255, 122, 26, 0));
-	       background: -o-radial-gradient(center, closest-side, rgba(255, 122, 26, 0.16), rgba(255, 122, 26, 0.05) 55%, rgba(255, 122, 26, 0));
+	       background: -webkit-radial-gradient(closest-side, rgba(255, 122, 26, 0.16), rgba(255, 122, 26, 0.05) 55%, rgba(255, 122, 26, 0));
+	       background: -moz-radial-gradient(closest-side, rgba(255, 122, 26, 0.16), rgba(255, 122, 26, 0.05) 55%, rgba(255, 122, 26, 0));
+	       background: -o-radial-gradient(closest-side, rgba(255, 122, 26, 0.16), rgba(255, 122, 26, 0.05) 55%, rgba(255, 122, 26, 0));
 	       background: radial-gradient(closest-side, rgba(255, 122, 26, 0.16), rgba(255, 122, 26, 0.05) 55%, rgba(255, 122, 26, 0));
 	     aspect-ratio: 1.5;
 	   pointer-events: none;
@@ -1235,8 +1241,10 @@ html[data-mode="text"] .stage_glow
 	           opacity: 0;
 	          overflow: visible;
 	          position: absolute;
-	        mask-image: linear-gradient(transparent, #000000 22%, #000000 78%, transparent);
 	    pointer-events: none;
+
+	-webkit-mask-image: linear-gradient(transparent, #000 22%, #000 78%, transparent);
+	        mask-image: linear-gradient(transparent, #000 22%, #000 78%, transparent);
 
 	-webkit-transition: opacity 1.2s cubic-bezier(.22, .7, .2, 1); /* FALLBACK */
 	-webkit-transition: opacity 1.2s var(--ease);
@@ -1268,9 +1276,9 @@ html[data-mode="text"] .seams line
 .render_missing
 {
 	              top: 50%;
-	            right: 4%;
 	            color: #A39D90; /* FALLBACK */
 	            color: var(--ash);
+	            right: 4%;
 	           margin: 0;
 	          display: none;
 	         position: absolute;
@@ -1422,9 +1430,9 @@ html[data-mode="text"] .discipline dt
 
 html[data-mode="text"] .project_name::before
 {
+	content: "> ";
 	  color: #6B665D; /* FALLBACK */
 	  color: var(--dim);
-	content: "> ";
 }
 
 .project_name + .lead
@@ -1445,7 +1453,7 @@ html[data-mode="text"] .project_name::before
 
 .cmt
 {
-	          color: #000000; /* FALLBACK */
+	          color: #FFF; /* FALLBACK */
 	          color: var(--w-text);
 	         --bz-t: 22px;
 	         --bz-s: 26px;
@@ -1453,46 +1461,46 @@ html[data-mode="text"] .project_name::before
 	        padding: 0;
 	       --w-face: #D4D0C8;
 	       --w-dark: #404040;
-	       --w-text: #000000;
+	       --w-text: #000;
 	       --w-gray: #6F6B63;
-	       --w-link: #0000EE;
+	       --w-link: #00E;
 	       --w-font: Tahoma, "MS Sans Serif", Verdana, Geneva, "DejaVu Sans", sans-serif;
-	      --w-light: #FFFFFF;
+	      --w-light: #FFF;
 	      --plastic: #E7E1D0;
 	     --w-shadow: #808080;
-	     --w-window: #FFFFFF;
+	     --w-window: #FFF;
 	     --w-select: #0A246A;
-	     background: #FFFFFF; /* FALLBACK */
+	     background: #000; /* FALLBACK */
 	     background: var(--w-desktop);
 	     border-top: 0;
 	    --w-title-a: #0A246A;
 	    --w-title-b: #A6CAF0;
-	    --w-desktop: #FFFFFF;
+	    --w-desktop: #004D48;
 	    font-family: Tahoma, "MS Sans Serif", Verdana, Geneva, "DejaVu Sans", sans-serif; /* FALLBACK */
 	    font-family: var(--w-font);
 	  --plastic-lip: #BDB49C;
-	 --w-title-text: #FFFFFF;
+	 --w-title-text: #FFF;
 	 --plastic-edge: #F7F3E8;
-	--w-select-text: #FFFFFF;
+	--w-select-text: #FFF;
 }
 
 /* TEXT MODE: THE SAME DESKTOP WITH THE HIGH CONTRAST BLACK SCHEME */
 
 html[data-mode="text"] .cmt
 {
-	   --w-face: #000000;
-	   --w-dark: #FFFFFF;
-	   --w-text: #FFFFFF;
-	   --w-gray: #00FF00;
-	   --w-link: #FFFF00;
-	  --w-light: #FFFFFF;
+	   --w-face: #000;
+	   --w-dark: #FFF;
+	   --w-text: #FFF;
+	   --w-gray: #0F0;
+	   --w-link: #FF0;
+	  --w-light: #FFF;
 	  --plastic: #DAD4C2;
-	 --w-shadow: #FFFFFF;
-	 --w-window: #000000;
+	 --w-shadow: #FFF;
+	 --w-window: #000;
 	 --w-select: #800080;
 	--w-title-a: #800080;
 	--w-title-b: #800080;
-	--w-desktop: #000000;
+	--w-desktop: #000;
 }
 
 /* THE FRAME: STICKY, THE SIZE OF THE SCREEN, ON TOP OF EVERYTHING IN CMT */
@@ -1525,13 +1533,13 @@ html[data-mode="text"] .cmt
 .crt_glass,
 .crt_power
 {
-	                  top: 22px; /* FALLBACK */
+	                  top: 10px; /* FALLBACK */
 	                  top: var(--bz-t);
-	                 left: 26px; /* FALLBACK */
+	                 left: 10px; /* FALLBACK */
 	                 left: var(--bz-s);
-	                right: 26px; /* FALLBACK */
+	                right: 10px; /* FALLBACK */
 	                right: var(--bz-s);
-	               bottom: 58px; /* FALLBACK */
+	               bottom: 36px; /* FALLBACK */
 	               bottom: var(--bz-b);
 	             position: absolute;
 
@@ -1544,11 +1552,11 @@ html[data-mode="text"] .cmt
 
 .crt_bezel
 {
-	-webkit-box-shadow: 0 0 0 3px #BDB49C, 0 0 0 4px #F7F3E8, 0 0 0 100vmax #E7E1D0, inset 0 0 0 2px rgba(0, 0, 0, 0.6), inset 0 0 30px 8px rgba(0, 0, 0, 0.22); /* FALLBACK */
+	-webkit-box-shadow: 0 0 0 3px #BDB49C, 0 0 0 4px #F7F3E8, 0 0 0 100vmax #DAD4C2, inset 0 0 0 2px rgba(0, 0, 0, 0.6), inset 0 0 30px 8px rgba(0, 0, 0, 0.22); /* FALLBACK */
 	-webkit-box-shadow: 0 0 0 3px var(--plastic-lip), 0 0 0 4px var(--plastic-edge), 0 0 0 100vmax var(--plastic), inset 0 0 0 2px rgba(0, 0, 0, 0.6), inset 0 0 30px 8px rgba(0, 0, 0, 0.22);
-	   -moz-box-shadow: 0 0 0 3px #BDB49C, 0 0 0 4px #F7F3E8, 0 0 0 100vmax #E7E1D0, inset 0 0 0 2px rgba(0, 0, 0, 0.6), inset 0 0 30px 8px rgba(0, 0, 0, 0.22); /* FALLBACK */
+	   -moz-box-shadow: 0 0 0 3px #BDB49C, 0 0 0 4px #F7F3E8, 0 0 0 100vmax #DAD4C2, inset 0 0 0 2px rgba(0, 0, 0, 0.6), inset 0 0 30px 8px rgba(0, 0, 0, 0.22); /* FALLBACK */
 	   -moz-box-shadow: 0 0 0 3px var(--plastic-lip), 0 0 0 4px var(--plastic-edge), 0 0 0 100vmax var(--plastic), inset 0 0 0 2px rgba(0, 0, 0, 0.6), inset 0 0 30px 8px rgba(0, 0, 0, 0.22);
-	        box-shadow: 0 0 0 3px #BDB49C, 0 0 0 4px #F7F3E8, 0 0 0 100vmax #E7E1D0, inset 0 0 0 2px rgba(0, 0, 0, 0.6), inset 0 0 30px 8px rgba(0, 0, 0, 0.22); /* FALLBACK */
+	        box-shadow: 0 0 0 3px #BDB49C, 0 0 0 4px #F7F3E8, 0 0 0 100vmax #DAD4C2, inset 0 0 0 2px rgba(0, 0, 0, 0.6), inset 0 0 30px 8px rgba(0, 0, 0, 0.22); /* FALLBACK */
 	        box-shadow: 0 0 0 3px var(--plastic-lip), 0 0 0 4px var(--plastic-edge), 0 0 0 100vmax var(--plastic), inset 0 0 0 2px rgba(0, 0, 0, 0.6), inset 0 0 30px 8px rgba(0, 0, 0, 0.22);
 }
 
@@ -1556,7 +1564,7 @@ html[data-mode="text"] .cmt
 .crt_model,
 .crt_knobs
 {
-	           bottom: calc((58px - 4px) / -2); /* FALLBACK */
+	           bottom: calc((36px - 4px) / -2); /* FALLBACK */
 	           bottom: calc((var(--bz-b) - 4px) / -2);
 	         position: absolute;
 
@@ -1569,11 +1577,11 @@ html[data-mode="text"] .cmt
 
 .crt_badge
 {
-	             left: 50%;
 	             font: 700 11px/1 Arial, Tahoma, "MS Sans Serif", Verdana, Geneva, "DejaVu Sans", sans-serif; /* FALLBACK */
 	             font: 700 11px/1 Arial, var(--w-font);
+	             left: 50%;
 	            color: #9A917A;
-	      text-shadow: 0 1px 0 #FFFFFF;
+	      text-shadow: 0 1px 0 #FFF;
 	   letter-spacing: 0.32em;
 
 	-webkit-transform: translate(-50%, 50%);
@@ -1585,11 +1593,11 @@ html[data-mode="text"] .cmt
 
 .crt_model
 {
-	          left: 4px;
 	          font: italic 700 11px/1 Arial, Tahoma, "MS Sans Serif", Verdana, Geneva, "DejaVu Sans", sans-serif; /* FALLBACK */
 	          font: italic 700 11px/1 Arial, var(--w-font);
+	          left: 4px;
 	         color: #A8A08A;
-	   text-shadow: 0 1px 0 #FFFFFF;
+	   text-shadow: 0 1px 0 #FFF;
 	letter-spacing: 0.06em;
 }
 
@@ -1614,14 +1622,15 @@ html[data-mode="text"] .cmt
 {
 	                width: 14px;
 	               height: 8px;
+	           background: -webkit-gradient(linear, left top, left bottom, from(#F4F0E4), to(#CFC7B0));
 	           background: -webkit-linear-gradient(#F4F0E4, #CFC7B0);
 	           background: -moz-linear-gradient(#F4F0E4, #CFC7B0);
 	           background: -o-linear-gradient(#F4F0E4, #CFC7B0);
 	           background: linear-gradient(#F4F0E4, #CFC7B0);
 
-	   -webkit-box-shadow: 0 1px 0 #FFFFFF, inset 0 0 0 1px #B3A98F;
-	      -moz-box-shadow: 0 1px 0 #FFFFFF, inset 0 0 0 1px #B3A98F;
-	           box-shadow: 0 1px 0 #FFFFFF, inset 0 0 0 1px #B3A98F;
+	   -webkit-box-shadow: 0 1px 0 #FFF, inset 0 0 0 1px #B3A98F;
+	      -moz-box-shadow: 0 1px 0 #FFF, inset 0 0 0 1px #B3A98F;
+	           box-shadow: 0 1px 0 #FFF, inset 0 0 0 1px #B3A98F;
 
 	-webkit-border-radius: 3px;
 	   -moz-border-radius: 3px;
@@ -1669,12 +1678,13 @@ html[data-mode="text"] .crt_glass
 
 .crt_glass::after
 {
+	          content: "";
 	              top: 0;
 	             left: 0;
 	            right: 0;
 	           height: 18%;
-	          content: "";
 	         position: absolute;
+	       background: -webkit-gradient(linear, left top, left bottom, from(transparent), color-stop(50%, rgba(255, 255, 255, 0.07)), to(transparent));
 	       background: -webkit-linear-gradient(transparent, rgba(255, 255, 255, 0.07) 50%, transparent);
 	       background: -moz-linear-gradient(transparent, rgba(255, 255, 255, 0.07) 50%, transparent);
 	       background: -o-linear-gradient(transparent, rgba(255, 255, 255, 0.07) 50%, transparent);
@@ -1691,7 +1701,7 @@ html[data-mode="text"] .crt_glass
 .crt_power
 {
 	   opacity: 0;
-	background: #000000;
+	background: #000;
 	visibility: hidden;
 }
 
@@ -1711,14 +1721,14 @@ html[data-mode="text"] .crt_glass
 
 .crt_power::after
 {
+	           content: "";
 	               top: 50%;
 	              left: 0;
 	             right: 0;
 	            height: 100%;
-	           content: "";
 	           opacity: 0;
 	          position: absolute;
-	        background: #FFFFFF;
+	        background: #FFF;
 
 	-webkit-box-shadow: 0 0 40px 10px rgba(255, 255, 255, 0.8);
 	   -moz-box-shadow: 0 0 40px 10px rgba(255, 255, 255, 0.8);
@@ -2152,9 +2162,9 @@ html[data-mode="text"] .crt_glass
 
 .screen
 {
-	    z-index: 1;
-	    padding: calc(22px + clamp(40px, 7vh, 80px)) 0 calc(58px + clamp(56px, 9vh, 100px)); /* FALLBACK */
+	    padding: calc(10px + clamp(40px, 7vh, 80px)) 0 calc(36px + clamp(56px, 9vh, 100px)); /* FALLBACK */
 	    padding: calc(var(--bz-t) + clamp(40px, 7vh, 80px)) 0 calc(var(--bz-b) + clamp(56px, 9vh, 100px));
+	    z-index: 1;
 	   position: relative;
 	  font-size: 13px;
 	line-height: 1.4;
@@ -2162,9 +2172,9 @@ html[data-mode="text"] .crt_glass
 
 .screen .wrap
 {
-	 padding-left: max(clamp(20px, 5vw, 72px), calc(26px + 18px)); /* FALLBACK */
+	 padding-left: max(clamp(20px, 5vw, 72px), calc(10px + 18px)); /* FALLBACK */
 	 padding-left: max(var(--gutter), calc(var(--bz-s) + 18px));
-	padding-right: max(clamp(20px, 5vw, 72px), calc(26px + 18px)); /* FALLBACK */
+	padding-right: max(clamp(20px, 5vw, 72px), calc(10px + 18px)); /* FALLBACK */
 	padding-right: max(var(--gutter), calc(var(--bz-s) + 18px));
 }
 
@@ -2172,35 +2182,35 @@ html[data-mode="text"] .crt_glass
 
 .win
 {
-	             color: #000000; /* FALLBACK */
+	             color: #FFF; /* FALLBACK */
 	             color: var(--w-text);
 	           padding: 3px;
 	          position: relative;
-	        background: #D4D0C8; /* FALLBACK */
+	        background: #000; /* FALLBACK */
 	        background: var(--w-face);
 
-	-webkit-box-shadow: inset -1px -1px #404040, inset 1px 1px #D4D0C8, inset -2px -2px #808080, inset 2px 2px #FFFFFF, 6px 8px 0 rgba(0, 0, 0, 0.12); /* FALLBACK */
+	-webkit-box-shadow: inset -1px -1px #FFF, inset 1px 1px #000, inset -2px -2px #FFF, inset 2px 2px #FFF, 6px 8px 0 rgba(0, 0, 0, 0.12); /* FALLBACK */
 	-webkit-box-shadow: inset -1px -1px var(--w-dark), inset 1px 1px var(--w-face), inset -2px -2px var(--w-shadow), inset 2px 2px var(--w-light), 6px 8px 0 rgba(0, 0, 0, 0.12);
-	   -moz-box-shadow: inset -1px -1px #404040, inset 1px 1px #D4D0C8, inset -2px -2px #808080, inset 2px 2px #FFFFFF, 6px 8px 0 rgba(0, 0, 0, 0.12); /* FALLBACK */
+	   -moz-box-shadow: inset -1px -1px #FFF, inset 1px 1px #000, inset -2px -2px #FFF, inset 2px 2px #FFF, 6px 8px 0 rgba(0, 0, 0, 0.12); /* FALLBACK */
 	   -moz-box-shadow: inset -1px -1px var(--w-dark), inset 1px 1px var(--w-face), inset -2px -2px var(--w-shadow), inset 2px 2px var(--w-light), 6px 8px 0 rgba(0, 0, 0, 0.12);
-	        box-shadow: inset -1px -1px #404040, inset 1px 1px #D4D0C8, inset -2px -2px #808080, inset 2px 2px #FFFFFF, 6px 8px 0 rgba(0, 0, 0, 0.12); /* FALLBACK */
+	        box-shadow: inset -1px -1px #FFF, inset 1px 1px #000, inset -2px -2px #FFF, inset 2px 2px #FFF, 6px 8px 0 rgba(0, 0, 0, 0.12); /* FALLBACK */
 	        box-shadow: inset -1px -1px var(--w-dark), inset 1px 1px var(--w-face), inset -2px -2px var(--w-shadow), inset 2px 2px var(--w-light), 6px 8px 0 rgba(0, 0, 0, 0.12);
 }
 
 html[data-mode="text"] .win
 {
-	-webkit-box-shadow: inset 0 0 0 1px #FFFFFF, inset 0 0 0 3px #D4D0C8, inset 0 0 0 4px #FFFFFF; /* FALLBACK */
+	-webkit-box-shadow: inset 0 0 0 1px #FFF, inset 0 0 0 3px #000, inset 0 0 0 4px #FFF; /* FALLBACK */
 	-webkit-box-shadow: inset 0 0 0 1px var(--w-light), inset 0 0 0 3px var(--w-face), inset 0 0 0 4px var(--w-light);
-	   -moz-box-shadow: inset 0 0 0 1px #FFFFFF, inset 0 0 0 3px #D4D0C8, inset 0 0 0 4px #FFFFFF; /* FALLBACK */
+	   -moz-box-shadow: inset 0 0 0 1px #FFF, inset 0 0 0 3px #000, inset 0 0 0 4px #FFF; /* FALLBACK */
 	   -moz-box-shadow: inset 0 0 0 1px var(--w-light), inset 0 0 0 3px var(--w-face), inset 0 0 0 4px var(--w-light);
-	        box-shadow: inset 0 0 0 1px #FFFFFF, inset 0 0 0 3px #D4D0C8, inset 0 0 0 4px #FFFFFF; /* FALLBACK */
+	        box-shadow: inset 0 0 0 1px #FFF, inset 0 0 0 3px #000, inset 0 0 0 4px #FFF; /* FALLBACK */
 	        box-shadow: inset 0 0 0 1px var(--w-light), inset 0 0 0 3px var(--w-face), inset 0 0 0 4px var(--w-light);
 }
 
 .win_bar
 {
 	                gap: 6px;
-	              color: #FFFFFF; /* FALLBACK */
+	              color: #FFF; /* FALLBACK */
 	              color: var(--w-title-text);
 	             height: 24px;
 	            display: -webkit-box;
@@ -2209,13 +2219,15 @@ html[data-mode="text"] .win
 	            display: -ms-flexbox;
 	            display: flex;
 	            padding: 0 3px 0 5px;
-	         background: -webkit-linear-gradient(0deg, #0A246A, #A6CAF0); /* FALLBACK */
+	         background: -webkit-gradient(linear, left top, right top, from(#800080), to(#800080)); /* FALLBACK */
+	         background: -webkit-gradient(linear, left top, right top, from(var(--w-title-a)), to(var(--w-title-b)));
+	         background: -webkit-linear-gradient(0deg, #800080, #800080); /* FALLBACK */
 	         background: -webkit-linear-gradient(0deg, var(--w-title-a), var(--w-title-b));
-	         background: -moz-linear-gradient(0deg, #0A246A, #A6CAF0); /* FALLBACK */
+	         background: -moz-linear-gradient(0deg, #800080, #800080); /* FALLBACK */
 	         background: -moz-linear-gradient(0deg, var(--w-title-a), var(--w-title-b));
-	         background: -o-linear-gradient(0deg, #0A246A, #A6CAF0); /* FALLBACK */
+	         background: -o-linear-gradient(0deg, #800080, #800080); /* FALLBACK */
 	         background: -o-linear-gradient(0deg, var(--w-title-a), var(--w-title-b));
-	         background: linear-gradient(90deg, #0A246A, #A6CAF0); /* FALLBACK */
+	         background: linear-gradient(90deg, #800080, #800080); /* FALLBACK */
 	         background: linear-gradient(90deg, var(--w-title-a), var(--w-title-b));
 	        font-weight: 700;
 
@@ -2239,11 +2251,11 @@ html[data-mode="text"] .win
 	        overflow: hidden;
 	       min-width: 0;
 	     white-space: nowrap;
+	   -moz-box-flex: 1;
 	   text-overflow: ellipsis;
 
 	-webkit-box-flex: 1;
 	    -webkit-flex: 1;
-	   -moz-box-flex: 1;
 	        -ms-flex: 1;
 	            flex: 1;
 }
@@ -2264,14 +2276,14 @@ html[data-mode="text"] .win
 	            height: 16px;
 	           display: block;
 	          position: relative;
-	        background: #D4D0C8; /* FALLBACK */
+	        background: #000; /* FALLBACK */
 	        background: var(--w-face);
 
-	-webkit-box-shadow: inset -1px -1px #404040, inset 1px 1px #FFFFFF, inset -2px -2px #808080, inset 2px 2px #D4D0C8; /* FALLBACK */
+	-webkit-box-shadow: inset -1px -1px #FFF, inset 1px 1px #FFF, inset -2px -2px #FFF, inset 2px 2px #000; /* FALLBACK */
 	-webkit-box-shadow: inset -1px -1px var(--w-dark), inset 1px 1px var(--w-light), inset -2px -2px var(--w-shadow), inset 2px 2px var(--w-face);
-	   -moz-box-shadow: inset -1px -1px #404040, inset 1px 1px #FFFFFF, inset -2px -2px #808080, inset 2px 2px #D4D0C8; /* FALLBACK */
+	   -moz-box-shadow: inset -1px -1px #FFF, inset 1px 1px #FFF, inset -2px -2px #FFF, inset 2px 2px #000; /* FALLBACK */
 	   -moz-box-shadow: inset -1px -1px var(--w-dark), inset 1px 1px var(--w-light), inset -2px -2px var(--w-shadow), inset 2px 2px var(--w-face);
-	        box-shadow: inset -1px -1px #404040, inset 1px 1px #FFFFFF, inset -2px -2px #808080, inset 2px 2px #D4D0C8; /* FALLBACK */
+	        box-shadow: inset -1px -1px #FFF, inset 1px 1px #FFF, inset -2px -2px #FFF, inset 2px 2px #000; /* FALLBACK */
 	        box-shadow: inset -1px -1px var(--w-dark), inset 1px 1px var(--w-light), inset -2px -2px var(--w-shadow), inset 2px 2px var(--w-face);
 }
 
@@ -2295,7 +2307,7 @@ html[data-mode="text"] .win
 	     width: 7px;
 	    bottom: 4px;
 	    height: 2px;
-	background: #000000; /* FALLBACK */
+	background: #FFF; /* FALLBACK */
 	background: var(--w-text);
 }
 
@@ -2306,11 +2318,11 @@ html[data-mode="text"] .win
 	             width: 9px;
 	            height: 9px;
 
-	-webkit-box-shadow: inset 0 2px #000000, inset 0 0 0 1px #000000; /* FALLBACK */
+	-webkit-box-shadow: inset 0 2px #FFF, inset 0 0 0 1px #FFF; /* FALLBACK */
 	-webkit-box-shadow: inset 0 2px var(--w-text), inset 0 0 0 1px var(--w-text);
-	   -moz-box-shadow: inset 0 2px #000000, inset 0 0 0 1px #000000; /* FALLBACK */
+	   -moz-box-shadow: inset 0 2px #FFF, inset 0 0 0 1px #FFF; /* FALLBACK */
 	   -moz-box-shadow: inset 0 2px var(--w-text), inset 0 0 0 1px var(--w-text);
-	        box-shadow: inset 0 2px #000000, inset 0 0 0 1px #000000; /* FALLBACK */
+	        box-shadow: inset 0 2px #FFF, inset 0 0 0 1px #FFF; /* FALLBACK */
 	        box-shadow: inset 0 2px var(--w-text), inset 0 0 0 1px var(--w-text);
 }
 
@@ -2321,7 +2333,7 @@ html[data-mode="text"] .win
 	             left: 4px;
 	            width: 10px;
 	           height: 2px;
-	       background: #000000; /* FALLBACK */
+	       background: #FFF; /* FALLBACK */
 	       background: var(--w-text);
 
 	-webkit-transform: rotate(45deg);
@@ -2373,14 +2385,14 @@ html[data-mode="text"] .win
 	            display: -ms-flexbox;
 	            display: flex;
 	            padding: 4px 4px 5px;
-	         border-top: 1px solid #808080; /* FALLBACK */
+	         border-top: 1px solid #FFF; /* FALLBACK */
 	         border-top: 1px solid var(--w-shadow);
 
-	 -webkit-box-shadow: inset 0 1px #FFFFFF; /* FALLBACK */
+	 -webkit-box-shadow: inset 0 1px #FFF; /* FALLBACK */
 	 -webkit-box-shadow: inset 0 1px var(--w-light);
-	    -moz-box-shadow: inset 0 1px #FFFFFF; /* FALLBACK */
+	    -moz-box-shadow: inset 0 1px #FFF; /* FALLBACK */
 	    -moz-box-shadow: inset 0 1px var(--w-light);
-	         box-shadow: inset 0 1px #FFFFFF; /* FALLBACK */
+	         box-shadow: inset 0 1px #FFF; /* FALLBACK */
 	         box-shadow: inset 0 1px var(--w-light);
 
 	  -webkit-box-align: center;
@@ -2392,7 +2404,7 @@ html[data-mode="text"] .win
 
 .address_label
 {
-	color: #6F6B63; /* FALLBACK */
+	color: #0F0; /* FALLBACK */
 	color: var(--w-gray);
 }
 
@@ -2406,20 +2418,20 @@ html[data-mode="text"] .win
 	            display: flex;
 	            padding: 3px 6px;
 	          min-width: 0;
-	         background: #FFFFFF; /* FALLBACK */
+	         background: #000; /* FALLBACK */
 	         background: var(--w-window);
+	      -moz-box-flex: 1;
 
 	   -webkit-box-flex: 1;
 	       -webkit-flex: 1;
-	      -moz-box-flex: 1;
 	           -ms-flex: 1;
 	               flex: 1;
 
-	 -webkit-box-shadow: inset 1px 1px #808080, inset -1px -1px #FFFFFF, inset 2px 2px #404040, inset -2px -2px #D4D0C8; /* FALLBACK */
+	 -webkit-box-shadow: inset 1px 1px #FFF, inset -1px -1px #FFF, inset 2px 2px #FFF, inset -2px -2px #000; /* FALLBACK */
 	 -webkit-box-shadow: inset 1px 1px var(--w-shadow), inset -1px -1px var(--w-light), inset 2px 2px var(--w-dark), inset -2px -2px var(--w-face);
-	    -moz-box-shadow: inset 1px 1px #808080, inset -1px -1px #FFFFFF, inset 2px 2px #404040, inset -2px -2px #D4D0C8; /* FALLBACK */
+	    -moz-box-shadow: inset 1px 1px #FFF, inset -1px -1px #FFF, inset 2px 2px #FFF, inset -2px -2px #000; /* FALLBACK */
 	    -moz-box-shadow: inset 1px 1px var(--w-shadow), inset -1px -1px var(--w-light), inset 2px 2px var(--w-dark), inset -2px -2px var(--w-face);
-	         box-shadow: inset 1px 1px #808080, inset -1px -1px #FFFFFF, inset 2px 2px #404040, inset -2px -2px #D4D0C8; /* FALLBACK */
+	         box-shadow: inset 1px 1px #FFF, inset -1px -1px #FFF, inset 2px 2px #FFF, inset -2px -2px #000; /* FALLBACK */
 	         box-shadow: inset 1px 1px var(--w-shadow), inset -1px -1px var(--w-light), inset 2px 2px var(--w-dark), inset -2px -2px var(--w-face);
 
 	  -webkit-box-align: center;
@@ -2451,11 +2463,11 @@ html[data-mode="text"] .win
 	            display: flex;
 	            padding: 2px 8px;
 
-	 -webkit-box-shadow: inset 1px 1px #808080, inset -1px -1px #FFFFFF; /* FALLBACK */
+	 -webkit-box-shadow: inset 1px 1px #FFF, inset -1px -1px #FFF; /* FALLBACK */
 	 -webkit-box-shadow: inset 1px 1px var(--w-shadow), inset -1px -1px var(--w-light);
-	    -moz-box-shadow: inset 1px 1px #808080, inset -1px -1px #FFFFFF; /* FALLBACK */
+	    -moz-box-shadow: inset 1px 1px #FFF, inset -1px -1px #FFF; /* FALLBACK */
 	    -moz-box-shadow: inset 1px 1px var(--w-shadow), inset -1px -1px var(--w-light);
-	         box-shadow: inset 1px 1px #808080, inset -1px -1px #FFFFFF; /* FALLBACK */
+	         box-shadow: inset 1px 1px #FFF, inset -1px -1px #FFF; /* FALLBACK */
 	         box-shadow: inset 1px 1px var(--w-shadow), inset -1px -1px var(--w-light);
 
 	  -webkit-box-align: center;
@@ -2467,9 +2479,10 @@ html[data-mode="text"] .win
 
 .win_status > span:first-child
 {
+	   -moz-box-flex: 1;
+
 	-webkit-box-flex: 1;
 	    -webkit-flex: 1;
-	   -moz-box-flex: 1;
 	        -ms-flex: 1;
 	            flex: 1;
 }
@@ -2481,7 +2494,7 @@ html[data-mode="text"] .win
 	                    gap: 6px;
 	                   font: 13px Tahoma, "MS Sans Serif", Verdana, Geneva, "DejaVu Sans", sans-serif; /* FALLBACK */
 	                   font: 13px var(--w-font);
-	                  color: #000000; /* FALLBACK */
+	                  color: #FFF; /* FALLBACK */
 	                  color: var(--w-text);
 	                 border: 0;
 	                 cursor: default;
@@ -2493,15 +2506,15 @@ html[data-mode="text"] .win
 	                display: inline-flex;
 	                padding: 0 14px;
 	              min-width: 88px;
-	             background: #D4D0C8; /* FALLBACK */
+	             background: #000; /* FALLBACK */
 	             background: var(--w-face);
 	        text-decoration: none;
 
-	     -webkit-box-shadow: inset -1px -1px #404040, inset 1px 1px #FFFFFF, inset -2px -2px #808080, inset 2px 2px #D4D0C8; /* FALLBACK */
+	     -webkit-box-shadow: inset -1px -1px #FFF, inset 1px 1px #FFF, inset -2px -2px #FFF, inset 2px 2px #000; /* FALLBACK */
 	     -webkit-box-shadow: inset -1px -1px var(--w-dark), inset 1px 1px var(--w-light), inset -2px -2px var(--w-shadow), inset 2px 2px var(--w-face);
-	        -moz-box-shadow: inset -1px -1px #404040, inset 1px 1px #FFFFFF, inset -2px -2px #808080, inset 2px 2px #D4D0C8; /* FALLBACK */
+	        -moz-box-shadow: inset -1px -1px #FFF, inset 1px 1px #FFF, inset -2px -2px #FFF, inset 2px 2px #000; /* FALLBACK */
 	        -moz-box-shadow: inset -1px -1px var(--w-dark), inset 1px 1px var(--w-light), inset -2px -2px var(--w-shadow), inset 2px 2px var(--w-face);
-	             box-shadow: inset -1px -1px #404040, inset 1px 1px #FFFFFF, inset -2px -2px #808080, inset 2px 2px #D4D0C8; /* FALLBACK */
+	             box-shadow: inset -1px -1px #FFF, inset 1px 1px #FFF, inset -2px -2px #FFF, inset 2px 2px #000; /* FALLBACK */
 	             box-shadow: inset -1px -1px var(--w-dark), inset 1px 1px var(--w-light), inset -2px -2px var(--w-shadow), inset 2px 2px var(--w-face);
 
 	      -webkit-box-align: center;
@@ -2521,17 +2534,17 @@ html[data-mode="text"] .win
 {
 	       padding-top: 2px;
 
-	-webkit-box-shadow: inset 1px 1px #404040, inset -1px -1px #FFFFFF, inset 2px 2px #808080, inset -2px -2px #D4D0C8; /* FALLBACK */
+	-webkit-box-shadow: inset 1px 1px #FFF, inset -1px -1px #FFF, inset 2px 2px #FFF, inset -2px -2px #000; /* FALLBACK */
 	-webkit-box-shadow: inset 1px 1px var(--w-dark), inset -1px -1px var(--w-light), inset 2px 2px var(--w-shadow), inset -2px -2px var(--w-face);
-	   -moz-box-shadow: inset 1px 1px #404040, inset -1px -1px #FFFFFF, inset 2px 2px #808080, inset -2px -2px #D4D0C8; /* FALLBACK */
+	   -moz-box-shadow: inset 1px 1px #FFF, inset -1px -1px #FFF, inset 2px 2px #FFF, inset -2px -2px #000; /* FALLBACK */
 	   -moz-box-shadow: inset 1px 1px var(--w-dark), inset -1px -1px var(--w-light), inset 2px 2px var(--w-shadow), inset -2px -2px var(--w-face);
-	        box-shadow: inset 1px 1px #404040, inset -1px -1px #FFFFFF, inset 2px 2px #808080, inset -2px -2px #D4D0C8; /* FALLBACK */
+	        box-shadow: inset 1px 1px #FFF, inset -1px -1px #FFF, inset 2px 2px #FFF, inset -2px -2px #000; /* FALLBACK */
 	        box-shadow: inset 1px 1px var(--w-dark), inset -1px -1px var(--w-light), inset 2px 2px var(--w-shadow), inset -2px -2px var(--w-face);
 }
 
 .btn98:focus-visible
 {
-	       outline: 1px dotted #000000; /* FALLBACK */
+	       outline: 1px dotted #FFF; /* FALLBACK */
 	       outline: 1px dotted var(--w-text);
 	outline-offset: -5px;
 }
@@ -2544,15 +2557,15 @@ html[data-mode="text"] .win
 
 .btn98.off
 {
-	      color: #808080; /* FALLBACK */
+	      color: #FFF; /* FALLBACK */
 	      color: var(--w-shadow);
-	text-shadow: 1px 1px #FFFFFF; /* FALLBACK */
+	text-shadow: 1px 1px #FFF; /* FALLBACK */
 	text-shadow: 1px 1px var(--w-light);
 }
 
 html[data-mode="text"] .btn98.off
 {
-	      color: #6F6B63; /* FALLBACK */
+	      color: #0F0; /* FALLBACK */
 	      color: var(--w-gray);
 	text-shadow: none;
 }
@@ -2564,16 +2577,16 @@ html[data-mode="text"] .btn98.off
 	               margin: 2px 0 0;
 	              display: -ms-grid;
 	              display: grid;
-	           min-height: 520px;
-	           background: #FFFFFF; /* FALLBACK */
+	           background: #000; /* FALLBACK */
 	           background: var(--w-window);
+	           min-height: 520px;
 	grid-template-columns: minmax(260px, 5fr) minmax(0, 7fr);
 
-	   -webkit-box-shadow: inset 1px 1px #808080, inset -1px -1px #FFFFFF, inset 2px 2px #404040, inset -2px -2px #D4D0C8; /* FALLBACK */
+	   -webkit-box-shadow: inset 1px 1px #FFF, inset -1px -1px #FFF, inset 2px 2px #FFF, inset -2px -2px #000; /* FALLBACK */
 	   -webkit-box-shadow: inset 1px 1px var(--w-shadow), inset -1px -1px var(--w-light), inset 2px 2px var(--w-dark), inset -2px -2px var(--w-face);
-	      -moz-box-shadow: inset 1px 1px #808080, inset -1px -1px #FFFFFF, inset 2px 2px #404040, inset -2px -2px #D4D0C8; /* FALLBACK */
+	      -moz-box-shadow: inset 1px 1px #FFF, inset -1px -1px #FFF, inset 2px 2px #FFF, inset -2px -2px #000; /* FALLBACK */
 	      -moz-box-shadow: inset 1px 1px var(--w-shadow), inset -1px -1px var(--w-light), inset 2px 2px var(--w-dark), inset -2px -2px var(--w-face);
-	           box-shadow: inset 1px 1px #808080, inset -1px -1px #FFFFFF, inset 2px 2px #404040, inset -2px -2px #D4D0C8; /* FALLBACK */
+	           box-shadow: inset 1px 1px #FFF, inset -1px -1px #FFF, inset 2px 2px #FFF, inset -2px -2px #000; /* FALLBACK */
 	           box-shadow: inset 1px 1px var(--w-shadow), inset -1px -1px var(--w-light), inset 2px 2px var(--w-dark), inset -2px -2px var(--w-face);
 }
 
@@ -2587,21 +2600,21 @@ html[data-mode="text"] .btn98.off
 	             width: 100%;
 	          position: relative;
 	         max-width: 300px;
-	        background: #000000;
+	        background: #000;
 	      aspect-ratio: 1.15;
 	     margin-bottom: 22px;
 
-	-webkit-box-shadow: inset 1px 1px #808080, inset -1px -1px #FFFFFF, 0 0 0 1px #404040; /* FALLBACK */
+	-webkit-box-shadow: inset 1px 1px #FFF, inset -1px -1px #FFF, 0 0 0 1px #FFF; /* FALLBACK */
 	-webkit-box-shadow: inset 1px 1px var(--w-shadow), inset -1px -1px var(--w-light), 0 0 0 1px var(--w-dark);
-	   -moz-box-shadow: inset 1px 1px #808080, inset -1px -1px #FFFFFF, 0 0 0 1px #404040; /* FALLBACK */
+	   -moz-box-shadow: inset 1px 1px #FFF, inset -1px -1px #FFF, 0 0 0 1px #FFF; /* FALLBACK */
 	   -moz-box-shadow: inset 1px 1px var(--w-shadow), inset -1px -1px var(--w-light), 0 0 0 1px var(--w-dark);
-	        box-shadow: inset 1px 1px #808080, inset -1px -1px #FFFFFF, 0 0 0 1px #404040; /* FALLBACK */
+	        box-shadow: inset 1px 1px #FFF, inset -1px -1px #FFF, 0 0 0 1px #FFF; /* FALLBACK */
 	        box-shadow: inset 1px 1px var(--w-shadow), inset -1px -1px var(--w-light), 0 0 0 1px var(--w-dark);
 }
 
 .explorer_side .project_name
 {
-	         color: #000000; /* FALLBACK */
+	         color: #FFF; /* FALLBACK */
 	         color: var(--w-text);
 	     font-size: clamp(48px, 6.4vw, 96px);
 	   font-family: Arial, Tahoma, "MS Sans Serif", Verdana, Geneva, "DejaVu Sans", sans-serif; /* FALLBACK */
@@ -2619,7 +2632,7 @@ html[data-mode="text"] .explorer_side .project_name::before
 
 .explorer_side .project_full
 {
-	       color: #6F6B63; /* FALLBACK */
+	       color: #0F0; /* FALLBACK */
 	       color: var(--w-gray);
 	      margin: 10px 0 14px;
 	   font-size: 15px;
@@ -2631,19 +2644,21 @@ html[data-mode="text"] .explorer_side .project_name::before
 	    height: 2px;
 	    margin: 0 0 16px;
 	   display: block;
-	background: -webkit-linear-gradient(0deg, #0A246A, #A6CAF0 55%, rgba(166, 202, 240, 0)); /* FALLBACK */
+	background: -webkit-gradient(linear, left top, right top, from(#800080), color-stop(55%, #800080), to(rgba(166, 202, 240, 0))); /* FALLBACK */
+	background: -webkit-gradient(linear, left top, right top, from(var(--w-title-a)), color-stop(55%, var(--w-title-b)), to(rgba(166, 202, 240, 0)));
+	background: -webkit-linear-gradient(0deg, #800080, #800080 55%, rgba(166, 202, 240, 0)); /* FALLBACK */
 	background: -webkit-linear-gradient(0deg, var(--w-title-a), var(--w-title-b) 55%, rgba(166, 202, 240, 0));
-	background: -moz-linear-gradient(0deg, #0A246A, #A6CAF0 55%, rgba(166, 202, 240, 0)); /* FALLBACK */
+	background: -moz-linear-gradient(0deg, #800080, #800080 55%, rgba(166, 202, 240, 0)); /* FALLBACK */
 	background: -moz-linear-gradient(0deg, var(--w-title-a), var(--w-title-b) 55%, rgba(166, 202, 240, 0));
-	background: -o-linear-gradient(0deg, #0A246A, #A6CAF0 55%, rgba(166, 202, 240, 0)); /* FALLBACK */
+	background: -o-linear-gradient(0deg, #800080, #800080 55%, rgba(166, 202, 240, 0)); /* FALLBACK */
 	background: -o-linear-gradient(0deg, var(--w-title-a), var(--w-title-b) 55%, rgba(166, 202, 240, 0));
-	background: linear-gradient(90deg, #0A246A, #A6CAF0 55%, rgba(166, 202, 240, 0)); /* FALLBACK */
+	background: linear-gradient(90deg, #800080, #800080 55%, rgba(166, 202, 240, 0)); /* FALLBACK */
 	background: linear-gradient(90deg, var(--w-title-a), var(--w-title-b) 55%, rgba(166, 202, 240, 0));
 }
 
 .explorer_side .lead
 {
-	      color: #000000; /* FALLBACK */
+	      color: #FFF; /* FALLBACK */
 	      color: var(--w-text);
 	     margin: 0;
 	  font-size: 14.5px;
@@ -2660,7 +2675,7 @@ html[data-mode="text"] .explorer_side .project_name::before
 .info_hint,
 .info_kind
 {
-	 color: #6F6B63; /* FALLBACK */
+	 color: #0F0; /* FALLBACK */
 	 color: var(--w-gray);
 	margin: 0;
 }
@@ -2679,7 +2694,7 @@ html[data-mode="text"] .explorer_side .project_name::before
 
 .info_link
 {
-	          color: #0000EE; /* FALLBACK */
+	          color: #FF0; /* FALLBACK */
 	          color: var(--w-link);
 	text-decoration: underline;
 }
@@ -2692,8 +2707,11 @@ html[data-mode="text"] .explorer_side .project_name::before
 	              display: grid;
 	              padding: 18px 14px;
 	           list-style: none;
-	        align-content: start;
 	grid-template-columns: repeat(auto-fill, minmax(104px, 1fr));
+
+	-webkit-align-content: start;
+	   -ms-flex-line-pack: start;
+	        align-content: start;
 }
 
 .folder_button
@@ -2752,7 +2770,7 @@ html[data-mode="text"] .explorer_side .project_name::before
 
 .folder_button.on picture
 {
-	background: #0A246A; /* FALLBACK */
+	background: #800080; /* FALLBACK */
 	background: var(--w-select);
 }
 
@@ -2763,9 +2781,9 @@ html[data-mode="text"] .explorer_side .project_name::before
 
 .folder_button.on .folder_name
 {
-	     color: #FFFFFF; /* FALLBACK */
+	     color: #FFF; /* FALLBACK */
 	     color: var(--w-select-text);
-	background: #0A246A; /* FALLBACK */
+	background: #800080; /* FALLBACK */
 	background: var(--w-select);
 }
 
@@ -2776,7 +2794,7 @@ html[data-mode="text"] .explorer_side .project_name::before
 
 .folder_button:focus-visible .folder_name
 {
-	outline: 1px dotted #000000; /* FALLBACK */
+	outline: 1px dotted #FFF; /* FALLBACK */
 	outline: 1px dotted var(--w-text);
 }
 
@@ -2799,7 +2817,7 @@ html[data-mode="text"] .explorer_side .project_name::before
 	            display: -moz-box;
 	            display: -ms-flexbox;
 	            display: flex;
-	            padding: 22px 0 58px; /* FALLBACK */
+	            padding: 10px 0 36px; /* FALLBACK */
 	            padding: var(--bz-t) 0 var(--bz-b);
 	           position: -webkit-sticky;
 	           position: sticky;
@@ -2831,14 +2849,14 @@ html[data-mode="text"] .explorer_side .project_name::before
 	                display: -ms-flexbox;
 	                display: flex;
 	                padding: 16px 20px 16px 22px;
-	             background: #FFFFFF; /* FALLBACK */
+	             background: #000; /* FALLBACK */
 	             background: var(--w-window);
 
-	     -webkit-box-shadow: 0 1px #808080, 0 2px #FFFFFF; /* FALLBACK */
+	     -webkit-box-shadow: 0 1px #FFF, 0 2px #FFF; /* FALLBACK */
 	     -webkit-box-shadow: 0 1px var(--w-shadow), 0 2px var(--w-light);
-	        -moz-box-shadow: 0 1px #808080, 0 2px #FFFFFF; /* FALLBACK */
+	        -moz-box-shadow: 0 1px #FFF, 0 2px #FFF; /* FALLBACK */
 	        -moz-box-shadow: 0 1px var(--w-shadow), 0 2px var(--w-light);
-	             box-shadow: 0 1px #808080, 0 2px #FFFFFF; /* FALLBACK */
+	             box-shadow: 0 1px #FFF, 0 2px #FFF; /* FALLBACK */
 	             box-shadow: 0 1px var(--w-shadow), 0 2px var(--w-light);
 
 	      -webkit-box-align: start;
@@ -2873,10 +2891,11 @@ html[data-mode="text"] .explorer_side .project_name::before
 .wizard_icon
 {
 	     line-height: 0;
-
-	-webkit-box-flex: 0;
-	    -webkit-flex: none;
 	   -moz-box-flex: 0;
+	-webkit-box-flex: 0;
+
+	-webkit-box-flex: none;
+	    -webkit-flex: none;
 	        -ms-flex: none;
 	            flex: none;
 }
@@ -2900,15 +2919,15 @@ html[data-mode="text"] .explorer_side .project_name::before
 	               display: -ms-flexbox;
 	               display: flex;
 	               padding: 4px;
-	            list-style: none;
-	            background: #FFFFFF; /* FALLBACK */
+	            background: #000; /* FALLBACK */
 	            background: var(--w-window);
+	            list-style: none;
 
-	    -webkit-box-shadow: inset 1px 1px #808080, inset -1px -1px #FFFFFF, inset 2px 2px #404040, inset -2px -2px #D4D0C8; /* FALLBACK */
+	    -webkit-box-shadow: inset 1px 1px #FFF, inset -1px -1px #FFF, inset 2px 2px #FFF, inset -2px -2px #000; /* FALLBACK */
 	    -webkit-box-shadow: inset 1px 1px var(--w-shadow), inset -1px -1px var(--w-light), inset 2px 2px var(--w-dark), inset -2px -2px var(--w-face);
-	       -moz-box-shadow: inset 1px 1px #808080, inset -1px -1px #FFFFFF, inset 2px 2px #404040, inset -2px -2px #D4D0C8; /* FALLBACK */
+	       -moz-box-shadow: inset 1px 1px #FFF, inset -1px -1px #FFF, inset 2px 2px #FFF, inset -2px -2px #000; /* FALLBACK */
 	       -moz-box-shadow: inset 1px 1px var(--w-shadow), inset -1px -1px var(--w-light), inset 2px 2px var(--w-dark), inset -2px -2px var(--w-face);
-	            box-shadow: inset 1px 1px #808080, inset -1px -1px #FFFFFF, inset 2px 2px #404040, inset -2px -2px #D4D0C8; /* FALLBACK */
+	            box-shadow: inset 1px 1px #FFF, inset -1px -1px #FFF, inset 2px 2px #FFF, inset -2px -2px #000; /* FALLBACK */
 	            box-shadow: inset 1px 1px var(--w-shadow), inset -1px -1px var(--w-light), inset 2px 2px var(--w-dark), inset -2px -2px var(--w-face);
 
 	    -webkit-box-orient: vertical;
@@ -2928,7 +2947,10 @@ html[data-mode="text"] .explorer_side .project_name::before
 	              padding: 2px 8px 2px 4px;
 	grid-template-columns: 32px minmax(0, 1fr) 14px;
 
+	    -webkit-box-align: center;
 	  -webkit-align-items: center;
+	       -moz-box-align: center;
+	       -ms-flex-align: center;
 	          align-items: center;
 }
 
@@ -2947,9 +2969,9 @@ html[data-mode="text"] .explorer_side .project_name::before
 
 .slab.active
 {
-	     color: #FFFFFF; /* FALLBACK */
+	     color: #FFF; /* FALLBACK */
 	     color: var(--w-select-text);
-	background: #0A246A; /* FALLBACK */
+	background: #800080; /* FALLBACK */
 	background: var(--w-select);
 }
 
@@ -2968,11 +2990,11 @@ html[data-mode="text"] .explorer_side .project_name::before
 
 .slab[data-state="done"] .slab_mark::before
 {
+	          content: "";
 	              top: 1px;
 	             left: 2px;
 	            width: 9px;
 	           height: 5px;
-	          content: "";
 	         position: absolute;
 	      border-left: 2px solid #008000;
 	    border-bottom: 2px solid #008000;
@@ -2986,47 +3008,47 @@ html[data-mode="text"] .explorer_side .project_name::before
 
 .slab[data-state="work"] .slab_mark
 {
-	        background: -webkit-linear-gradient(0deg, #0A246A 50%, transparent 50%); /* FALLBACK */
+	        background: -webkit-linear-gradient(0deg, #800080 50%, transparent 50%); /* FALLBACK */
 	        background: -webkit-linear-gradient(0deg, var(--w-select) 50%, transparent 50%);
-	        background: -moz-linear-gradient(0deg, #0A246A 50%, transparent 50%); /* FALLBACK */
+	        background: -moz-linear-gradient(0deg, #800080 50%, transparent 50%); /* FALLBACK */
 	        background: -moz-linear-gradient(0deg, var(--w-select) 50%, transparent 50%);
-	        background: -o-linear-gradient(0deg, #0A246A 50%, transparent 50%); /* FALLBACK */
+	        background: -o-linear-gradient(0deg, #800080 50%, transparent 50%); /* FALLBACK */
 	        background: -o-linear-gradient(0deg, var(--w-select) 50%, transparent 50%);
-	        background: linear-gradient(90deg, #0A246A 50%, transparent 50%); /* FALLBACK */
+	        background: linear-gradient(90deg, #800080 50%, transparent 50%); /* FALLBACK */
 	        background: linear-gradient(90deg, var(--w-select) 50%, transparent 50%);
 
-	-webkit-box-shadow: inset 0 0 0 1px #000000; /* FALLBACK */
+	-webkit-box-shadow: inset 0 0 0 1px #FFF; /* FALLBACK */
 	-webkit-box-shadow: inset 0 0 0 1px var(--w-text);
-	   -moz-box-shadow: inset 0 0 0 1px #000000; /* FALLBACK */
+	   -moz-box-shadow: inset 0 0 0 1px #FFF; /* FALLBACK */
 	   -moz-box-shadow: inset 0 0 0 1px var(--w-text);
-	        box-shadow: inset 0 0 0 1px #000000; /* FALLBACK */
+	        box-shadow: inset 0 0 0 1px #FFF; /* FALLBACK */
 	        box-shadow: inset 0 0 0 1px var(--w-text);
 }
 
 .slab[data-state="next"] .slab_mark
 {
-	-webkit-box-shadow: inset 0 0 0 1px #6F6B63; /* FALLBACK */
+	-webkit-box-shadow: inset 0 0 0 1px #0F0; /* FALLBACK */
 	-webkit-box-shadow: inset 0 0 0 1px var(--w-gray);
-	   -moz-box-shadow: inset 0 0 0 1px #6F6B63; /* FALLBACK */
+	   -moz-box-shadow: inset 0 0 0 1px #0F0; /* FALLBACK */
 	   -moz-box-shadow: inset 0 0 0 1px var(--w-gray);
-	        box-shadow: inset 0 0 0 1px #6F6B63; /* FALLBACK */
+	        box-shadow: inset 0 0 0 1px #0F0; /* FALLBACK */
 	        box-shadow: inset 0 0 0 1px var(--w-gray);
 }
 
 .slab.active .slab_mark::before
 {
-	border-color: #FFFFFF; /* FALLBACK */
+	border-color: #FFF; /* FALLBACK */
 	border-color: var(--w-select-text);
 }
 
 .slab.active[data-state="work"] .slab_mark,
 .slab.active[data-state="next"] .slab_mark
 {
-	-webkit-box-shadow: inset 0 0 0 1px #FFFFFF; /* FALLBACK */
+	-webkit-box-shadow: inset 0 0 0 1px #FFF; /* FALLBACK */
 	-webkit-box-shadow: inset 0 0 0 1px var(--w-select-text);
-	   -moz-box-shadow: inset 0 0 0 1px #FFFFFF; /* FALLBACK */
+	   -moz-box-shadow: inset 0 0 0 1px #FFF; /* FALLBACK */
 	   -moz-box-shadow: inset 0 0 0 1px var(--w-select-text);
-	        box-shadow: inset 0 0 0 1px #FFFFFF; /* FALLBACK */
+	        box-shadow: inset 0 0 0 1px #FFF; /* FALLBACK */
 	        box-shadow: inset 0 0 0 1px var(--w-select-text);
 }
 
@@ -3038,18 +3060,18 @@ html[data-mode="text"] .explorer_side .project_name::before
 	-ms-flex-item-align: start;
 	         align-self: start;
 
-	 -webkit-box-shadow: inset 0 0 0 1px #808080, inset 1px 1px 0 1px #FFFFFF; /* FALLBACK */
+	 -webkit-box-shadow: inset 0 0 0 1px #FFF, inset 1px 1px 0 1px #FFF; /* FALLBACK */
 	 -webkit-box-shadow: inset 0 0 0 1px var(--w-shadow), inset 1px 1px 0 1px var(--w-light);
-	    -moz-box-shadow: inset 0 0 0 1px #808080, inset 1px 1px 0 1px #FFFFFF; /* FALLBACK */
+	    -moz-box-shadow: inset 0 0 0 1px #FFF, inset 1px 1px 0 1px #FFF; /* FALLBACK */
 	    -moz-box-shadow: inset 0 0 0 1px var(--w-shadow), inset 1px 1px 0 1px var(--w-light);
-	         box-shadow: inset 0 0 0 1px #808080, inset 1px 1px 0 1px #FFFFFF; /* FALLBACK */
+	         box-shadow: inset 0 0 0 1px #FFF, inset 1px 1px 0 1px #FFF; /* FALLBACK */
 	         box-shadow: inset 0 0 0 1px var(--w-shadow), inset 1px 1px 0 1px var(--w-light);
 }
 
 .layer_state
 {
 	                gap: 6px;
-	              color: #6F6B63; /* FALLBACK */
+	              color: #0F0; /* FALLBACK */
 	              color: var(--w-gray);
 	             margin: 0 0 6px;
 	            display: -webkit-box;
@@ -3068,21 +3090,21 @@ html[data-mode="text"] .explorer_side .project_name::before
 
 .layer_state::before
 {
+	   content: "";
 	     width: 8px;
 	    height: 8px;
-	   content: "";
 	background: #008000;
 }
 
 .layer_state[data-state="work"]::before
 {
-	background: #0A246A; /* FALLBACK */
+	background: #800080; /* FALLBACK */
 	background: var(--w-select);
 }
 
 .layer_state[data-state="next"]::before
 {
-	background: #6F6B63; /* FALLBACK */
+	background: #0F0; /* FALLBACK */
 	background: var(--w-gray);
 }
 
@@ -3113,14 +3135,14 @@ html[data-mode="text"] .explorer_side .project_name::before
 {
 	            height: 22px;
 	           padding: 3px;
-	        background: #FFFFFF; /* FALLBACK */
+	        background: #000; /* FALLBACK */
 	        background: var(--w-window);
 
-	-webkit-box-shadow: inset 1px 1px #808080, inset -1px -1px #FFFFFF; /* FALLBACK */
+	-webkit-box-shadow: inset 1px 1px #FFF, inset -1px -1px #FFF; /* FALLBACK */
 	-webkit-box-shadow: inset 1px 1px var(--w-shadow), inset -1px -1px var(--w-light);
-	   -moz-box-shadow: inset 1px 1px #808080, inset -1px -1px #FFFFFF; /* FALLBACK */
+	   -moz-box-shadow: inset 1px 1px #FFF, inset -1px -1px #FFF; /* FALLBACK */
 	   -moz-box-shadow: inset 1px 1px var(--w-shadow), inset -1px -1px var(--w-light);
-	        box-shadow: inset 1px 1px #808080, inset -1px -1px #FFFFFF; /* FALLBACK */
+	        box-shadow: inset 1px 1px #FFF, inset -1px -1px #FFF; /* FALLBACK */
 	        box-shadow: inset 1px 1px var(--w-shadow), inset -1px -1px var(--w-light);
 }
 
@@ -3129,13 +3151,13 @@ html[data-mode="text"] .explorer_side .project_name::before
 	     width: 0;
 	    height: 100%;
 	   display: block;
-	background: -webkit-repeating-linear-gradient(0deg, #0A246A 0, #0A246A 9px, transparent 9px, transparent 11px); /* FALLBACK */
+	background: -webkit-repeating-linear-gradient(0deg, #800080 0, #800080 9px, transparent 9px, transparent 11px); /* FALLBACK */
 	background: -webkit-repeating-linear-gradient(0deg, var(--w-select) 0, var(--w-select) 9px, transparent 9px, transparent 11px);
-	background: -moz-repeating-linear-gradient(0deg, #0A246A 0, #0A246A 9px, transparent 9px, transparent 11px); /* FALLBACK */
+	background: -moz-repeating-linear-gradient(0deg, #800080 0, #800080 9px, transparent 9px, transparent 11px); /* FALLBACK */
 	background: -moz-repeating-linear-gradient(0deg, var(--w-select) 0, var(--w-select) 9px, transparent 9px, transparent 11px);
-	background: -o-repeating-linear-gradient(0deg, #0A246A 0, #0A246A 9px, transparent 9px, transparent 11px); /* FALLBACK */
+	background: -o-repeating-linear-gradient(0deg, #800080 0, #800080 9px, transparent 9px, transparent 11px); /* FALLBACK */
 	background: -o-repeating-linear-gradient(0deg, var(--w-select) 0, var(--w-select) 9px, transparent 9px, transparent 11px);
-	background: repeating-linear-gradient(90deg, #0A246A 0, #0A246A 9px, transparent 9px, transparent 11px); /* FALLBACK */
+	background: repeating-linear-gradient(90deg, #800080 0, #800080 9px, transparent 9px, transparent 11px); /* FALLBACK */
 	background: repeating-linear-gradient(90deg, var(--w-select) 0, var(--w-select) 9px, transparent 9px, transparent 11px);
 }
 
@@ -3149,11 +3171,11 @@ html[data-mode="text"] .explorer_side .project_name::before
 	            display: flex;
 	            padding: 12px 16px 10px;
 
-	 -webkit-box-shadow: inset 0 1px #808080, inset 0 2px #FFFFFF; /* FALLBACK */
+	 -webkit-box-shadow: inset 0 1px #FFF, inset 0 2px #FFF; /* FALLBACK */
 	 -webkit-box-shadow: inset 0 1px var(--w-shadow), inset 0 2px var(--w-light);
-	    -moz-box-shadow: inset 0 1px #808080, inset 0 2px #FFFFFF; /* FALLBACK */
+	    -moz-box-shadow: inset 0 1px #FFF, inset 0 2px #FFF; /* FALLBACK */
 	    -moz-box-shadow: inset 0 1px var(--w-shadow), inset 0 2px var(--w-light);
-	         box-shadow: inset 0 1px #808080, inset 0 2px #FFFFFF; /* FALLBACK */
+	         box-shadow: inset 0 1px #FFF, inset 0 2px #FFF; /* FALLBACK */
 	         box-shadow: inset 0 1px var(--w-shadow), inset 0 2px var(--w-light);
 
 	  -webkit-box-align: center;
@@ -3165,7 +3187,7 @@ html[data-mode="text"] .explorer_side .project_name::before
 
 .layers_hint
 {
-	    color: #6F6B63; /* FALLBACK */
+	    color: #0F0; /* FALLBACK */
 	    color: var(--w-gray);
 	   margin: 0 auto 0 4px;
 	font-size: 12px;
@@ -3201,7 +3223,7 @@ html[data-mode="text"] .explorer_side .project_name::before
 
 .program_note
 {
-	      color: #6F6B63; /* FALLBACK */
+	      color: #0F0; /* FALLBACK */
 	      color: var(--w-gray);
 	     margin: 18px 0 0;
 	   grid-row: 2;
@@ -3211,14 +3233,14 @@ html[data-mode="text"] .explorer_side .project_name::before
 .code_tools
 {
 	           padding: 3px 4px 5px;
-	        border-top: 1px solid #808080; /* FALLBACK */
+	        border-top: 1px solid #FFF; /* FALLBACK */
 	        border-top: 1px solid var(--w-shadow);
 
-	-webkit-box-shadow: inset 0 1px #FFFFFF; /* FALLBACK */
+	-webkit-box-shadow: inset 0 1px #FFF; /* FALLBACK */
 	-webkit-box-shadow: inset 0 1px var(--w-light);
-	   -moz-box-shadow: inset 0 1px #FFFFFF; /* FALLBACK */
+	   -moz-box-shadow: inset 0 1px #FFF; /* FALLBACK */
 	   -moz-box-shadow: inset 0 1px var(--w-light);
-	        box-shadow: inset 0 1px #FFFFFF; /* FALLBACK */
+	        box-shadow: inset 0 1px #FFF; /* FALLBACK */
 	        box-shadow: inset 0 1px var(--w-light);
 }
 
@@ -3231,16 +3253,16 @@ html[data-mode="text"] .explorer_side .project_name::before
 {
 	            margin: 0 0 2px;
 	          overflow: auto;
-	        max-height: 560px;
 	        background: #272822;
-	   scrollbar-color: #D4D0C8 #EEEBE5; /* FALLBACK */
+	        max-height: 560px;
+	   scrollbar-color: #000 #EEEBE5; /* FALLBACK */
 	   scrollbar-color: var(--w-face) #EEEBE5;
 
-	-webkit-box-shadow: inset 1px 1px #808080, inset -1px -1px #FFFFFF, inset 2px 2px #404040, inset -2px -2px #D4D0C8; /* FALLBACK */
+	-webkit-box-shadow: inset 1px 1px #FFF, inset -1px -1px #FFF, inset 2px 2px #FFF, inset -2px -2px #000; /* FALLBACK */
 	-webkit-box-shadow: inset 1px 1px var(--w-shadow), inset -1px -1px var(--w-light), inset 2px 2px var(--w-dark), inset -2px -2px var(--w-face);
-	   -moz-box-shadow: inset 1px 1px #808080, inset -1px -1px #FFFFFF, inset 2px 2px #404040, inset -2px -2px #D4D0C8; /* FALLBACK */
+	   -moz-box-shadow: inset 1px 1px #FFF, inset -1px -1px #FFF, inset 2px 2px #FFF, inset -2px -2px #000; /* FALLBACK */
 	   -moz-box-shadow: inset 1px 1px var(--w-shadow), inset -1px -1px var(--w-light), inset 2px 2px var(--w-dark), inset -2px -2px var(--w-face);
-	        box-shadow: inset 1px 1px #808080, inset -1px -1px #FFFFFF, inset 2px 2px #404040, inset -2px -2px #D4D0C8; /* FALLBACK */
+	        box-shadow: inset 1px 1px #FFF, inset -1px -1px #FFF, inset 2px 2px #FFF, inset -2px -2px #000; /* FALLBACK */
 	        box-shadow: inset 1px 1px var(--w-shadow), inset -1px -1px var(--w-light), inset 2px 2px var(--w-dark), inset -2px -2px var(--w-face);
 }
 
@@ -3248,19 +3270,19 @@ html[data-mode="text"] .explorer_side .project_name::before
 {
 	     width: 16px;
 	    height: 16px;
-	background: repeating-conic-gradient(#D4D0C8 0 25%, #FFFFFF 0 50%) 0 0 / 2px 2px;
-	background: repeating-conic-gradient(#D4D0C8 0 25%, #FFFFFF 0 50%) 0 0 / 2px 2px;
-	background: repeating-conic-gradient(#D4D0C8 0 25%, #FFFFFF 0 50%) 0 0 / 2px 2px;
-	background: repeating-conic-gradient(#D4D0C8 0 25%, #FFFFFF 0 50%) 0 0 / 2px 2px;
+	background: repeating-conic-gradient(#D4D0C8 0 25%, #FFF 0 50%) 0 0 / 2px 2px;
+	background: repeating-conic-gradient(#D4D0C8 0 25%, #FFF 0 50%) 0 0 / 2px 2px;
+	background: repeating-conic-gradient(#D4D0C8 0 25%, #FFF 0 50%) 0 0 / 2px 2px;
+	background: repeating-conic-gradient(#D4D0C8 0 25%, #FFF 0 50%) 0 0 / 2px 2px;
 }
 
 .code_view::-webkit-scrollbar-thumb
 {
 	        background: #D4D0C8;
 
-	-webkit-box-shadow: inset -1px -1px #404040, inset 1px 1px #FFFFFF, inset -2px -2px #808080, inset 2px 2px #D4D0C8;
-	   -moz-box-shadow: inset -1px -1px #404040, inset 1px 1px #FFFFFF, inset -2px -2px #808080, inset 2px 2px #D4D0C8;
-	        box-shadow: inset -1px -1px #404040, inset 1px 1px #FFFFFF, inset -2px -2px #808080, inset 2px 2px #D4D0C8;
+	-webkit-box-shadow: inset -1px -1px #404040, inset 1px 1px #FFF, inset -2px -2px #808080, inset 2px 2px #D4D0C8;
+	   -moz-box-shadow: inset -1px -1px #404040, inset 1px 1px #FFF, inset -2px -2px #808080, inset 2px 2px #D4D0C8;
+	        box-shadow: inset -1px -1px #404040, inset 1px 1px #FFF, inset -2px -2px #808080, inset 2px 2px #D4D0C8;
 }
 
 .code_view::-webkit-scrollbar-corner
@@ -3274,8 +3296,11 @@ html[data-mode="text"] .explorer_side .project_name::before
 	        color: #F8F8F2;
 	       margin: 0;
 	      padding: 10px 0 12px;
-	     tab-size: 4;
 	counter-reset: line;
+
+	-moz-tab-size: 4;
+	  -o-tab-size: 4;
+	     tab-size: 4;
 }
 
 .code .ln
@@ -3293,10 +3318,10 @@ html[data-mode="text"] .explorer_side .project_name::before
 
 .code .ln::before
 {
+	          content: counter(line);
 	             left: 0;
 	            color: #8F908A;
 	            width: 40px;
-	          content: counter(line);
 	         position: absolute;
 	       text-align: right;
 	counter-increment: line;
@@ -3367,24 +3392,24 @@ html[data-mode="text"] .explorer_side .project_name::before
 .cmd
 {
 	            margin: 2px 0 0;
+	        background: #000;
 	        overflow-x: auto;
 	        overflow-y: hidden;
-	        background: #000000;
 	    container-type: inline-size;
 
-	-webkit-box-shadow: inset 1px 1px #808080, inset -1px -1px #FFFFFF, inset 2px 2px #404040, inset -2px -2px #D4D0C8; /* FALLBACK */
+	-webkit-box-shadow: inset 1px 1px #FFF, inset -1px -1px #FFF, inset 2px 2px #FFF, inset -2px -2px #000; /* FALLBACK */
 	-webkit-box-shadow: inset 1px 1px var(--w-shadow), inset -1px -1px var(--w-light), inset 2px 2px var(--w-dark), inset -2px -2px var(--w-face);
-	   -moz-box-shadow: inset 1px 1px #808080, inset -1px -1px #FFFFFF, inset 2px 2px #404040, inset -2px -2px #D4D0C8; /* FALLBACK */
+	   -moz-box-shadow: inset 1px 1px #FFF, inset -1px -1px #FFF, inset 2px 2px #FFF, inset -2px -2px #000; /* FALLBACK */
 	   -moz-box-shadow: inset 1px 1px var(--w-shadow), inset -1px -1px var(--w-light), inset 2px 2px var(--w-dark), inset -2px -2px var(--w-face);
-	        box-shadow: inset 1px 1px #808080, inset -1px -1px #FFFFFF, inset 2px 2px #404040, inset -2px -2px #D4D0C8; /* FALLBACK */
+	        box-shadow: inset 1px 1px #FFF, inset -1px -1px #FFF, inset 2px 2px #FFF, inset -2px -2px #000; /* FALLBACK */
 	        box-shadow: inset 1px 1px var(--w-shadow), inset -1px -1px var(--w-light), inset 2px 2px var(--w-dark), inset -2px -2px var(--w-face);
 }
 
 .cmd_screen
 {
 	      color: #C0C0C0;
-	     margin: 0;
 	     height: calc(36em + 12px);
+	     margin: 0;
 	    padding: 6px 8px;
 	   overflow: hidden;
 	  font-size: 10px;
@@ -3514,8 +3539,8 @@ html[data-mode="text"] .explorer_side .project_name::before
 	       top: 0;
 	      left: 0;
 	     right: 0;
-	    margin: 0;
 	    height: 76px;
+	    margin: 0;
 	   padding: 0;
 	  position: absolute;
 	list-style: none;
@@ -3557,27 +3582,42 @@ html[data-mode="text"] .explorer_side .project_name::before
 
 .device:nth-child(2)
 {
-	transition-delay: 0.25s;
+	-webkit-transition-delay: 0.25s;
+	   -moz-transition-delay: 0.25s;
+	     -o-transition-delay: 0.25s;
+	        transition-delay: 0.25s;
 }
 
 .device:nth-child(3)
 {
-	transition-delay: 0.5s;
+	-webkit-transition-delay: 0.5s;
+	   -moz-transition-delay: 0.5s;
+	     -o-transition-delay: 0.5s;
+	        transition-delay: 0.5s;
 }
 
 .device:nth-child(4)
 {
-	transition-delay: 0.75s;
+	-webkit-transition-delay: 0.75s;
+	   -moz-transition-delay: 0.75s;
+	     -o-transition-delay: 0.75s;
+	        transition-delay: 0.75s;
 }
 
 .device:nth-child(5)
 {
-	transition-delay: 1s;
+	-webkit-transition-delay: 1s;
+	   -moz-transition-delay: 1s;
+	     -o-transition-delay: 1s;
+	        transition-delay: 1s;
 }
 
 .device:nth-child(6)
 {
-	transition-delay: 1.25s;
+	-webkit-transition-delay: 1.25s;
+	   -moz-transition-delay: 1.25s;
+	     -o-transition-delay: 1.25s;
+	        transition-delay: 1.25s;
 }
 
 .device img
@@ -3596,11 +3636,11 @@ html[data-mode="text"] .explorer_side .project_name::before
 	            height: 2px;
 	          position: absolute;
 
-	-webkit-box-shadow: inset 0 1px #808080, inset 0 -1px #FFFFFF; /* FALLBACK */
+	-webkit-box-shadow: inset 0 1px #FFF, inset 0 -1px #FFF; /* FALLBACK */
 	-webkit-box-shadow: inset 0 1px var(--w-shadow), inset 0 -1px var(--w-light);
-	   -moz-box-shadow: inset 0 1px #808080, inset 0 -1px #FFFFFF; /* FALLBACK */
+	   -moz-box-shadow: inset 0 1px #FFF, inset 0 -1px #FFF; /* FALLBACK */
 	   -moz-box-shadow: inset 0 1px var(--w-shadow), inset 0 -1px var(--w-light);
-	        box-shadow: inset 0 1px #808080, inset 0 -1px #FFFFFF; /* FALLBACK */
+	        box-shadow: inset 0 1px #FFF, inset 0 -1px #FFF; /* FALLBACK */
 	        box-shadow: inset 0 1px var(--w-shadow), inset 0 -1px var(--w-light);
 }
 
@@ -3611,13 +3651,13 @@ html[data-mode="text"] .explorer_side .project_name::before
 	                   right: calc((2027 - 2024) / 52 * 100%);
 	                  height: 6px;
 	                position: absolute;
-	              background: -webkit-repeating-linear-gradient(0deg, #0A246A 0, #0A246A 9px, transparent 9px, transparent 11px); /* FALLBACK */
+	              background: -webkit-repeating-linear-gradient(0deg, #800080 0, #800080 9px, transparent 9px, transparent 11px); /* FALLBACK */
 	              background: -webkit-repeating-linear-gradient(0deg, var(--w-select) 0, var(--w-select) 9px, transparent 9px, transparent 11px);
-	              background: -moz-repeating-linear-gradient(0deg, #0A246A 0, #0A246A 9px, transparent 9px, transparent 11px); /* FALLBACK */
+	              background: -moz-repeating-linear-gradient(0deg, #800080 0, #800080 9px, transparent 9px, transparent 11px); /* FALLBACK */
 	              background: -moz-repeating-linear-gradient(0deg, var(--w-select) 0, var(--w-select) 9px, transparent 9px, transparent 11px);
-	              background: -o-repeating-linear-gradient(0deg, #0A246A 0, #0A246A 9px, transparent 9px, transparent 11px); /* FALLBACK */
+	              background: -o-repeating-linear-gradient(0deg, #800080 0, #800080 9px, transparent 9px, transparent 11px); /* FALLBACK */
 	              background: -o-repeating-linear-gradient(0deg, var(--w-select) 0, var(--w-select) 9px, transparent 9px, transparent 11px);
-	              background: repeating-linear-gradient(90deg, #0A246A 0, #0A246A 9px, transparent 9px, transparent 11px); /* FALLBACK */
+	              background: repeating-linear-gradient(90deg, #800080 0, #800080 9px, transparent 9px, transparent 11px); /* FALLBACK */
 	              background: repeating-linear-gradient(90deg, var(--w-select) 0, var(--w-select) 9px, transparent 9px, transparent 11px);
 
 	-webkit-transform-origin: 0 50%;
@@ -3713,19 +3753,19 @@ html[data-mode="text"] .explorer_side .project_name::before
 .timeline_row.cpp li
 {
 	        top: 22px;
-	      color: #6F6B63; /* FALLBACK */
+	      color: #0F0; /* FALLBACK */
 	      color: var(--w-gray);
 	font-weight: 400;
 }
 
 .timeline_row li::after
 {
+	   content: "";
 	      left: 50%;
 	     width: 1px;
 	    height: 14px;
-	   content: "";
 	  position: absolute;
-	background: #808080; /* FALLBACK */
+	background: #FFF; /* FALLBACK */
 	background: var(--w-shadow);
 }
 
@@ -3747,7 +3787,7 @@ html[data-mode="text"] .explorer_side .project_name::before
 
 .timeline_years li
 {
-	    color: #6F6B63; /* FALLBACK */
+	    color: #0F0; /* FALLBACK */
 	    color: var(--w-gray);
 	font-size: 11px;
 }
@@ -3766,11 +3806,11 @@ html[data-mode="text"] .explorer_side .project_name::before
 	            margin: 0;
 	           padding: 14px 16px;
 
-	-webkit-box-shadow: inset 0 0 0 1px #808080, inset 1px 1px 0 1px #FFFFFF; /* FALLBACK */
+	-webkit-box-shadow: inset 0 0 0 1px #FFF, inset 1px 1px 0 1px #FFF; /* FALLBACK */
 	-webkit-box-shadow: inset 0 0 0 1px var(--w-shadow), inset 1px 1px 0 1px var(--w-light);
-	   -moz-box-shadow: inset 0 0 0 1px #808080, inset 1px 1px 0 1px #FFFFFF; /* FALLBACK */
+	   -moz-box-shadow: inset 0 0 0 1px #FFF, inset 1px 1px 0 1px #FFF; /* FALLBACK */
 	   -moz-box-shadow: inset 0 0 0 1px var(--w-shadow), inset 1px 1px 0 1px var(--w-light);
-	        box-shadow: inset 0 0 0 1px #808080, inset 1px 1px 0 1px #FFFFFF; /* FALLBACK */
+	        box-shadow: inset 0 0 0 1px #FFF, inset 1px 1px 0 1px #FFF; /* FALLBACK */
 	        box-shadow: inset 0 0 0 1px var(--w-shadow), inset 1px 1px 0 1px var(--w-light);
 }
 
@@ -3801,20 +3841,20 @@ html[data-mode="text"] .explorer_side .project_name::before
 {
 	           padding: 3px 10px;
 	         font-size: 12.5px;
-	        background: #D4D0C8; /* FALLBACK */
+	        background: #000; /* FALLBACK */
 	        background: var(--w-face);
 
-	-webkit-box-shadow: inset -1px -1px #404040, inset 1px 1px #FFFFFF, inset -2px -2px #808080, inset 2px 2px #D4D0C8; /* FALLBACK */
+	-webkit-box-shadow: inset -1px -1px #FFF, inset 1px 1px #FFF, inset -2px -2px #FFF, inset 2px 2px #000; /* FALLBACK */
 	-webkit-box-shadow: inset -1px -1px var(--w-dark), inset 1px 1px var(--w-light), inset -2px -2px var(--w-shadow), inset 2px 2px var(--w-face);
-	   -moz-box-shadow: inset -1px -1px #404040, inset 1px 1px #FFFFFF, inset -2px -2px #808080, inset 2px 2px #D4D0C8; /* FALLBACK */
+	   -moz-box-shadow: inset -1px -1px #FFF, inset 1px 1px #FFF, inset -2px -2px #FFF, inset 2px 2px #000; /* FALLBACK */
 	   -moz-box-shadow: inset -1px -1px var(--w-dark), inset 1px 1px var(--w-light), inset -2px -2px var(--w-shadow), inset 2px 2px var(--w-face);
-	        box-shadow: inset -1px -1px #404040, inset 1px 1px #FFFFFF, inset -2px -2px #808080, inset 2px 2px #D4D0C8; /* FALLBACK */
+	        box-shadow: inset -1px -1px #FFF, inset 1px 1px #FFF, inset -2px -2px #FFF, inset 2px 2px #000; /* FALLBACK */
 	        box-shadow: inset -1px -1px var(--w-dark), inset 1px 1px var(--w-light), inset -2px -2px var(--w-shadow), inset 2px 2px var(--w-face);
 }
 
 .range_text
 {
-	    color: #000000; /* FALLBACK */
+	    color: #FFF; /* FALLBACK */
 	    color: var(--w-text);
 	font-size: 13.5px;
 }
@@ -3851,10 +3891,14 @@ html[data-mode="text"] .explorer_side .project_name::before
 {
 	             width: 100%;
 	            height: 100%;
-	           opacity: 0;
 	           display: block;
+	           opacity: 0;
+
+	     -o-object-fit: cover;
 	        object-fit: cover;
-	        mask-image: linear-gradient(transparent, #000000 18%, #000000 82%, transparent);
+
+	-webkit-mask-image: linear-gradient(transparent, #000 18%, #000 82%, transparent);
+	        mask-image: linear-gradient(transparent, #000 18%, #000 82%, transparent);
 
 	-webkit-transition: opacity 1.6s cubic-bezier(.22, .7, .2, 1); /* FALLBACK */
 	-webkit-transition: opacity 1.6s var(--ease);
@@ -3884,12 +3928,12 @@ html[data-mode="text"] .explorer_side .project_name::before
 	               overflow: hidden;
 	             background: rgba(14, 13, 12, 0.7);
 
-	     -webkit-box-shadow: inset 0 0 0 1px rgba(236, 230, 216, 0.14), 0 60px 120px -50px rgba(0, 0, 0, 1); /* FALLBACK */
-	     -webkit-box-shadow: inset 0 0 0 1px var(--surface-edge), 0 60px 120px -50px rgba(0, 0, 0, 1);
-	        -moz-box-shadow: inset 0 0 0 1px rgba(236, 230, 216, 0.14), 0 60px 120px -50px rgba(0, 0, 0, 1); /* FALLBACK */
-	        -moz-box-shadow: inset 0 0 0 1px var(--surface-edge), 0 60px 120px -50px rgba(0, 0, 0, 1);
-	             box-shadow: inset 0 0 0 1px rgba(236, 230, 216, 0.14), 0 60px 120px -50px rgba(0, 0, 0, 1); /* FALLBACK */
-	             box-shadow: inset 0 0 0 1px var(--surface-edge), 0 60px 120px -50px rgba(0, 0, 0, 1);
+	     -webkit-box-shadow: inset 0 0 0 1px rgba(236, 230, 216, 0.14), 0 60px 120px -50px #000; /* FALLBACK */
+	     -webkit-box-shadow: inset 0 0 0 1px var(--surface-edge), 0 60px 120px -50px #000;
+	        -moz-box-shadow: inset 0 0 0 1px rgba(236, 230, 216, 0.14), 0 60px 120px -50px #000; /* FALLBACK */
+	        -moz-box-shadow: inset 0 0 0 1px var(--surface-edge), 0 60px 120px -50px #000;
+	             box-shadow: inset 0 0 0 1px rgba(236, 230, 216, 0.14), 0 60px 120px -50px #000; /* FALLBACK */
+	             box-shadow: inset 0 0 0 1px var(--surface-edge), 0 60px 120px -50px #000;
 
 	  -webkit-border-radius: 22px; /* FALLBACK */
 	  -webkit-border-radius: var(--radius);
@@ -3906,7 +3950,7 @@ html[data-mode="text"] .explorer_side .project_name::before
 
 html[data-mode="text"] .editor
 {
-	background: #000000;
+	background: #000;
 }
 
 .editor_tabs
@@ -4025,7 +4069,7 @@ html[data-mode="text"] .editor_side,
 html[data-mode="text"] .editor_props,
 html[data-mode="text"] .editor_tools
 {
-	background: #000000;
+	background: #000;
 }
 
 .editor_side
@@ -4073,7 +4117,7 @@ html[data-mode="text"] .editor_tools
 
 .side_list li.on
 {
-	     color: #FFFFFF;
+	     color: #FFF;
 	background: rgba(255, 255, 255, 0.07);
 }
 
@@ -4112,7 +4156,7 @@ html[data-mode="text"] .editor_tools
 {
 	     color: #FFD08A; /* FALLBACK */
 	     color: var(--wick);
-	background: rgba(255, 208, 138, 0.10);
+	background: rgba(255, 208, 138, 0.1);
 }
 
 .layer_row.on .icon
@@ -4165,7 +4209,7 @@ html[data-mode="text"] .editor_tools
 
 .tool.on
 {
-	     color: #FFFFFF;
+	     color: #FFF;
 	background: rgba(255, 255, 255, 0.08);
 }
 
@@ -4187,8 +4231,8 @@ html[data-mode="text"] .editor_tools
 	           top: 9%;
 	          left: 5%;
 	         right: 4%;
-	        bottom: 9%;
 	        border: 1.5px dashed rgba(139, 92, 246, 0.7);
+	        bottom: 9%;
 	      position: absolute;
 	pointer-events: none;
 }
@@ -4232,8 +4276,8 @@ html[data-mode="text"] .section_frame span
 .editor_people i
 {
 	                width: 22px;
-	               height: 22px;
 	               border: 2px solid #141417;
+	               height: 22px;
 	         margin-right: -6px;
 
 	-webkit-border-radius: 50%;
@@ -4307,9 +4351,10 @@ html[data-mode="text"] .section_frame span
 
 .props_field
 {
+	   -moz-box-flex: 1;
+
 	-webkit-box-flex: 1;
 	    -webkit-flex: 1;
-	   -moz-box-flex: 1;
 	        -ms-flex: 1;
 	            flex: 1;
 }
@@ -4402,7 +4447,7 @@ html[data-mode="text"] .section_frame span
 
 html[data-mode="text"] .editor_canvas
 {
-	background-color: #000000;
+	background-color: #000;
 }
 
 .object
@@ -4458,7 +4503,7 @@ html[data-mode="text"] .editor_canvas
 
 html[data-mode="text"] .card
 {
-	           background: #000000;
+	           background: #000;
 
 	   -webkit-box-shadow: inset 0 0 0 1px #ECE6D8; /* FALLBACK */
 	   -webkit-box-shadow: inset 0 0 0 1px var(--bone);
@@ -4490,12 +4535,12 @@ html[data-mode="text"] .card
 
 .card_button
 {
-	                color: #000000;
+	                color: #000;
 	              padding: 7px 14px;
 	            font-size: 13px;
-	           margin-top: auto;
 	           background: #ECE6D8; /* FALLBACK */
 	           background: var(--bone);
+	           margin-top: auto;
 	          font-weight: 620;
 
 	   -webkit-align-self: flex-start;
@@ -4588,7 +4633,7 @@ html[data-mode="text"] .sun
 	                display: -ms-flexbox;
 	                display: flex;
 	               overflow: hidden;
-	             background: #000000;
+	             background: #000;
 
 	     -webkit-box-shadow: inset 0 0 0 1px rgba(236, 230, 216, 0.12); /* FALLBACK */
 	     -webkit-box-shadow: inset 0 0 0 1px var(--line);
@@ -4781,9 +4826,11 @@ html[data-mode="text"] .snippet
 .turn
 {
 	         width: 22px;
-	        height: 22px;
+	        cursor: -webkit-grab;
+	        cursor: -moz-grab;
 	        cursor: grab;
 	        cursor: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='24' height='24' viewBox='0 0 24 24'%3E%3Cpath d='M6 16 A8 8 0 0 1 16 6' fill='none' stroke='%23fff' stroke-width='4'/%3E%3Cpath d='M6 16 A8 8 0 0 1 16 6' fill='none' stroke='%23000' stroke-width='1.6'/%3E%3Cpath d='M14 2.5 L19 6 L14 9.5 Z M2.5 14 L6 19 L9.5 14 Z' fill='%23000' stroke='%23fff' stroke-width='1'/%3E%3C/svg%3E") 12 12, grab;
+	        height: 22px;
 	      position: absolute;
 	pointer-events: auto;
 }
@@ -4817,7 +4864,7 @@ html[data-mode="text"] .snippet
 	             width: 8px;
 	            height: 8px;
 	          position: absolute;
-	        background: #FFFFFF;
+	        background: #FFF;
 	    pointer-events: auto;
 
 	-webkit-box-shadow: 0 0 0 1.5px #0D99FF; /* FALLBACK */
@@ -4864,7 +4911,7 @@ html[data-mode="text"] .snippet
 {
 	                  top: 0;
 	                 left: 0;
-	                color: #FFFFFF;
+	                color: #FFF;
 	              display: none;
 	              padding: 2px 7px;
 	             position: absolute;
@@ -4938,11 +4985,11 @@ html[data-mode="text"] .snippet
 
 .feature_list li::before
 {
+	   content: "";
 	       top: .78em;
 	      left: 0;
 	     width: 7px;
 	    height: 1px;
-	   content: "";
 	  position: absolute;
 	background: #A39D90; /* FALLBACK */
 	background: var(--ash);
@@ -4950,10 +4997,10 @@ html[data-mode="text"] .snippet
 
 html[data-mode="text"] .feature_list li::before
 {
+	   content: "-";
 	       top: 0;
 	     width: auto;
 	    height: auto;
-	   content: "-";
 	background: none;
 }
 
@@ -5022,11 +5069,11 @@ html[data-mode="text"] .feature_list li::before
 	           color: var(--bone);
 	        overflow: hidden;
 	     white-space: nowrap;
+	   -moz-box-flex: 1;
 	   text-overflow: ellipsis;
 
 	-webkit-box-flex: 1;
 	    -webkit-flex: 1;
-	   -moz-box-flex: 1;
 	        -ms-flex: 1;
 	            flex: 1;
 }
@@ -5187,9 +5234,9 @@ html[data-mode="text"] .studio_card
 	                color: var(--ember);
 	              padding: 2px 8px;
 	            font-size: 11px;
-	          margin-left: auto;
 	          font-family: "Martian Mono", Menlo, Consolas, monospace; /* FALLBACK */
 	          font-family: var(--mono);
+	          margin-left: auto;
 	          white-space: nowrap;
 
 	   -webkit-box-shadow: inset 0 0 0 1px rgba(255, 122, 26, 0.45);
@@ -5211,10 +5258,10 @@ html[data-mode="text"] .studio_card
 	          margin: 0;
 	       font-size: 14.5px;
 	     line-height: 1.5;
+	   -moz-box-flex: 1;
 
 	-webkit-box-flex: 1;
 	    -webkit-flex: 1;
-	   -moz-box-flex: 1;
 	        -ms-flex: 1;
 	            flex: 1;
 }
@@ -5227,10 +5274,10 @@ html[data-mode="text"] .studio_card
 	  font-size: 11px;
 	 border-top: 1px solid rgba(236, 230, 216, 0.12); /* FALLBACK */
 	 border-top: 1px solid var(--line);
-	padding-top: 10px;
 	font-family: "Martian Mono", Menlo, Consolas, monospace; /* FALLBACK */
 	font-family: var(--mono);
 	line-height: 1.6;
+	padding-top: 10px;
 }
 
 html[data-mode="text"] .studio_tags
@@ -5415,8 +5462,8 @@ html[data-mode="text"] .point dt
 
 .orb
 {
-	                    top: 50%;
 	                    gap: 15%;
+	                    top: 50%;
 	                  right: 7%;
 	                  width: 24%;
 	                display: -webkit-box;
@@ -5425,10 +5472,10 @@ html[data-mode="text"] .point dt
 	                display: -ms-flexbox;
 	                display: flex;
 	               position: absolute;
-	             background: -webkit-radial-gradient(34% 28%, circle, #2C2B29, #0A0A09 55%, #000000 80%);
-	             background: -moz-radial-gradient(34% 28%, circle, #2C2B29, #0A0A09 55%, #000000 80%);
-	             background: -o-radial-gradient(34% 28%, circle, #2C2B29, #0A0A09 55%, #000000 80%);
-	             background: radial-gradient(circle at 34% 28%, #2C2B29, #0A0A09 55%, #000000 80%);
+	             background: -webkit-radial-gradient(34% 28%, circle, #2C2B29, #0A0A09 55%, #000 80%);
+	             background: -moz-radial-gradient(34% 28%, circle, #2C2B29, #0A0A09 55%, #000 80%);
+	             background: -o-radial-gradient(34% 28%, circle, #2C2B29, #0A0A09 55%, #000 80%);
+	             background: radial-gradient(circle at 34% 28%, #2C2B29, #0A0A09 55%, #000 80%);
 	           aspect-ratio: 1;
 
 	     -webkit-box-shadow: inset 0 0 0 1px rgba(255, 255, 255, 0.08), inset -10px -14px 28px rgba(0, 0, 0, 0.9), 0 24px 60px rgba(0, 0, 0, 0.9);
@@ -5460,15 +5507,15 @@ html[data-mode="text"] .point dt
 
 .orb::after
 {
+	              content: "";
 	                  top: 9%;
 	                 left: 20%;
 	                width: 34%;
 	               height: 22%;
-	              content: "";
 	             position: absolute;
-	           background: -webkit-radial-gradient(center, closest-side, rgba(255, 255, 255, 0.22), rgba(255, 255, 255, 0));
-	           background: -moz-radial-gradient(center, closest-side, rgba(255, 255, 255, 0.22), rgba(255, 255, 255, 0));
-	           background: -o-radial-gradient(center, closest-side, rgba(255, 255, 255, 0.22), rgba(255, 255, 255, 0));
+	           background: -webkit-radial-gradient(closest-side, rgba(255, 255, 255, 0.22), rgba(255, 255, 255, 0));
+	           background: -moz-radial-gradient(closest-side, rgba(255, 255, 255, 0.22), rgba(255, 255, 255, 0));
+	           background: -o-radial-gradient(closest-side, rgba(255, 255, 255, 0.22), rgba(255, 255, 255, 0));
 	           background: radial-gradient(closest-side, rgba(255, 255, 255, 0.22), rgba(255, 255, 255, 0));
 
 	-webkit-border-radius: 50%;
@@ -5484,7 +5531,7 @@ html[data-mode="text"] .point dt
 
 html[data-mode="text"] .orb
 {
-	        background: #000000;
+	        background: #000;
 
 	-webkit-box-shadow: inset 0 0 0 1px #ECE6D8; /* FALLBACK */
 	-webkit-box-shadow: inset 0 0 0 1px var(--bone);
@@ -5504,7 +5551,9 @@ html[data-mode="text"] .orb::after
 	                width: 13%;
 	               height: 26%;
 	             position: relative;
-	           background: #FFFFFF;
+	           background: #FFF;
+	   -webkit-transition: -webkit-transform .12s cubic-bezier(.22, .7, .2, 1), background-color .3s cubic-bezier(.22, .7, .2, 1), -webkit-box-shadow .3s cubic-bezier(.22, .7, .2, 1), clip-path .2s cubic-bezier(.22, .7, .2, 1); /* FALLBACK */
+	   -webkit-transition: -webkit-transform .12s var(--ease), background-color .3s var(--ease), -webkit-box-shadow .3s var(--ease), clip-path .2s var(--ease);
 
 	   -webkit-box-shadow: 0 0 14px rgba(255, 255, 255, 0.55);
 	      -moz-box-shadow: 0 0 14px rgba(255, 255, 255, 0.55);
@@ -5514,19 +5563,19 @@ html[data-mode="text"] .orb::after
 	   -moz-border-radius: 50%;
 	        border-radius: 50%;
 
-	    -webkit-transform: translate(0, 0) scaleY(calc(1 * 1)); /* FALLBACK */
+	    -webkit-transform: translate(0, 0) scaleY(calc(1 * 0.1)); /* FALLBACK */
 	    -webkit-transform: translate(var(--look-x, 0), var(--look-y, 0)) scaleY(calc(var(--blink, 1) * var(--squash, 1)));
-	       -moz-transform: translate(0, 0) scaleY(calc(1 * 1)); /* FALLBACK */
+	       -moz-transform: translate(0, 0) scaleY(calc(1 * 0.1)); /* FALLBACK */
 	       -moz-transform: translate(var(--look-x, 0), var(--look-y, 0)) scaleY(calc(var(--blink, 1) * var(--squash, 1)));
-	        -ms-transform: translate(0, 0) scaleY(calc(1 * 1)); /* FALLBACK */
+	        -ms-transform: translate(0, 0) scaleY(calc(1 * 0.1)); /* FALLBACK */
 	        -ms-transform: translate(var(--look-x, 0), var(--look-y, 0)) scaleY(calc(var(--blink, 1) * var(--squash, 1)));
-	         -o-transform: translate(0, 0) scaleY(calc(1 * 1)); /* FALLBACK */
+	         -o-transform: translate(0, 0) scaleY(calc(1 * 0.1)); /* FALLBACK */
 	         -o-transform: translate(var(--look-x, 0), var(--look-y, 0)) scaleY(calc(var(--blink, 1) * var(--squash, 1)));
-	            transform: translate(0, 0) scaleY(calc(1 * 1)); /* FALLBACK */
+	            transform: translate(0, 0) scaleY(calc(1 * 0.1)); /* FALLBACK */
 	            transform: translate(var(--look-x, 0), var(--look-y, 0)) scaleY(calc(var(--blink, 1) * var(--squash, 1)));
 
-	   -webkit-transition: -webkit-transform .12s cubic-bezier(.22, .7, .2, 1), background-color .3s cubic-bezier(.22, .7, .2, 1), -webkit-box-shadow .3s cubic-bezier(.22, .7, .2, 1), clip-path .2s cubic-bezier(.22, .7, .2, 1); /* FALLBACK */
-	   -webkit-transition: -webkit-transform .12s var(--ease), background-color .3s var(--ease), -webkit-box-shadow .3s var(--ease), clip-path .2s var(--ease);
+	   -webkit-transition: -webkit-transform .12s cubic-bezier(.22, .7, .2, 1), background-color .3s cubic-bezier(.22, .7, .2, 1), -webkit-box-shadow .3s cubic-bezier(.22, .7, .2, 1), -webkit-clip-path .2s cubic-bezier(.22, .7, .2, 1); /* FALLBACK */
+	   -webkit-transition: -webkit-transform .12s var(--ease), background-color .3s var(--ease), -webkit-box-shadow .3s var(--ease), -webkit-clip-path .2s var(--ease);
 	      -moz-transition: -moz-transform .12s cubic-bezier(.22, .7, .2, 1), background-color .3s cubic-bezier(.22, .7, .2, 1), -moz-box-shadow .3s cubic-bezier(.22, .7, .2, 1), clip-path .2s cubic-bezier(.22, .7, .2, 1); /* FALLBACK */
 	      -moz-transition: -moz-transform .12s var(--ease), background-color .3s var(--ease), -moz-box-shadow .3s var(--ease), clip-path .2s var(--ease);
 	        -o-transition: -o-transform .12s cubic-bezier(.22, .7, .2, 1), background-color .3s cubic-bezier(.22, .7, .2, 1), box-shadow .3s cubic-bezier(.22, .7, .2, 1), clip-path .2s cubic-bezier(.22, .7, .2, 1); /* FALLBACK */
@@ -5542,7 +5591,7 @@ html[data-mode="text"] .orb::after
 
 .orb
 {
-	            rotate: 0deg; /* FALLBACK */
+	            rotate: -7deg; /* FALLBACK */
 	            rotate: var(--tilt, 0deg);
 	      touch-action: pan-y;
 
@@ -5558,6 +5607,8 @@ html[data-mode="text"] .orb::after
 
 .orb[data-zone="head"]
 {
+	cursor: -webkit-grab;
+	cursor: -moz-grab;
 	cursor: grab;
 }
 
@@ -5571,6 +5622,8 @@ html[data-mode="text"] .orb::after
 .orb.grabbing,
 .orb.grabbing[data-zone]
 {
+	cursor: -webkit-grabbing;
+	cursor: -moz-grabbing;
 	cursor: grabbing;
 }
 
@@ -5593,15 +5646,17 @@ html[data-mode="text"] .orb::after
 
 .orb_eye::before
 {
+	              content: "";
 	                  top: 26%;
 	                 left: -18%;
 	                right: -18%;
 	               height: 52%;
-	               filter: drop-shadow(0 0 6px rgba(255, 255, 255, 0.6));
-	              content: "";
 	              opacity: 0;
 	             position: absolute;
-	           border-top: 0.28em solid #FFFFFF;
+	           border-top: 0.28em solid #FFF;
+
+	       -webkit-filter: drop-shadow(0 0 6px rgba(255, 255, 255, 0.6));
+	               filter: drop-shadow(0 0 6px rgba(255, 255, 255, 0.6));
 
 	-webkit-border-radius: 50% 50% 0 0 / 100% 100% 0 0;
 	   -moz-border-radius: 50% 50% 0 0 / 100% 100% 0 0;
@@ -5640,11 +5695,11 @@ html[data-mode="text"] .orb::after
 
 .orb::before
 {
+	           content: "?";
 	               top: -30%;
-	             right: 6%;
 	             color: #FFD08A; /* FALLBACK */
 	             color: var(--wick);
-	           content: "?";
+	             right: 6%;
 	           opacity: 0;
 	          position: absolute;
 	         font-size: 2.6em;
@@ -5949,8 +6004,10 @@ html[data-mode="text"] .orb::after
 {
 	0%
 	{
-		           filter: none;
 		        translate: 0 0;
+
+		   -webkit-filter: none;
+		           filter: none;
 
 		-webkit-clip-path: none;
 		        clip-path: none;
@@ -5958,8 +6015,10 @@ html[data-mode="text"] .orb::after
 
 	10%
 	{
-		           filter: drop-shadow(5px 0 0 rgba(255, 0, 70, 0.9)) drop-shadow(-5px 0 0 rgba(0, 230, 255, 0.9));
 		        translate: -9px 0;
+
+		   -webkit-filter: drop-shadow(5px 0 0 rgba(255, 0, 70, 0.9)) drop-shadow(-5px 0 0 rgba(0, 230, 255, 0.9));
+		           filter: drop-shadow(5px 0 0 rgba(255, 0, 70, 0.9)) drop-shadow(-5px 0 0 rgba(0, 230, 255, 0.9));
 
 		-webkit-clip-path: inset(0 0 52% 0);
 		        clip-path: inset(0 0 52% 0);
@@ -5975,8 +6034,10 @@ html[data-mode="text"] .orb::after
 
 	30%
 	{
-		           filter: drop-shadow(-6px 0 0 rgba(255, 0, 70, 0.9)) drop-shadow(6px 0 0 rgba(0, 230, 255, 0.9)) brightness(1.8);
 		        translate: -4px -2px;
+
+		   -webkit-filter: drop-shadow(-6px 0 0 rgba(255, 0, 70, 0.9)) drop-shadow(6px 0 0 rgba(0, 230, 255, 0.9)) brightness(1.8);
+		           filter: drop-shadow(-6px 0 0 rgba(255, 0, 70, 0.9)) drop-shadow(6px 0 0 rgba(0, 230, 255, 0.9)) brightness(1.8);
 
 		-webkit-clip-path: none;
 		        clip-path: none;
@@ -5992,8 +6053,10 @@ html[data-mode="text"] .orb::after
 
 	60%
 	{
-		           filter: drop-shadow(3px 0 0 rgba(255, 0, 70, 0.8)) drop-shadow(-3px 0 0 rgba(0, 230, 255, 0.8));
 		        translate: -3px 1px;
+
+		   -webkit-filter: drop-shadow(3px 0 0 rgba(255, 0, 70, 0.8)) drop-shadow(-3px 0 0 rgba(0, 230, 255, 0.8));
+		           filter: drop-shadow(3px 0 0 rgba(255, 0, 70, 0.8)) drop-shadow(-3px 0 0 rgba(0, 230, 255, 0.8));
 
 		-webkit-clip-path: inset(12% 0 40% 0);
 		        clip-path: inset(12% 0 40% 0);
@@ -6001,8 +6064,10 @@ html[data-mode="text"] .orb::after
 
 	75%
 	{
-		           filter: brightness(0.6);
 		        translate: 2px 0;
+
+		   -webkit-filter: brightness(0.6);
+		           filter: brightness(0.6);
 
 		-webkit-clip-path: none;
 		        clip-path: none;
@@ -6010,14 +6075,18 @@ html[data-mode="text"] .orb::after
 
 	88%
 	{
-		   filter: none;
-		translate: -1px 0;
+		     translate: -1px 0;
+
+		-webkit-filter: none;
+		        filter: none;
 	}
 
 	100%
 	{
-		           filter: none;
 		        translate: 0 0;
+
+		   -webkit-filter: none;
+		           filter: none;
 
 		-webkit-clip-path: none;
 		        clip-path: none;
@@ -6029,55 +6098,48 @@ html[data-mode="text"] .orb::after
 	0%
 	{
 		   filter: none;
-		translate: 0 0;
-
 		clip-path: none;
+		translate: 0 0;
 	}
 
 	10%
 	{
 		   filter: drop-shadow(5px 0 0 rgba(255, 0, 70, 0.9)) drop-shadow(-5px 0 0 rgba(0, 230, 255, 0.9));
-		translate: -9px 0;
-
 		clip-path: inset(0 0 52% 0);
+		translate: -9px 0;
 	}
 
 	20%
 	{
-		translate: 8px 3px;
-
 		clip-path: inset(30% 0 22% 0);
+		translate: 8px 3px;
 	}
 
 	30%
 	{
 		   filter: drop-shadow(-6px 0 0 rgba(255, 0, 70, 0.9)) drop-shadow(6px 0 0 rgba(0, 230, 255, 0.9)) brightness(1.8);
-		translate: -4px -2px;
-
 		clip-path: none;
+		translate: -4px -2px;
 	}
 
 	45%
 	{
-		translate: 6px 0;
-
 		clip-path: inset(56% 0 0 0);
+		translate: 6px 0;
 	}
 
 	60%
 	{
 		   filter: drop-shadow(3px 0 0 rgba(255, 0, 70, 0.8)) drop-shadow(-3px 0 0 rgba(0, 230, 255, 0.8));
-		translate: -3px 1px;
-
 		clip-path: inset(12% 0 40% 0);
+		translate: -3px 1px;
 	}
 
 	75%
 	{
 		   filter: brightness(0.6);
-		translate: 2px 0;
-
 		clip-path: none;
+		translate: 2px 0;
 	}
 
 	88%
@@ -6089,9 +6151,8 @@ html[data-mode="text"] .orb::after
 	100%
 	{
 		   filter: none;
-		translate: 0 0;
-
 		clip-path: none;
+		translate: 0 0;
 	}
 }
 
@@ -6100,55 +6161,48 @@ html[data-mode="text"] .orb::after
 	0%
 	{
 		   filter: none;
-		translate: 0 0;
-
 		clip-path: none;
+		translate: 0 0;
 	}
 
 	10%
 	{
 		   filter: drop-shadow(5px 0 0 rgba(255, 0, 70, 0.9)) drop-shadow(-5px 0 0 rgba(0, 230, 255, 0.9));
-		translate: -9px 0;
-
 		clip-path: inset(0 0 52% 0);
+		translate: -9px 0;
 	}
 
 	20%
 	{
-		translate: 8px 3px;
-
 		clip-path: inset(30% 0 22% 0);
+		translate: 8px 3px;
 	}
 
 	30%
 	{
 		   filter: drop-shadow(-6px 0 0 rgba(255, 0, 70, 0.9)) drop-shadow(6px 0 0 rgba(0, 230, 255, 0.9)) brightness(1.8);
-		translate: -4px -2px;
-
 		clip-path: none;
+		translate: -4px -2px;
 	}
 
 	45%
 	{
-		translate: 6px 0;
-
 		clip-path: inset(56% 0 0 0);
+		translate: 6px 0;
 	}
 
 	60%
 	{
 		   filter: drop-shadow(3px 0 0 rgba(255, 0, 70, 0.8)) drop-shadow(-3px 0 0 rgba(0, 230, 255, 0.8));
-		translate: -3px 1px;
-
 		clip-path: inset(12% 0 40% 0);
+		translate: -3px 1px;
 	}
 
 	75%
 	{
 		   filter: brightness(0.6);
-		translate: 2px 0;
-
 		clip-path: none;
+		translate: 2px 0;
 	}
 
 	88%
@@ -6160,9 +6214,8 @@ html[data-mode="text"] .orb::after
 	100%
 	{
 		   filter: none;
-		translate: 0 0;
-
 		clip-path: none;
+		translate: 0 0;
 	}
 }
 
@@ -6170,8 +6223,10 @@ html[data-mode="text"] .orb::after
 {
 	0%
 	{
-		           filter: none;
 		        translate: 0 0;
+
+		   -webkit-filter: none;
+		           filter: none;
 
 		-webkit-clip-path: none;
 		        clip-path: none;
@@ -6179,8 +6234,10 @@ html[data-mode="text"] .orb::after
 
 	10%
 	{
-		           filter: drop-shadow(5px 0 0 rgba(255, 0, 70, 0.9)) drop-shadow(-5px 0 0 rgba(0, 230, 255, 0.9));
 		        translate: -9px 0;
+
+		   -webkit-filter: drop-shadow(5px 0 0 rgba(255, 0, 70, 0.9)) drop-shadow(-5px 0 0 rgba(0, 230, 255, 0.9));
+		           filter: drop-shadow(5px 0 0 rgba(255, 0, 70, 0.9)) drop-shadow(-5px 0 0 rgba(0, 230, 255, 0.9));
 
 		-webkit-clip-path: inset(0 0 52% 0);
 		        clip-path: inset(0 0 52% 0);
@@ -6196,8 +6253,10 @@ html[data-mode="text"] .orb::after
 
 	30%
 	{
-		           filter: drop-shadow(-6px 0 0 rgba(255, 0, 70, 0.9)) drop-shadow(6px 0 0 rgba(0, 230, 255, 0.9)) brightness(1.8);
 		        translate: -4px -2px;
+
+		   -webkit-filter: drop-shadow(-6px 0 0 rgba(255, 0, 70, 0.9)) drop-shadow(6px 0 0 rgba(0, 230, 255, 0.9)) brightness(1.8);
+		           filter: drop-shadow(-6px 0 0 rgba(255, 0, 70, 0.9)) drop-shadow(6px 0 0 rgba(0, 230, 255, 0.9)) brightness(1.8);
 
 		-webkit-clip-path: none;
 		        clip-path: none;
@@ -6213,8 +6272,10 @@ html[data-mode="text"] .orb::after
 
 	60%
 	{
-		           filter: drop-shadow(3px 0 0 rgba(255, 0, 70, 0.8)) drop-shadow(-3px 0 0 rgba(0, 230, 255, 0.8));
 		        translate: -3px 1px;
+
+		   -webkit-filter: drop-shadow(3px 0 0 rgba(255, 0, 70, 0.8)) drop-shadow(-3px 0 0 rgba(0, 230, 255, 0.8));
+		           filter: drop-shadow(3px 0 0 rgba(255, 0, 70, 0.8)) drop-shadow(-3px 0 0 rgba(0, 230, 255, 0.8));
 
 		-webkit-clip-path: inset(12% 0 40% 0);
 		        clip-path: inset(12% 0 40% 0);
@@ -6222,8 +6283,10 @@ html[data-mode="text"] .orb::after
 
 	75%
 	{
-		           filter: brightness(0.6);
 		        translate: 2px 0;
+
+		   -webkit-filter: brightness(0.6);
+		           filter: brightness(0.6);
 
 		-webkit-clip-path: none;
 		        clip-path: none;
@@ -6231,14 +6294,18 @@ html[data-mode="text"] .orb::after
 
 	88%
 	{
-		   filter: none;
-		translate: -1px 0;
+		     translate: -1px 0;
+
+		-webkit-filter: none;
+		        filter: none;
 	}
 
 	100%
 	{
-		           filter: none;
 		        translate: 0 0;
+
+		   -webkit-filter: none;
+		           filter: none;
 
 		-webkit-clip-path: none;
 		        clip-path: none;
@@ -6573,14 +6640,18 @@ html[data-mode="text"] .idea p
 
 .logos
 {
-	   padding: 8px 0;
-	  overflow: hidden;
-	  position: relative;
-	mask-image: linear-gradient(90deg, transparent, #000000 9%, #000000 91%, transparent);
+	           padding: 8px 0;
+	          overflow: hidden;
+	          position: relative;
+
+	-webkit-mask-image: linear-gradient(90deg, transparent, #000 9%, #000 91%, transparent);
+	        mask-image: linear-gradient(90deg, transparent, #000 9%, #000 91%, transparent);
 }
 
 .logo_track
 {
+	            width: -webkit-max-content;
+	            width: -moz-max-content;
 	            width: max-content;
 	           margin: 0;
 	          display: -webkit-box;
@@ -6604,7 +6675,10 @@ html[data-mode="text"] .idea p
 .logos:hover .logo_track,
 .logos:focus-within .logo_track
 {
-	animation-play-state: paused;
+	-webkit-animation-play-state: paused;
+	   -moz-animation-play-state: paused;
+	     -o-animation-play-state: paused;
+	        animation-play-state: paused;
 }
 
 .logo_item
@@ -6673,7 +6747,7 @@ html[data-mode="text"] .idea p
 
 html[data-mode="text"] .logo_link:hover
 {
-	     color: #000000;
+	     color: #000;
 	background: #ECE6D8; /* FALLBACK */
 	background: var(--bone);
 }
@@ -6697,15 +6771,18 @@ html[data-mode="text"] .logo_link:hover
 
 .logo_icon img
 {
-	     width: 100%;
-	    height: 100%;
-	   display: block;
-	object-fit: contain;
+	        width: 100%;
+	       height: 100%;
+	      display: block;
+
+	-o-object-fit: contain;
+	   object-fit: contain;
 }
 
 html[data-mode="text"] .logo_icon img
 {
-	filter: grayscale(1) contrast(1.15);
+	-webkit-filter: grayscale(1) contrast(1.15);
+	        filter: grayscale(1) contrast(1.15);
 }
 
 .logo_icon.missing img
@@ -6715,10 +6792,10 @@ html[data-mode="text"] .logo_icon img
 
 .logo_icon.missing::after
 {
-	                  inset: 0;
+	                content: attr(data-letter);
 	                  color: #FFD08A; /* FALLBACK */
 	                  color: var(--wick);
-	                content: attr(data-letter);
+	                  inset: 0;
 	                display: -webkit-box;
 	                display: -webkit-flex;
 	                display: -moz-box;
@@ -6789,7 +6866,10 @@ html[data-mode="text"] .logo_name
 	              display: grid;
 	grid-template-columns: minmax(0, 6fr) minmax(0, 5fr);
 
+	    -webkit-box-align: center;
 	  -webkit-align-items: center;
+	       -moz-box-align: center;
+	       -ms-flex-align: center;
 	          align-items: center;
 }
 
@@ -6821,6 +6901,7 @@ html[data-mode="text"] .project_name
 	         font-size: clamp(18px, 2.6vw, 34px);
 	       font-family: "Martian Mono", Menlo, Consolas, monospace; /* FALLBACK */
 	       font-family: var(--mono);
+	       white-space: nowrap;
 	     border-bottom: 1px solid rgba(236, 230, 216, 0.3);
 	     overflow-wrap: anywhere;
 	    padding-bottom: 8px;
@@ -6846,6 +6927,8 @@ html[data-mode="text"] .project_name
 
 .contact .link
 {
+	  width: -webkit-fit-content;
+	  width: -moz-fit-content;
 	  width: fit-content;
 	display: block;
 }
@@ -6871,16 +6954,19 @@ html[data-mode="text"] .project_name
 	              display: grid;
 	grid-template-columns: repeat(2, minmax(0, 1fr));
 
+	    -webkit-box-align: stretch;
 	  -webkit-align-items: stretch;
+	       -moz-box-align: stretch;
+	       -ms-flex-align: stretch;
 	          align-items: stretch;
 }
 
 .sr_only
 {
 	            width: 1px;
+	           border: 0;
 	           height: 1px;
 	           margin: -1px;
-	           border: 0;
 	          padding: 0;
 	         overflow: hidden;
 	         position: absolute;
@@ -6923,8 +7009,8 @@ html[data-mode="text"] .project_name
 .banner_art
 {
 	            top: 0;
-	           left: 0;
 	           fill: none;
+	           left: 0;
 	          width: 100%;
 	         height: 100%;
 	         stroke: rgba(255, 255, 255, 0.82);
@@ -6967,6 +7053,8 @@ html[data-mode="text"] .project_name
 	                width: 100%;
 	               height: 100%;
 	              display: block;
+
+	        -o-object-fit: cover;
 	           object-fit: cover;
 
 	-webkit-border-radius: 50%;
@@ -6991,6 +7079,8 @@ html[data-mode="text"] .project_name
 .profile_badges
 {
 	                  gap: 2px;
+	                width: -webkit-max-content;
+	                width: -moz-max-content;
 	                width: max-content;
 	               margin: 12px 14px 0 auto;
 	              display: -webkit-box;
@@ -7113,9 +7203,9 @@ html[data-mode="text"] .project_name
 
 .role::before
 {
+	              content: "";
 	                width: 10px;
 	               height: 10px;
-	              content: "";
 
 	  -webkit-flex-shrink: 0;
 	    -ms-flex-negative: 0;
@@ -7222,14 +7312,14 @@ html[data-mode="text"] .project_name
 .art_pen rect,
 .art_pen circle
 {
-	  fill: #FFFFFF;
+	  fill: #FFF;
 	stroke: none;
 }
 
 .art_onion circle,
 .art_ball
 {
-	  fill: #FFFFFF;
+	  fill: #FFF;
 	stroke: none;
 }
 
@@ -7457,11 +7547,11 @@ html[data-mode="text"] .project_name
 
 .profile.term .profile_banner::after
 {
+	       content: "";
 	           top: 0;
 	          left: 0;
 	         right: 0;
 	        bottom: 0;
-	       content: "";
 	      position: absolute;
 	    background: -webkit-repeating-linear-gradient(90deg, rgba(0, 0, 0, 0.36) 0, rgba(0, 0, 0, 0.36) 1px, transparent 1px, transparent 3px);
 	    background: -moz-repeating-linear-gradient(90deg, rgba(0, 0, 0, 0.36) 0, rgba(0, 0, 0, 0.36) 1px, transparent 1px, transparent 3px);
@@ -7513,9 +7603,11 @@ html[data-mode="text"] .project_name
 	              top: 50%;
 	            right: 22px;
 	            width: 96px;
-	           filter: drop-shadow(0 0 10px rgba(255, 122, 26, 0.55));
 	          opacity: 0.9;
 	         position: absolute;
+
+	   -webkit-filter: drop-shadow(0 0 10px rgba(255, 122, 26, 0.55));
+	           filter: drop-shadow(0 0 10px rgba(255, 122, 26, 0.55));
 
 	-webkit-transform: translateY(-50%);
 	   -moz-transform: translateY(-50%);
@@ -7537,9 +7629,9 @@ html[data-mode="text"] .project_name
 	                 left: 0;
 	                right: 0;
 	               bottom: 0;
-	              z-index: 2;
 	              opacity: 0; /* FALLBACK */
 	              opacity: var(--glare);
+	              z-index: 2;
 	             position: absolute;
 	           background: -webkit-radial-gradient(50% 50%, circle, rgba(255, 255, 255, 0.16), transparent 55%); /* FALLBACK */
 	           background: -webkit-radial-gradient(var(--glare-x) var(--glare-y), circle, rgba(255, 255, 255, 0.16), transparent 55%);
@@ -7577,11 +7669,11 @@ html[data-mode="text"] .project_name
 	              padding: 26px 26px 22px;
 	             overflow: hidden;
 	             position: relative;
-	           min-height: 340px;
 	           background: -webkit-radial-gradient(18% 12%, circle, rgba(255, 255, 255, 0.6), transparent 55%), -webkit-radial-gradient(88% 92%, circle, rgba(150, 118, 80, 0.2), transparent 60%), #ECE6D8;
 	           background: -moz-radial-gradient(18% 12%, circle, rgba(255, 255, 255, 0.6), transparent 55%), -moz-radial-gradient(88% 92%, circle, rgba(150, 118, 80, 0.2), transparent 60%), #ECE6D8;
 	           background: -o-radial-gradient(18% 12%, circle, rgba(255, 255, 255, 0.6), transparent 55%), -o-radial-gradient(88% 92%, circle, rgba(150, 118, 80, 0.2), transparent 60%), #ECE6D8;
 	           background: radial-gradient(circle at 18% 12%, rgba(255, 255, 255, 0.6), transparent 55%), radial-gradient(circle at 88% 92%, rgba(150, 118, 80, 0.2), transparent 60%), #ECE6D8;
+	           min-height: 340px;
 	grid-template-columns: minmax(0, 1.05fr) minmax(0, 1fr);
 
 	   -webkit-box-shadow: inset 0 1px 0 rgba(255, 255, 255, 0.7), 0 50px 90px -40px rgba(0, 0, 0, 0.95), 0 20px 40px -24px rgba(255, 122, 26, 0.3);
@@ -7640,8 +7732,8 @@ html[data-mode="text"] .project_name
 
 .pc_kinds
 {
-	   margin: 0;
 	   border: 0;
+	   margin: 0;
 	  padding: 0;
 	min-width: 0;
 }
@@ -7681,9 +7773,9 @@ html[data-mode="text"] .project_name
 	     top: 0;
 	    left: 0;
 	   width: 100%;
+	  cursor: pointer;
 	  height: 100%;
 	  margin: 0;
-	  cursor: pointer;
 	 opacity: 0;
 	position: absolute;
 }
@@ -7742,19 +7834,19 @@ html[data-mode="text"] .project_name
 	         outline: none;
 	         padding: 0;
 	       font-size: 15px;
-	      min-height: 112px;
 	      background: -webkit-repeating-linear-gradient(transparent 0, transparent 27px, rgba(42, 36, 32, 0.22) 27px, rgba(42, 36, 32, 0.22) 28px);
 	      background: -moz-repeating-linear-gradient(transparent 0, transparent 27px, rgba(42, 36, 32, 0.22) 27px, rgba(42, 36, 32, 0.22) 28px);
 	      background: -o-repeating-linear-gradient(transparent 0, transparent 27px, rgba(42, 36, 32, 0.22) 27px, rgba(42, 36, 32, 0.22) 28px);
 	      background: repeating-linear-gradient(transparent 0, transparent 27px, rgba(42, 36, 32, 0.22) 27px, rgba(42, 36, 32, 0.22) 28px);
+	      min-height: 112px;
 	     caret-color: #FF7A1A;
 	     font-family: "Mona Sans", "Helvetica Neue", Arial, sans-serif; /* FALLBACK */
 	     font-family: var(--font);
 	     line-height: 28px;
+	   -moz-box-flex: 1;
 
 	-webkit-box-flex: 1;
 	    -webkit-flex: 1;
-	   -moz-box-flex: 1;
 	        -ms-flex: 1;
 	            flex: 1;
 }
@@ -7778,13 +7870,15 @@ html[data-mode="text"] .project_name
 	            right: 0;
 	            width: 72px;
 	           height: 88px;
-	           filter: drop-shadow(0 1px 1.5px rgba(0, 0, 0, 0.3));
 	          padding: 5px;
 	         position: absolute;
 	       background: -webkit-radial-gradient(center, circle, transparent 2.6px, #FFFBF2 3px) -5px -5px / 10px 10px;
 	       background: -moz-radial-gradient(center, circle, transparent 2.6px, #FFFBF2 3px) -5px -5px / 10px 10px;
 	       background: -o-radial-gradient(center, circle, transparent 2.6px, #FFFBF2 3px) -5px -5px / 10px 10px;
 	       background: radial-gradient(circle at center, transparent 2.6px, #FFFBF2 3px) -5px -5px / 10px 10px;
+
+	   -webkit-filter: drop-shadow(0 1px 1.5px rgba(0, 0, 0, 0.3));
+	           filter: drop-shadow(0 1px 1.5px rgba(0, 0, 0, 0.3));
 
 	-webkit-transform: rotate(3deg);
 	   -moz-transform: rotate(3deg);
@@ -7849,12 +7943,12 @@ html[data-mode="text"] .project_name
 {
 	              top: 12px;
 	             fill: none;
+	            color: #2A2420;
 	            right: 22px;
 	            width: 150px;
-	            color: #2A2420;
 	           stroke: currentColor;
-	          z-index: 1;
 	          opacity: 0;
+	          z-index: 1;
 	         position: absolute;
 	     stroke-width: 1.6;
 	   pointer-events: none;
@@ -8428,28 +8522,32 @@ html[data-mode="text"] .project_name
 
 .lost
 {
+	background: -webkit-radial-gradient(50% 36%, circle, #000 0, #000 9vmin, rgba(255, 196, 140, 0.6) 9.4vmin, rgba(255, 122, 26, 0.18) 12vmin, rgba(0, 0, 0, 0) 30vmin), #000;
+	background: -moz-radial-gradient(50% 36%, circle, #000 0, #000 9vmin, rgba(255, 196, 140, 0.6) 9.4vmin, rgba(255, 122, 26, 0.18) 12vmin, rgba(0, 0, 0, 0) 30vmin), #000;
+	background: -o-radial-gradient(50% 36%, circle, #000 0, #000 9vmin, rgba(255, 196, 140, 0.6) 9.4vmin, rgba(255, 122, 26, 0.18) 12vmin, rgba(0, 0, 0, 0) 30vmin), #000;
+	background: radial-gradient(circle at 50% 36%, #000 0, #000 9vmin, rgba(255, 196, 140, 0.6) 9.4vmin, rgba(255, 122, 26, 0.18) 12vmin, rgba(0, 0, 0, 0) 30vmin), #000;
 	min-height: 100vh;
 	min-height: 100svh;
 	overflow-x: hidden;
-	background: -webkit-radial-gradient(50% 36%, circle, #000000 0, #000000 9vmin, rgba(255, 196, 140, 0.6) 9.4vmin, rgba(255, 122, 26, 0.18) 12vmin, rgba(0, 0, 0, 0) 30vmin), #000000;
-	background: -moz-radial-gradient(50% 36%, circle, #000000 0, #000000 9vmin, rgba(255, 196, 140, 0.6) 9.4vmin, rgba(255, 122, 26, 0.18) 12vmin, rgba(0, 0, 0, 0) 30vmin), #000000;
-	background: -o-radial-gradient(50% 36%, circle, #000000 0, #000000 9vmin, rgba(255, 196, 140, 0.6) 9.4vmin, rgba(255, 122, 26, 0.18) 12vmin, rgba(0, 0, 0, 0) 30vmin), #000000;
-	background: radial-gradient(circle at 50% 36%, #000000 0, #000000 9vmin, rgba(255, 196, 140, 0.6) 9.4vmin, rgba(255, 122, 26, 0.18) 12vmin, rgba(0, 0, 0, 0) 30vmin), #000000;
 }
 
 /* THE PRE-RENDERED LOOP FILLS THE SCREEN; ITS FIRST FRAME (THE POSTER) SHOWS WHILE IT LOADS */
 
 .hole
 {
-	            top: 0;
-	           left: 0;
-	          width: 100%;
-	         height: 100%;
-	        z-index: 0;
-	        display: block;
-	       position: fixed;
-	     object-fit: cover;
-	object-position: 50% 50%;
+	               top: 0;
+	              left: 0;
+	             width: 100%;
+	            height: 100%;
+	           display: block;
+	           z-index: 0;
+	          position: fixed;
+
+	     -o-object-fit: cover;
+	        object-fit: cover;
+
+	-o-object-position: 50% 50%;
+	   object-position: 50% 50%;
 }
 
 .lost_header
@@ -8457,7 +8555,6 @@ html[data-mode="text"] .project_name
 	     top: 0;
 	    left: 0;
 	   right: 0;
-	 z-index: 2;
 	 display: -webkit-box;
 	 display: -webkit-flex;
 	 display: -moz-box;
@@ -8465,6 +8562,7 @@ html[data-mode="text"] .project_name
 	 display: flex;
 	 padding: 20px clamp(20px, 5vw, 72px); /* FALLBACK */
 	 padding: 20px var(--gutter);
+	 z-index: 2;
 	position: fixed;
 }
 
@@ -8473,7 +8571,6 @@ html[data-mode="text"] .project_name
 	                  left: 0;
 	                 right: 0;
 	                bottom: 0;
-	               z-index: 2;
 	               display: -webkit-box;
 	               display: -webkit-flex;
 	               display: -moz-box;
@@ -8481,7 +8578,9 @@ html[data-mode="text"] .project_name
 	               display: flex;
 	               padding: 140px clamp(20px, 5vw, 72px) clamp(64px, 11vh, 112px); /* FALLBACK */
 	               padding: 140px var(--gutter) clamp(64px, 11vh, 112px);
+	               z-index: 2;
 	              position: fixed;
+	            background: -webkit-gradient(linear, left top, left bottom, from(rgba(0, 0, 0, 0)), color-stop(48%, rgba(0, 0, 0, 0.7)), to(rgba(0, 0, 0, 0.88)));
 	            background: -webkit-linear-gradient(rgba(0, 0, 0, 0), rgba(0, 0, 0, 0.7) 48%, rgba(0, 0, 0, 0.88));
 	            background: -moz-linear-gradient(rgba(0, 0, 0, 0), rgba(0, 0, 0, 0.7) 48%, rgba(0, 0, 0, 0.88));
 	            background: -o-linear-gradient(rgba(0, 0, 0, 0), rgba(0, 0, 0, 0.7) 48%, rgba(0, 0, 0, 0.88));
@@ -8545,14 +8644,14 @@ html[data-mode="text"] .project_name
 .lost_note
 {
 	      left: 0;
-	     right: 0;
 	     color: #6B665D; /* FALLBACK */
 	     color: var(--dim);
+	     right: 0;
 	    bottom: 18px;
 	    margin: 0;
-	   z-index: 2;
 	   padding: 0 clamp(20px, 5vw, 72px); /* FALLBACK */
 	   padding: 0 var(--gutter);
+	   z-index: 2;
 	  position: fixed;
 	 font-size: 12px;
 	text-align: center;
@@ -8868,24 +8967,36 @@ html[data-mode="text"] .project_name
 
 	.hero_title
 	{
-		  order: 1;
-		padding: 0 clamp(20px, 5vw, 72px); /* FALLBACK */
-		padding: 0 var(--gutter);
+		                  padding: 0 clamp(20px, 5vw, 72px); /* FALLBACK */
+		                  padding: 0 var(--gutter);
+
+		-webkit-box-ordinal-group: 2;
+		            -webkit-order: 1;
+		           -ms-flex-order: 1;
+		                    order: 1;
 	}
 
 	.stage_slot
 	{
-		     order: 2;
-		margin-top: 8px;
-		min-height: clamp(300px, 96vw, 480px);
+		               margin-top: 8px;
+		               min-height: clamp(300px, 96vw, 480px);
+
+		-webkit-box-ordinal-group: 3;
+		            -webkit-order: 2;
+		           -ms-flex-order: 2;
+		                    order: 2;
 	}
 
 	.hero_side
 	{
-		     order: 4;
-		   padding: 0 clamp(20px, 5vw, 72px); /* FALLBACK */
-		   padding: 0 var(--gutter);
-		margin-top: 28px;
+		                  padding: 0 clamp(20px, 5vw, 72px); /* FALLBACK */
+		                  padding: 0 var(--gutter);
+		               margin-top: 28px;
+
+		-webkit-box-ordinal-group: 5;
+		            -webkit-order: 4;
+		           -ms-flex-order: 4;
+		                    order: 4;
 	}
 
 	.footer_text
@@ -8937,8 +9048,8 @@ html[data-mode="text"] .project_name
 
 	.crt_glyph
 	{
-		width: 64px;
 		right: 14px;
+		width: 64px;
 	}
 
 	.studio_grid
@@ -8974,9 +9085,10 @@ html[data-mode="text"] .project_name
 
 	.hero_actions .button
 	{
+		          -moz-box-flex: 1;
+
 		       -webkit-box-flex: 1;
 		           -webkit-flex: 1 1 auto;
-		          -moz-box-flex: 1;
 		               -ms-flex: 1 1 auto;
 		                   flex: 1 1 auto;
 

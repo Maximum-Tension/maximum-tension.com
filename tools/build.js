@@ -7,6 +7,14 @@ const { minify: minifyHtml } = require("html-minifier-terser");
 
 const root = process.argv[2] || path.join(__dirname, "..");
 const src = path.join(root, "src");
+const built = [];
+
+// "script.js  77.8 KB -> 56.7 KB"
+function report(name, from, to)
+{
+	const kb = n => (n / 1024).toFixed(1).padStart(6) + " KB";
+	built.push("  " + name.padEnd(22) + kb(from) + "  ->" + kb(to));
+}
 
 function header(text)
 {
@@ -65,12 +73,14 @@ async function main()
 		const result = await minifyJs(body, { compress: false, mangle: false, format: { comments: false, ascii_only: false } });
 		fs.mkdirSync(path.dirname(path.join(root, name)), { recursive: true });
 		fs.writeFileSync(path.join(root, name), head + result.code + "\n");
+		report(name, Buffer.byteLength(text), Buffer.byteLength(head + result.code + "\n"));
 	}
 
 	{
 		const text = fs.readFileSync(path.join(src, "style.css"), "utf8");
 		const [head, body] = header(text);
 		fs.writeFileSync(path.join(root, "style.css"), head + minifyCss(body) + "\n");
+		report("style.css", Buffer.byteLength(text), Buffer.byteLength(head + minifyCss(body) + "\n"));
 	}
 
 	for (const page of ["index.html", "404.html"])
@@ -81,15 +91,21 @@ async function main()
 			removeComments: true,
 			ignoreCustomComments: [/^#/, /^\[if/, /^<!\[endif\]/, /^\s*\[if/],
 			keepClosingSlash: true,
-			minifyCSS: false,
-			minifyJS: false,
+			/* INLINE <style> / style="" KEEP EVERY DECLARATION, INLINE <script> GOES THROUGH TERSER */
+			minifyCSS: css => minifyCss(css),
+			minifyJS: { compress: false, mangle: false, format: { comments: false, ascii_only: false } },
 			sortAttributes: false,
-			caseSensitive: true
+			/* CASE-INSENSITIVE, SO AN UPPERCASE <SCRIPT> IS SEEN AS A SCRIPT (THE BROWSER KEEPS SVG viewBox ETC. RIGHT) */
+			caseSensitive: false
 		});
 		/* THE ASCII HEADER STAYS LINE BY LINE, EXACTLY AS IN src/ */
 		const head = text.slice(0, text.indexOf("<html"));
 		fs.writeFileSync(path.join(root, page), head + result.slice(result.indexOf("<html")) + "\n");
+		report(page, Buffer.byteLength(text), Buffer.byteLength(head + result.slice(result.indexOf("<html")) + "\n"));
 	}
+
+	console.log("Built from " + src + ":");
+	console.log(built.join("\n"));
 
 }
 

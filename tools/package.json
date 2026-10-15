@@ -1,0 +1,16 @@
+{
+	"name": "maximum-tension-build",
+	"version": "1.0.0",
+	"private": true,
+	"description": "Builds the served root copies of maximum-tension.com from src/. Run build.cmd, or: npm install, then node build.js",
+	"license": "MIT",
+	"scripts":
+	{
+		"build": "node build.js"
+	},
+	"dependencies":
+	{
+		"html-minifier-terser": "7.2.0",
+		"terser": "5.51.2"
+	}
+}
