@@ -3102,6 +3102,9 @@ function
 **  - A QUICK GRAB AND LET GO ON ITS FOREHEAD CONFUSES IT: IT LOOKS UP.
 **  - POKING AN EYE HURTS THAT EYE AND ANNOYS IT (MORE POKES, MORE ANGRY).
 **  - POKING ANYWHERE ELSE GLITCHES IT, LIKE SMACKING AN OLD CRT TV.
+**  - DOUBLE CLICKING ITS FOREHEAD, LIKE AN ICON TO OPEN: IT ROLLS ITS EYES
+**    AND AN ANGER MARK POPS UP.
+**  - A FINGER (THE POINTER) RESTING ON ITS MOUTH FOR 3 SECONDS: IT BLUSHES.
 **
 ** AND A SECRET: A MOOD FROM 0 (ADORES YOU) TO 100 (CRASHES), KEPT IN
 ** localStorage, SO IT REMEMBERS YOU. POKES, HEAD TAPS, SHAKING THE POINTER
@@ -3112,8 +3115,10 @@ function
 **     25-40  LEVEL -1  NARROWS ITS EYES HAPPILY AND BLUSHES
 **     40-60  LEVEL  0  A "?" FIRST, THEN WATCHES WITH ITS HEAD TILTED
 **     60-75  LEVEL  1  FROWNS AND LEANS AWAY
-**     75-99  LEVEL  2  NARROW RED EYES, TREMBLING
-**       100            A BLUE SCREEN, THEN A RESTART (STILL CROSS: 85)
+**     75-99  LEVEL  2  NARROW RED EYES, TREMBLING. THE RED STAYS WHATEVER
+**                      ELSE IT FEELS (CONFUSED: THE WIDE EYE STAYS ANGRY)
+**       100            A JUMPSCARE (ONE OF THREE, NEVER QUITE THE SAME), A
+**                      BLUE SCREEN, THEN A RESTART (STILL CROSS: 85)
 ** THE FURTHER FROM 50, THE WILDER THE NETWORK FIRES WHILE IT SEES YOU, AND
 ** THE NETWORK ONLY GROWS FROM WHAT IT SEES YOU DO.
 */
@@ -3211,7 +3216,7 @@ function
 
 	if (level === 3)
 	{
-		drone_crash();
+		drone_crash(true);
 		return ;
 	}
 
@@ -3439,9 +3444,172 @@ function
 	drone_mood(0.8);
 }
 
-/* 100: A BLUE SCREEN INSTEAD OF THE DRONE. IT COUNTS UP, THEN RESTARTS */
+/* A RANDOM NUMBER BETWEEN min AND max: NO TWO JUMPSCARES MOVE THE SAME */
 function
-	drone_crash()
+	wobble(min, max)
+{
+	return (min + Math.random() * (max - min));
+}
+
+/* THE NETWORK TURNS INTO TV STATIC (THE "STATIC" JUMPSCARE) */
+function
+	drone_static(until)
+{
+	const	context = network.context;
+	const	width = network_canvas.width;
+	const	height = network_canvas.height;
+	const	size = Math.max(2, Math.round(3 * network.ratio));
+
+	context.clearRect(0, 0, width, height);
+
+	for (let i = 0; i < 900; i++)
+	{
+		const	shade = Math.floor(Math.random() * 256);
+
+		context.fillStyle = "rgba(" + shade + ", " + shade + ", " + shade + ", " + wobble(0.2, 0.75).toFixed(2) + ")";
+		context.fillRect(Math.random() * width, Math.random() * height, size * wobble(1, 4), size);
+	}
+
+	if (performance.now() < until)
+		orb_state.static_frame = window.requestAnimationFrame(
+			function()
+			{
+				drone_static(until);
+			}
+		);
+}
+
+/*
+** RIGHT BEFORE THE BLUE SCREEN: A JUMPSCARE, ONE OF THREE. EVERY STEP TAKES A
+** RANDOM VALUE BETWEEN A MIN AND A MAX (PLACE, SIZE, ANGLE, TIMING):
+**  0 LUNGE   IT CREEPS CLOSER, TREMBLING, THEN LUNGES AT YOU AND SHAKES
+**  1 STATIC  THE NETWORK TURNS TO STATIC, IT FLICKERS FROM PLACE TO PLACE,
+**            THEN IT IS RIGHT IN FRONT OF YOU
+**  2 SNAP    IT SLOWLY TURNS AWAY AND SHUTS ITS EYES, THEN SNAPS BACK IN
+**            YOUR FACE, EYES WIDE OPEN
+*/
+function
+	drone_scare(done)
+{
+	const	frame = network_frame.getBoundingClientRect();
+	const	box = orb.getBoundingClientRect();
+	const	dx = frame.left + frame.width / 2 - (box.left + box.width / 2);
+	const	dy = frame.top + frame.height / 2 - (box.top + box.height / 2);
+	const	kind = Math.floor(Math.random() * 3);
+	const	side = Math.random() < 0.5 ? -1 : 1;
+	const	frames = [];
+	var		length;
+	var		motion;
+
+	function
+		at(x, y, size, turn, opacity, offset, easing)
+	{
+		frames.push(
+			{
+				transform: "translateY(-50%) translate(" + round_2(x) + "px, " + round_2(y) + "px) scale(" + round_2(size) + ") rotate(" + round_2(turn) + "deg)",
+				opacity: opacity,
+				offset: offset,
+				easing: easing || "linear"
+			}
+		);
+	}
+
+	at(0, 0, 1, 0, 1, 0);
+
+	if (kind === 0)
+	{
+		length = wobble(1300, 1700);
+
+		for (let i = 1; i <= 5; i++)
+			at(dx * 0.04 * i + wobble(-3, 3), wobble(-3, 3), 1 + 0.04 * i, wobble(-4, 4), 1, 0.08 * i);
+
+		at(dx * wobble(0.85, 1.05), dy * wobble(0.7, 1), wobble(3.2, 3.9), wobble(-8, 8), 1, wobble(0.46, 0.5), "steps(1)");
+
+		for (let i = 0; i < 6; i++)
+			at(dx + wobble(-14, 14), dy + wobble(-10, 10), wobble(3.4, 4), wobble(-10, 10), 1, 0.55 + i * 0.075, "steps(1)");
+	}
+	else if (kind === 1)
+	{
+		length = wobble(1500, 1900);
+		at(0, 0, 1, 0, 0, wobble(0.08, 0.12), "steps(1)");
+
+		for (let i = 0; i < 4; i++)
+		{
+			const	start = 0.16 + i * 0.15 + wobble(-0.02, 0.02);
+			const	x = dx + wobble(-0.32, 0.32) * frame.width;
+			const	y = dy + wobble(-0.28, 0.28) * frame.height;
+			const	size = wobble(1.1, 2.1);
+			const	turn = wobble(-25, 25);
+
+			at(x, y, size, turn, 1, start, "steps(1)");
+			at(x + wobble(-6, 6), y + wobble(-6, 6), size, turn, 0, start + wobble(0.08, 0.11), "steps(1)");
+		}
+
+		at(dx + wobble(-8, 8), dy + wobble(-8, 8), wobble(3.5, 4.1), wobble(-6, 6), 1, wobble(0.8, 0.84), "steps(1)");
+
+		for (let i = 0; i < 3; i++)
+			at(dx + wobble(-12, 12), dy + wobble(-9, 9), wobble(3.6, 4.2), wobble(-8, 8), 1, 0.88 + i * 0.04, "steps(1)");
+
+		DOM.CLASS.ADD(orb, "scare_static");
+		DOM.CLASS.ADD(network_frame, "scare_static");
+		drone_static(performance.now() + length);
+	}
+	else
+	{
+		length = wobble(1600, 2000);
+		at(wobble(-10, 10), wobble(0, 8), wobble(0.92, 0.98), side * wobble(22, 34), 1, wobble(0.4, 0.5), "ease-in");
+		at(wobble(-12, 12), wobble(2, 10), wobble(0.88, 0.95), side * wobble(28, 40), 1, 0.6, "steps(1)");
+		at(dx * wobble(0.8, 1), dy * wobble(0.6, 1), wobble(2.8, 3.4), -side * wobble(4, 12), 1, wobble(0.63, 0.66), "steps(1)");
+
+		for (let i = 0; i < 5; i++)
+			at(dx + wobble(-12, 12), dy + wobble(-8, 8), wobble(3, 3.6), wobble(-8, 8), 1, 0.72 + i * 0.055, "steps(1)");
+
+		/* EYES SHUT WHILE IT TURNS AWAY, WIDE OPEN WHEN IT SNAPS BACK */
+		DOM.CLASS.ADD(orb, "scare_shut");
+		window.setTimeout(
+			function()
+			{
+				DOM.CLASS.REMOVE(orb, "scare_shut");
+			},
+			length * 0.62
+		);
+	}
+
+	/* HOLD THE LAST SHAKE UNTIL THE BLUE SCREEN CUTS IN */
+	frames.push({transform: frames[frames.length - 1].transform, opacity: 1, offset: 1});
+	orb_look(box.left + box.width / 2, box.top + box.height / 2, 0.01);
+	DOM.CLASS.ADD(orb, "scare");
+	DOM.CLASS.ADD(network_frame, "scaring");
+	motion = orb.animate(frames, {duration: length, fill: "forwards"});
+
+	window.setTimeout(
+		function()
+		{
+			window.cancelAnimationFrame(orb_state.static_frame);
+			done();
+			DOM.CLASS.REMOVE(orb, "scare");
+			DOM.CLASS.REMOVE(orb, "scare_static");
+			DOM.CLASS.REMOVE(orb, "scare_shut");
+			DOM.CLASS.REMOVE(network_frame, "scaring");
+			DOM.CLASS.REMOVE(network_frame, "scare_static");
+			motion.cancel();
+		},
+		length + 60
+	);
+}
+
+/* THE BLUE SCREEN ITSELF */
+function
+	drone_bsod()
+{
+	DOM.CLASS.ADD(network_frame, "crashed");
+	drone_bsod_step(2200);
+}
+
+/* 100: (A JUMPSCARE, THEN) A BLUE SCREEN INSTEAD OF THE DRONE. IT COUNTS UP,
+** THEN RESTARTS. scare IS FALSE WHEN THE PAGE OPENS ALREADY CRASHED */
+function
+	drone_crash(scare)
 {
 	if (orb_state.crashed)
 		return ;
@@ -3455,13 +3623,17 @@ function
 	drone_save();
 	window.clearTimeout(orb_state.feel_timer);
 	window.clearTimeout(orb_state.wander_timer);
+	orb_mouth(false);
 	orb_face();
 	DOM.CLASS.REMOVE(orb, "grabbing");
 	orb.style.removeProperty("--tilt");
 	bsod_percent.textContent = "0";
 	drone_qr();
-	DOM.CLASS.ADD(network_frame, "crashed");
-	drone_bsod_step(2200);
+
+	if (scare && orb.animate && !reduced_motion && network_visible && page_visible)
+		drone_scare(drone_bsod);
+	else
+		drone_bsod();
 }
 
 /* LIKE WINDOWS: THE PERCENTAGE JUMPS IN UNEVEN STEPS (ONLY WHILE SEEN) */
@@ -3574,6 +3746,10 @@ function
 	if (zone)
 		return (zone);
 
+	/* BELOW AND BETWEEN THE EYES: WHERE A MOUTH WOULD BE */
+	if (Math.abs(u) < 0.34 && v > 0.26 && v < 0.74)
+		return ("mouth");
+
 	return (v < -0.36 ? "head" : "body");
 }
 
@@ -3619,6 +3795,9 @@ function
 		}
 	);
 	orb_state.face = face;
+
+	/* FURIOUS: WHATEVER ELSE IT FEELS, THE RED STAYS (SEE THE CSS) */
+	set_class(orb, "seething", orb_state.noticed && !orb_state.crashed && drone_level() === 2);
 
 	if (face && !orb_state.down)
 		orb.style.removeProperty("--tilt");
@@ -3714,6 +3893,73 @@ function
 	);
 }
 
+/* A FINGER ON ITS MOUTH (MOUSE OVER IT, OR A HELD TOUCH): 3 SECONDS, A BLUSH */
+function
+	orb_mouth(on)
+{
+	if (on === orb_state.mouth)
+		return ;
+
+	orb_state.mouth = on;
+	window.clearTimeout(orb_state.mouth_timer);
+
+	if (!on)
+	{
+		DOM.CLASS.REMOVE(orb, "blush");
+		return ;
+	}
+
+	orb_state.mouth_timer = window.setTimeout(
+		function()
+		{
+			if (!orb_state.mouth || orb_state.crashed)
+				return ;
+
+			if (orb_state.down)
+				orb_state.down.blushed = true;
+
+			DOM.CLASS.ADD(orb, "blush");
+			drone_feed(0.5);
+			drone_mood(-2);
+		},
+		3000
+	);
+}
+
+/* AN ANGER MARK POPS UP ON ITS FOREHEAD */
+function
+	orb_vein()
+{
+	const	vein = DOM.CREATE.ELEMENT("i");
+
+	vein.className = "orb_vein";
+	vein.innerHTML = "<svg viewBox=\"0 0 24 24\"><path d=\"M9 2.5Q9 9 2.5 9M15 2.5Q15 9 21.5 9M21.5 15Q15 15 15 21.5M2.5 15Q9 15 9 21.5\"/></svg>";
+	orb.appendChild(vein);
+	window.setTimeout(
+		function()
+		{
+			DOM.REMOVE(vein);
+		},
+		1800
+	);
+}
+
+/* A DOUBLE CLICK ON ITS FOREHEAD, LIKE AN ICON TO OPEN: IT ROLLS ITS EYES */
+function
+	orb_double_tap()
+{
+	const	rect = orb.getBoundingClientRect();
+
+	orb_state.stare_until = performance.now() + 900;
+	orb_look(rect.left + rect.width / 2, rect.top + rect.height / 2, 0.01);
+	orb_flash("rolling", 760);
+	orb_feel("annoyed", 1900);
+	orb_vein();
+	drone_feed(0.4);
+	drone_input(5);
+	drone_mood(3);
+}
+
 function
 	orb_poke_eye(index)
 {
@@ -3769,8 +4015,9 @@ function
 		return ;
 
 	drone_notice(true);
-	orb_state.down = {zone: zone, x: event.clientX, y: event.clientY, last_x: event.clientX, last_y: event.clientY, time: performance.now(), moved: 0};
+	orb_state.down = {zone: zone, x: event.clientX, y: event.clientY, last_x: event.clientX, last_y: event.clientY, time: performance.now(), moved: 0, blushed: false};
 	orb_state.pet_relief = 0;
+	orb_mouth(event.pointerType !== "mouse" && zone === "mouth");
 
 	try
 	{
@@ -3792,8 +4039,13 @@ function
 
 	if (!down)
 	{
-		if (event.pointerType === "mouse")
-			DOM.ATTRIBUTE.SET(orb, "data-zone", orb_zone(event));
+		if (event.pointerType === "mouse" && !orb_state.crashed)
+		{
+			const	zone = orb_zone(event);
+
+			DOM.ATTRIBUTE.SET(orb, "data-zone", zone);
+			orb_mouth(zone === "mouth");
+		}
 
 		return ;
 	}
@@ -3857,7 +4109,13 @@ function
 
 	if (down.zone === "head")
 	{
-		if (quick && orb_state.pet < 70)
+		if (quick && orb_state.pet < 70 && orb_state.taps.length && now - orb_state.taps[orb_state.taps.length - 1] < 420)
+		{
+			/* THE SECOND TAP OF A DOUBLE CLICK */
+			orb_state.taps = [];
+			orb_double_tap();
+		}
+		else if (quick && orb_state.pet < 70)
 		{
 			/* GRABBED AND LET GO AT ONCE: WHAT WAS THAT? IT LOOKS UP AT YOU.
 			** OVER AND OVER, IT GETS OLD QUICKLY */
@@ -3884,7 +4142,11 @@ function
 		return ;
 	}
 
-	if (down.moved > 12)
+	/* A TOUCH HELD ON THE MOUTH IS NOT A POKE; A TAP THERE STILL IS */
+	if (event.pointerType !== "mouse")
+		orb_mouth(false);
+
+	if (down.moved > 12 || down.blushed || (down.zone === "mouth" && !quick))
 		return ;
 
 	if (down.zone === "eye0" || down.zone === "eye1")
@@ -3923,6 +4185,8 @@ function
 		excited_until: 0,
 		curious_until: 0,
 		stare_until: 0,
+		mouth: false,
+		mouth_timer: 0,
 		bsod_done: 0,
 		heart_time: 0,
 		feel_timer: 0,
@@ -3930,6 +4194,7 @@ function
 		wander_timer: 0,
 		touch_timer: 0,
 		bsod_timer: 0,
+		static_frame: 0,
 		eye_timers: [0, 0],
 		flash_timers: {}
 	};
@@ -3956,13 +4221,16 @@ function
 		function()
 		{
 			if (!orb_state.down)
+			{
 				DOM.ATTRIBUTE.SET(orb, "data-zone", "");
+				orb_mouth(false);
+			}
 		}
 	);
 
 	/* LEFT AT 100 A MOMENT AGO: STILL ON THE BLUE SCREEN */
 	if (orb_state.mood >= 100)
-		drone_crash();
+		drone_crash(false);
 
 	orb_wander();
 

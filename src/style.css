@@ -5683,6 +5683,7 @@ html[data-mode="text"] .orb::after
 }
 
 .orb[data-zone="body"],
+.orb[data-zone="mouth"],
 .orb[data-zone="eye0"],
 .orb[data-zone="eye1"]
 {
@@ -5889,6 +5890,121 @@ html[data-mode="text"] .orb::after
 	   -moz-animation: orb_tremble .14s steps(2) infinite;
 	     -o-animation: orb_tremble .14s steps(2) infinite;
 	        animation: orb_tremble .14s steps(2) infinite;
+}
+
+/* SEETHING (LEVEL 2, WHILE IT SEES YOU): THE RED STAYS WHATEVER ELSE IT
+** FEELS. CONFUSED, THE WIDE EYE STAYS ANGRY, ONLY THE SQUINTING ONE GOES WHITE */
+
+.orb.seething .orb_eye
+{
+	        background: #FF8D7A;
+
+	-webkit-box-shadow: 0 0 16px rgba(255, 70, 40, 0.75);
+	   -moz-box-shadow: 0 0 16px rgba(255, 70, 40, 0.75);
+	        box-shadow: 0 0 16px rgba(255, 70, 40, 0.75);
+}
+
+.orb.seething.confused .orb_eye:first-child
+{
+	-webkit-clip-path: polygon(-100% -26%, 200% 76%, 200% 200%, -100% 200%);
+	        clip-path: polygon(-100% -26%, 200% 76%, 200% 200%, -100% 200%);
+}
+
+.orb.seething.confused .orb_eye + .orb_eye
+{
+	        background: #FFF;
+
+	-webkit-box-shadow: 0 0 14px rgba(255, 255, 255, 0.55);
+	   -moz-box-shadow: 0 0 14px rgba(255, 255, 255, 0.55);
+	        box-shadow: 0 0 14px rgba(255, 255, 255, 0.55);
+}
+
+/* BLUSH: A FINGER RESTING ON ITS MOUTH FOR 3 SECONDS. IT COMES SLOWLY */
+
+.orb_cheeks
+{
+	                  top: 0;
+	                 left: 0;
+	                width: 100%;
+	               height: 100%;
+	              opacity: 0;
+	             position: absolute;
+	           background: -webkit-radial-gradient(30% 64%, 11% 7%, rgba(255, 111, 168, 0.6), rgba(255, 111, 168, 0)), -webkit-radial-gradient(70% 64%, 11% 7%, rgba(255, 111, 168, 0.6), rgba(255, 111, 168, 0));
+	           background: -moz-radial-gradient(30% 64%, 11% 7%, rgba(255, 111, 168, 0.6), rgba(255, 111, 168, 0)), -moz-radial-gradient(70% 64%, 11% 7%, rgba(255, 111, 168, 0.6), rgba(255, 111, 168, 0));
+	           background: -o-radial-gradient(30% 64%, 11% 7%, rgba(255, 111, 168, 0.6), rgba(255, 111, 168, 0)), -o-radial-gradient(70% 64%, 11% 7%, rgba(255, 111, 168, 0.6), rgba(255, 111, 168, 0));
+	           background: radial-gradient(11% 7% at 30% 64%, rgba(255, 111, 168, 0.6), rgba(255, 111, 168, 0)), radial-gradient(11% 7% at 70% 64%, rgba(255, 111, 168, 0.6), rgba(255, 111, 168, 0));
+	       pointer-events: none;
+
+	-webkit-border-radius: 50%;
+	   -moz-border-radius: 50%;
+	        border-radius: 50%;
+
+	   -webkit-transition: opacity .5s cubic-bezier(.22, .7, .2, 1); /* FALLBACK */
+	   -webkit-transition: opacity .5s var(--ease);
+	      -moz-transition: opacity .5s cubic-bezier(.22, .7, .2, 1); /* FALLBACK */
+	      -moz-transition: opacity .5s var(--ease);
+	        -o-transition: opacity .5s cubic-bezier(.22, .7, .2, 1); /* FALLBACK */
+	        -o-transition: opacity .5s var(--ease);
+	           transition: opacity .5s cubic-bezier(.22, .7, .2, 1); /* FALLBACK */
+	           transition: opacity .5s var(--ease);
+}
+
+.orb.blush .orb_cheeks
+{
+	           opacity: 1;
+
+	-webkit-transition: opacity 1.4s ease-in-out;
+	   -moz-transition: opacity 1.4s ease-in-out;
+	     -o-transition: opacity 1.4s ease-in-out;
+	        transition: opacity 1.4s ease-in-out;
+}
+
+/* DOUBLE CLICKED ON THE FOREHEAD: AN EYE ROLL AND AN ANGER MARK */
+
+.orb.rolling .orb_eye
+{
+	-webkit-animation: orb_roll .76s ease-in-out;
+	   -moz-animation: orb_roll .76s ease-in-out;
+	     -o-animation: orb_roll .76s ease-in-out;
+	        animation: orb_roll .76s ease-in-out;
+}
+
+.orb_vein
+{
+	              top: 6%;
+	            right: 16%;
+	            width: 22%;
+	          opacity: 0;
+	         position: absolute;
+	   pointer-events: none;
+
+	   -webkit-filter: drop-shadow(0 0 6px rgba(255, 46, 20, 0.7));
+	           filter: drop-shadow(0 0 6px rgba(255, 46, 20, 0.7));
+
+	-webkit-animation: orb_vein 1.8s cubic-bezier(.22, .7, .2, 1) forwards; /* FALLBACK */
+	-webkit-animation: orb_vein 1.8s var(--ease) forwards;
+	   -moz-animation: orb_vein 1.8s cubic-bezier(.22, .7, .2, 1) forwards; /* FALLBACK */
+	   -moz-animation: orb_vein 1.8s var(--ease) forwards;
+	     -o-animation: orb_vein 1.8s cubic-bezier(.22, .7, .2, 1) forwards; /* FALLBACK */
+	     -o-animation: orb_vein 1.8s var(--ease) forwards;
+	        animation: orb_vein 1.8s cubic-bezier(.22, .7, .2, 1) forwards; /* FALLBACK */
+	        animation: orb_vein 1.8s var(--ease) forwards;
+}
+
+.orb_vein svg
+{
+	   width: 100%;
+	  height: auto;
+	 display: block;
+	overflow: visible;
+}
+
+.orb_vein path
+{
+	          fill: none;
+	        stroke: #FF4A2E;
+	  stroke-width: 3.2;
+	stroke-linecap: round;
 }
 
 .orb .orb_eye.hurt
@@ -6789,6 +6905,345 @@ html[data-mode="text"] .orb::after
 	{
 		translate: 1.5px 0.5px;
 	}
+}
+
+@-webkit-keyframes orb_roll
+{
+	0%
+	{
+		translate: 0 0;
+	}
+
+	25%
+	{
+		translate: -45% -22%;
+	}
+
+	50%
+	{
+		translate: 0 -40%;
+	}
+
+	75%
+	{
+		translate: 45% -22%;
+	}
+
+	88%
+	{
+		translate: 0 -34%;
+	}
+
+	100%
+	{
+		translate: 0 0;
+	}
+}
+
+@-moz-keyframes orb_roll
+{
+	0%
+	{
+		translate: 0 0;
+	}
+
+	25%
+	{
+		translate: -45% -22%;
+	}
+
+	50%
+	{
+		translate: 0 -40%;
+	}
+
+	75%
+	{
+		translate: 45% -22%;
+	}
+
+	88%
+	{
+		translate: 0 -34%;
+	}
+
+	100%
+	{
+		translate: 0 0;
+	}
+}
+
+@-o-keyframes orb_roll
+{
+	0%
+	{
+		translate: 0 0;
+	}
+
+	25%
+	{
+		translate: -45% -22%;
+	}
+
+	50%
+	{
+		translate: 0 -40%;
+	}
+
+	75%
+	{
+		translate: 45% -22%;
+	}
+
+	88%
+	{
+		translate: 0 -34%;
+	}
+
+	100%
+	{
+		translate: 0 0;
+	}
+}
+
+@keyframes orb_roll
+{
+	0%
+	{
+		translate: 0 0;
+	}
+
+	25%
+	{
+		translate: -45% -22%;
+	}
+
+	50%
+	{
+		translate: 0 -40%;
+	}
+
+	75%
+	{
+		translate: 45% -22%;
+	}
+
+	88%
+	{
+		translate: 0 -34%;
+	}
+
+	100%
+	{
+		translate: 0 0;
+	}
+}
+
+@-webkit-keyframes orb_vein
+{
+	0%
+	{
+		opacity: 0;
+		  scale: 0.3;
+	}
+
+	12%
+	{
+		opacity: 1;
+		  scale: 1.25;
+	}
+
+	22%
+	{
+		scale: 0.95;
+	}
+
+	32%
+	{
+		scale: 1.12;
+	}
+
+	42%
+	{
+		scale: 1;
+	}
+
+	80%
+	{
+		opacity: 1;
+	}
+
+	100%
+	{
+		opacity: 0;
+		  scale: 1;
+	}
+}
+
+@-moz-keyframes orb_vein
+{
+	0%
+	{
+		opacity: 0;
+		  scale: 0.3;
+	}
+
+	12%
+	{
+		opacity: 1;
+		  scale: 1.25;
+	}
+
+	22%
+	{
+		scale: 0.95;
+	}
+
+	32%
+	{
+		scale: 1.12;
+	}
+
+	42%
+	{
+		scale: 1;
+	}
+
+	80%
+	{
+		opacity: 1;
+	}
+
+	100%
+	{
+		opacity: 0;
+		  scale: 1;
+	}
+}
+
+@-o-keyframes orb_vein
+{
+	0%
+	{
+		opacity: 0;
+		  scale: 0.3;
+	}
+
+	12%
+	{
+		opacity: 1;
+		  scale: 1.25;
+	}
+
+	22%
+	{
+		scale: 0.95;
+	}
+
+	32%
+	{
+		scale: 1.12;
+	}
+
+	42%
+	{
+		scale: 1;
+	}
+
+	80%
+	{
+		opacity: 1;
+	}
+
+	100%
+	{
+		opacity: 0;
+		  scale: 1;
+	}
+}
+
+@keyframes orb_vein
+{
+	0%
+	{
+		opacity: 0;
+		  scale: 0.3;
+	}
+
+	12%
+	{
+		opacity: 1;
+		  scale: 1.25;
+	}
+
+	22%
+	{
+		scale: 0.95;
+	}
+
+	32%
+	{
+		scale: 1.12;
+	}
+
+	42%
+	{
+		scale: 1;
+	}
+
+	80%
+	{
+		opacity: 1;
+	}
+
+	100%
+	{
+		opacity: 0;
+		  scale: 1;
+	}
+}
+
+/* THE JUMPSCARE RIGHT BEFORE THE BLUE SCREEN (drone_scare MOVES THE HEAD):
+** BURNING RED EYES WIDE OPEN, THE NETWORK DIMS, A RED GLOW CREEPS IN */
+
+.orb.scare .orb_eye
+{
+	          --squash: 1.3;
+	        background: #FF2A1A;
+
+	-webkit-box-shadow: 0 0 24px rgba(255, 30, 10, 0.95), 0 0 6px #FFF;
+	   -moz-box-shadow: 0 0 24px rgba(255, 30, 10, 0.95), 0 0 6px #FFF;
+	        box-shadow: 0 0 24px rgba(255, 30, 10, 0.95), 0 0 6px #FFF;
+}
+
+.orb.scare_shut .orb_eye
+{
+	--squash: 0.06;
+}
+
+.orb.scare_static .orb_eye
+{
+	-webkit-animation: orb_flicker .3s steps(1) infinite;
+	   -moz-animation: orb_flicker .3s steps(1) infinite;
+	     -o-animation: orb_flicker .3s steps(1) infinite;
+	        animation: orb_flicker .3s steps(1) infinite;
+}
+
+.network_frame.scaring
+{
+	-webkit-box-shadow: inset 0 0 0 1px rgba(255, 60, 30, 0.5), inset 0 0 90px rgba(255, 20, 0, 0.4);
+	   -moz-box-shadow: inset 0 0 0 1px rgba(255, 60, 30, 0.5), inset 0 0 90px rgba(255, 20, 0, 0.4);
+	        box-shadow: inset 0 0 0 1px rgba(255, 60, 30, 0.5), inset 0 0 90px rgba(255, 20, 0, 0.4);
+}
+
+.network_frame.scaring .network
+{
+	opacity: 0.16;
+}
+
+.network_frame.scare_static .network
+{
+	opacity: 1;
 }
 
 /* 100% ANNOYED: A BLUE SCREEN INSTEAD OF THE DRONE, UNTIL IT RESTARTS */
