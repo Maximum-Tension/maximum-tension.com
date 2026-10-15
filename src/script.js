@@ -8,7 +8,7 @@
 # +.....................++.....................+ #   :!:: :!:!1:!:!::1:::!!!:  #
 # : C - Maximum Tension :: Create - 2026/10/14 : #   ::!::!!1001010!:!11!!::   #
 # :---------------------::---------------------: #   :!1!!11000000000011!!:    #
-# : License - MIT       :: Update - 2026/10/14 : #    ::::!!!1!!1!!!1!!!::     #
+# : License - MIT       :: Update - 2026/10/15 : #    ::::!!!1!!1!!!1!!!::     #
 # +.....................++.....................+ #       ::::!::!:::!::::      #
 \******************************************************************************/
 
@@ -3602,9 +3602,30 @@ function
 	request_frame();
 }
 
+async function
+	print_console()
+{
+	try {if (window.self !== window.top) return ;} // INSIDE AN IFRAME
+	catch (ERROR) {return ;}
+
+	console.log("%c ",
+		"background-image: url(data:image/svg+xml;base64," +
+		 btoa(await AJAX.GET("/favicons/console_header.svg")) +
+		");" +
+		"padding-bottom: 200px;" +
+		"padding-left: 500px;" +
+		"width: 100%;" +
+		"margin: 20px;" +
+		"background-size: contain;" +
+		"background-position: center center;" +
+		"background-repeat: no-repeat;"
+	);
+}
+
 function
 	main()
 {
+	print_console();
 	build_language_switch();
 	prepare_layers();
 	apply_language(lang);
