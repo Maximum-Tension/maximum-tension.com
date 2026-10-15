@@ -8,7 +8,7 @@
 # +.....................++.....................+ #   :!:: :!:!1:!:!::1:::!!!:  #
 # : C - Maximum Tension :: Create - 2026/10/14 : #   ::!::!!1001010!:!11!!::   #
 # :---------------------::---------------------: #   :!1!!11000000000011!!:    #
-# : License - MIT       :: Update - 2026/10/14 : #    ::::!!!1!!1!!!1!!!::     #
+# : License - MIT       :: Update - 2026/10/15 : #    ::::!!!1!!1!!!1!!!::     #
 # +.....................++.....................+ #       ::::!::!:::!::::      #
 \******************************************************************************/
 
@@ -29,6 +29,9 @@ const	lang_table = {
 		102: "We're Maximum Tension. We build software, algorithms and circuits from the lowest level up, do our own 3D, art and animation, and design websites with Apple-level care at small-studio prices.",
 		103: "See the projects",
 		104: "Ask for a website",
+		105: "Open your soul",
+		106: "Open your mind",
+		107: "Open your eyes",
 		116: "Glass needs WebGL, which is turned off in this browser.",
 
 		200: "Maximum Tension builds products with maximum efficiency and maximum performance, on minimum needs.",
@@ -185,9 +188,15 @@ const	lang_table = {
 		519: "Its own trainer, its own tests, and saving and loading of the whole network state. Built on CMT.",
 		520: "neurons",
 		521: "layers",
-		522: "This network grows while you watch. New neurons start silent.",
+		522: "This network grows from what you do near it. New neurons start silent.",
 		530: "Instead of one huge fixed model trained on massive data: a compact engine that grows and reshapes itself as it learns, using the most efficient technique in each place.",
 		531: "Read the technical papers",
+		532: "Your drone ran into a problem and needs to restart. We're just collecting some error info, and then we'll restart for you.",
+		533: "",
+		534: "% complete",
+		535: "If you call a support person, give them this info:",
+		536: "Stop code",
+		537: "What failed",
 
 		600: "Websites",
 		601: "The care of a product launch, at a price a small business can pay. Some of the sites we built:",
@@ -266,6 +275,9 @@ const	lang_table = {
 		102: "Biz Maximum Tension'ız. Yazılımı, algoritmaları ve devreleri en alt seviyeden başlayarak kuruyor, 3D'yi, sanatı ve animasyonu kendimiz yapıyor, web sitelerini ise Apple düzeyinde bir özenle, küçük bir stüdyonun fiyatlarıyla tasarlıyoruz.",
 		103: "Projeleri gör",
 		104: "Web sitesi teklifi alın",
+		105: "Ruhunu aç",
+		106: "Zihnini aç",
+		107: "Gözlerini aç",
 		116: "Cam görünüm WebGL istiyor; bu tarayıcıda kapalı.",
 
 		200: "Maximum Tension, ürünlerini maksimum verimlilik ve maksimum performansla, minimum ihtiyaçla geliştirir.",
@@ -422,9 +434,15 @@ const	lang_table = {
 		519: "Kendi eğitmeni, kendi testleri ve ağın tüm durumunu kaydetme ve yükleme. CMT üzerine kurulu.",
 		520: "nöron",
 		521: "katman",
-		522: "Bu ağ siz izlerken büyüyor. Yeni nöronlar sessiz başlıyor.",
+		522: "Bu ağ, yanında yaptıklarınızla büyüyor. Yeni nöronlar sessiz başlıyor.",
 		530: "Devasa veriyle eğitilmiş, tek parça ve sabit dev bir model yerine: öğrendikçe büyüyen, kendini yeniden şekillendiren ve her yerde en verimli tekniği kullanan derli toplu bir motor.",
 		531: "Teknik makaleleri okuyun",
+		532: "Drone'unuz bir sorunla karşılaştı ve yeniden başlatılması gerekiyor. Yalnızca bazı hata bilgilerini topluyoruz, ardından sizin için yeniden başlatacağız.",
+		533: "%",
+		534: " tamamlandı",
+		535: "Bir destek elemanını ararsanız ona şu bilgileri verin:",
+		536: "Durdurma kodu",
+		537: "Başarısız olan",
 
 		600: "Web siteleri",
 		601: "Bir ürün lansmanının özeni, küçük bir işletmenin ödeyebileceği bir fiyata. Yaptığımız sitelerden bazıları:",

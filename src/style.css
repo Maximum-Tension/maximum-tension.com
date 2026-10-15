@@ -68,7 +68,8 @@ html[data-mode="text"]
 	        box-sizing: border-box;
 }
 
-h1.seo_header
+h1.seo_h1,
+h2.seo_header
 {
 	display: none;
 }
@@ -1271,6 +1272,86 @@ html[data-mode="text"] .seams line
 {
 	          stroke: rgba(236, 230, 216, 0.5);
 	stroke-dasharray: 4 5;
+}
+
+/* WHAT THE THREE STRIPS MEAN. THE SCRIPT PLACES THEM AND ADDS .fits WHILE
+** THEIR STRIP COVERS THEM; EACH ONE ALSO WAITS FOR ITS STRIP TO APPEAR */
+
+.strip_label
+{
+	              top: 0;
+	             left: 0;
+	            color: #A39D90; /* FALLBACK */
+	            color: var(--ash);
+	           margin: 0;
+	          opacity: 0;
+	         position: absolute;
+	        font-size: 10.5px;
+	      font-family: "Martian Mono", Menlo, Consolas, monospace; /* FALLBACK */
+	      font-family: var(--mono);
+	      font-weight: 500;
+	      line-height: 1.4;
+	      white-space: nowrap;
+	   letter-spacing: 0.16em;
+	   pointer-events: none;
+	   text-transform: uppercase;
+
+	-webkit-transform: translateY(6px);
+	   -moz-transform: translateY(6px);
+	    -ms-transform: translateY(6px);
+	     -o-transform: translateY(6px);
+	        transform: translateY(6px);
+
+	-webkit-transition: opacity .45s cubic-bezier(.22, .7, .2, 1), -webkit-transform .45s cubic-bezier(.22, .7, .2, 1); /* FALLBACK */
+	-webkit-transition: opacity .45s var(--ease), -webkit-transform .45s var(--ease);
+	   -moz-transition: opacity .45s cubic-bezier(.22, .7, .2, 1), -moz-transform .45s cubic-bezier(.22, .7, .2, 1); /* FALLBACK */
+	   -moz-transition: opacity .45s var(--ease), -moz-transform .45s var(--ease);
+	     -o-transition: opacity .45s cubic-bezier(.22, .7, .2, 1), -o-transform .45s cubic-bezier(.22, .7, .2, 1); /* FALLBACK */
+	     -o-transition: opacity .45s var(--ease), -o-transform .45s var(--ease);
+	        transition: opacity .45s cubic-bezier(.22, .7, .2, 1), transform .45s cubic-bezier(.22, .7, .2, 1); /* FALLBACK */
+	        transition: opacity .45s var(--ease), transform .45s var(--ease);
+}
+
+.strip_label::before
+{
+	         content: "";
+	           width: 14px;
+	          height: 1px;
+	         display: inline-block;
+	      background: #FF7A1A; /* FALLBACK */
+	      background: var(--ember);
+	    margin-right: 10px;
+	  vertical-align: middle;
+}
+
+.layer_ascii.ready ~ .strip_soul.fits,
+.layer_wire.ready ~ .strip_mind.fits,
+.layer_glass.ready ~ .strip_eyes.fits
+{
+	                 opacity: 1;
+
+	       -webkit-transform: translateY(0);
+	          -moz-transform: translateY(0);
+	           -ms-transform: translateY(0);
+	            -o-transform: translateY(0);
+	               transform: translateY(0);
+
+	-webkit-transition-delay: .4s;
+	   -moz-transition-delay: .4s;
+	     -o-transition-delay: .4s;
+	        transition-delay: .4s;
+}
+
+/* SCROLLED BEHIND THE PAGE: THE LABELS STEP OUT OF THE WAY */
+
+.stage.behind .layer.ready ~ .strip_label.fits
+{
+	                 opacity: 0;
+
+	-webkit-transition-delay: 0s;
+	   -moz-transition-delay: 0s;
+	     -o-transition-delay: 0s;
+	        transition-delay: 0s;
 }
 
 .render_missing
@@ -5435,6 +5516,7 @@ html[data-mode="text"] .point dt
 	           background: -o-radial-gradient(75% 50%, 70% 60%, rgba(236, 230, 216, 0.05), rgba(236, 230, 216, 0) 70%);
 	           background: radial-gradient(70% 60% at 75% 50%, rgba(236, 230, 216, 0.05), rgba(236, 230, 216, 0) 70%);
 	         aspect-ratio: 1 / 0.92;
+	       container-type: inline-size;
 
 	   -webkit-box-shadow: inset 0 0 0 1px rgba(236, 230, 216, 0.12); /* FALLBACK */
 	   -webkit-box-shadow: inset 0 0 0 1px var(--line);
@@ -5688,7 +5770,7 @@ html[data-mode="text"] .orb::after
 	--squash: 1.18;
 }
 
-.orb.confused .orb_eye:last-child
+.orb.confused .orb_eye + .orb_eye
 {
 	--squash: 0.62;
 }
@@ -5746,7 +5828,7 @@ html[data-mode="text"] .orb::after
 	        clip-path: polygon(-100% -26%, 200% 76%, 200% 200%, -100% 200%);
 }
 
-.orb.annoyed .orb_eye:last-child
+.orb.annoyed .orb_eye + .orb_eye
 {
 	-webkit-clip-path: polygon(-100% 76%, 200% -26%, 200% 200%, -100% 200%);
 	        clip-path: polygon(-100% 76%, 200% -26%, 200% 200%, -100% 200%);
@@ -5759,6 +5841,96 @@ html[data-mode="text"] .orb::after
 	-webkit-box-shadow: 0 0 16px rgba(255, 70, 40, 0.75);
 	   -moz-box-shadow: 0 0 16px rgba(255, 70, 40, 0.75);
 	        box-shadow: 0 0 16px rgba(255, 70, 40, 0.75);
+}
+
+/* THE SECRET MOODS, SHOWN WHILE IT SEES YOU (THE SCRIPT EXPLAINS THEM) */
+
+/* FOND: A HAPPY SQUINT AND A BLUSH. THE BLUSH ALSO SHOWS WHEN HAPPY OR EXCITED */
+
+.orb.fond .orb_eye
+{
+	--squash: 0.48;
+}
+
+.orb_cheeks
+{
+	                  top: 0;
+	                 left: 0;
+	                width: 100%;
+	               height: 100%;
+	              opacity: 0;
+	             position: absolute;
+	           background: -webkit-radial-gradient(32% 68%, 10% 6%, rgba(255, 111, 168, 0.55), rgba(255, 111, 168, 0)), -webkit-radial-gradient(68% 68%, 10% 6%, rgba(255, 111, 168, 0.55), rgba(255, 111, 168, 0));
+	           background: -moz-radial-gradient(32% 68%, 10% 6%, rgba(255, 111, 168, 0.55), rgba(255, 111, 168, 0)), -moz-radial-gradient(68% 68%, 10% 6%, rgba(255, 111, 168, 0.55), rgba(255, 111, 168, 0));
+	           background: -o-radial-gradient(32% 68%, 10% 6%, rgba(255, 111, 168, 0.55), rgba(255, 111, 168, 0)), -o-radial-gradient(68% 68%, 10% 6%, rgba(255, 111, 168, 0.55), rgba(255, 111, 168, 0));
+	           background: radial-gradient(10% 6% at 32% 68%, rgba(255, 111, 168, 0.55), rgba(255, 111, 168, 0)), radial-gradient(10% 6% at 68% 68%, rgba(255, 111, 168, 0.55), rgba(255, 111, 168, 0));
+	       pointer-events: none;
+
+	-webkit-border-radius: 50%;
+	   -moz-border-radius: 50%;
+	        border-radius: 50%;
+
+	   -webkit-transition: opacity .4s cubic-bezier(.22, .7, .2, 1); /* FALLBACK */
+	   -webkit-transition: opacity .4s var(--ease);
+	      -moz-transition: opacity .4s cubic-bezier(.22, .7, .2, 1); /* FALLBACK */
+	      -moz-transition: opacity .4s var(--ease);
+	        -o-transition: opacity .4s cubic-bezier(.22, .7, .2, 1); /* FALLBACK */
+	        -o-transition: opacity .4s var(--ease);
+	           transition: opacity .4s cubic-bezier(.22, .7, .2, 1); /* FALLBACK */
+	           transition: opacity .4s var(--ease);
+}
+
+.orb.fond .orb_cheeks,
+.orb.happy .orb_cheeks,
+.orb.excited .orb_cheeks
+{
+	opacity: 1;
+}
+
+/* EXCITED (IT ADORES YOU AND JUST SPOTTED YOU): BIG SPARKLING EYES, HOPPING */
+
+.orb.excited .orb_eye
+{
+	          --squash: 1.22;
+
+	-webkit-box-shadow: 0 0 22px rgba(255, 255, 255, 0.9), 0 0 8px rgba(255, 178, 212, 0.9);
+	   -moz-box-shadow: 0 0 22px rgba(255, 255, 255, 0.9), 0 0 8px rgba(255, 178, 212, 0.9);
+	        box-shadow: 0 0 22px rgba(255, 255, 255, 0.9), 0 0 8px rgba(255, 178, 212, 0.9);
+}
+
+.orb.excited
+{
+	-webkit-animation: orb_hop .26s cubic-bezier(.3, 0, .6, 1) infinite alternate;
+	   -moz-animation: orb_hop .26s cubic-bezier(.3, 0, .6, 1) infinite alternate;
+	     -o-animation: orb_hop .26s cubic-bezier(.3, 0, .6, 1) infinite alternate;
+	        animation: orb_hop .26s cubic-bezier(.3, 0, .6, 1) infinite alternate;
+}
+
+/* BOTHERED: FROWNING (.annoyed), A LITTLE NARROWER, LEANING AWAY */
+
+.orb.bothered
+{
+	--tilt: 6deg;
+}
+
+.orb.bothered .orb_eye
+{
+	--squash: 0.82;
+}
+
+/* GLARING: NARROW RED SLITS (.annoyed .angry), TREMBLING WITH RAGE */
+
+.orb.glaring .orb_eye
+{
+	--squash: 0.56;
+}
+
+.orb.glaring
+{
+	-webkit-animation: orb_tremble .14s steps(2) infinite;
+	   -moz-animation: orb_tremble .14s steps(2) infinite;
+	     -o-animation: orb_tremble .14s steps(2) infinite;
+	        animation: orb_tremble .14s steps(2) infinite;
 }
 
 .orb .orb_eye.hurt
@@ -6555,6 +6727,210 @@ html[data-mode="text"] .orb::after
 		        transform: translate(calc(-50% + 0px), -110%) scale(1.1); /* FALLBACK */
 		        transform: translate(calc(-50% + var(--drift, 0px)), -110%) scale(1.1);
 	}
+}
+
+@-webkit-keyframes orb_hop
+{
+	from
+	{
+		translate: 0 0;
+	}
+
+	to
+	{
+		translate: 0 -9px;
+	}
+}
+
+@-moz-keyframes orb_hop
+{
+	from
+	{
+		translate: 0 0;
+	}
+
+	to
+	{
+		translate: 0 -9px;
+	}
+}
+
+@-o-keyframes orb_hop
+{
+	from
+	{
+		translate: 0 0;
+	}
+
+	to
+	{
+		translate: 0 -9px;
+	}
+}
+
+@keyframes orb_hop
+{
+	from
+	{
+		translate: 0 0;
+	}
+
+	to
+	{
+		translate: 0 -9px;
+	}
+}
+
+@-webkit-keyframes orb_tremble
+{
+	0%
+	{
+		translate: -1px 0;
+	}
+
+	100%
+	{
+		translate: 1.5px 0.5px;
+	}
+}
+
+@-moz-keyframes orb_tremble
+{
+	0%
+	{
+		translate: -1px 0;
+	}
+
+	100%
+	{
+		translate: 1.5px 0.5px;
+	}
+}
+
+@-o-keyframes orb_tremble
+{
+	0%
+	{
+		translate: -1px 0;
+	}
+
+	100%
+	{
+		translate: 1.5px 0.5px;
+	}
+}
+
+@keyframes orb_tremble
+{
+	0%
+	{
+		translate: -1px 0;
+	}
+
+	100%
+	{
+		translate: 1.5px 0.5px;
+	}
+}
+
+/* 100% ANNOYED: A BLUE SCREEN INSTEAD OF THE DRONE, UNTIL IT RESTARTS */
+
+.network_frame.crashed .network,
+.network_frame.crashed .orb
+{
+	visibility: hidden;
+}
+
+.bsod
+{
+	                top: 0;
+	               left: 0;
+	              color: #FFF;
+	              width: 100%;
+	             height: 100%;
+	            display: none;
+	            padding: 8% 9% 0;
+	           position: absolute;
+	         background: #0078D7;
+	          font-size: 12px; /* FALLBACK */
+	          font-size: clamp(9px, 3.1cqw, 16px);
+	        font-family: "Segoe UI", "Mona Sans", "Helvetica Neue", Arial, sans-serif; /* FALLBACK */
+	        font-family: "Segoe UI", var(--sans);
+	        line-height: 1.35;
+	 -webkit-box-sizing: border-box;
+	    -moz-box-sizing: border-box;
+	         box-sizing: border-box;
+
+	-webkit-user-select: none;
+	   -moz-user-select: none;
+	    -ms-user-select: none;
+	        user-select: none;
+}
+
+.network_frame.crashed .bsod
+{
+	display: block;
+}
+
+.bsod_face
+{
+	     margin: 0 0 5%;
+	  font-size: 5.4em;
+	font-weight: 300;
+	line-height: 1;
+}
+
+.bsod_text,
+.bsod_done
+{
+	   margin: 0 0 4%;
+	font-size: 1.12em;
+}
+
+.bsod_done
+{
+	margin-bottom: 7%;
+}
+
+.bsod_more
+{
+	            display: -webkit-box;
+	            display: -webkit-flex;
+	            display: -moz-box;
+	            display: -ms-flexbox;
+	            display: flex;
+
+	  -webkit-box-align: start;
+	-webkit-align-items: flex-start;
+	     -moz-box-align: start;
+	     -ms-flex-align: start;
+	        align-items: flex-start;
+}
+
+.bsod_qr
+{
+	       width: 17%;
+	margin-right: 5%;
+	-webkit-flex: none;
+	    -ms-flex: none;
+	        flex: none;
+}
+
+.bsod_qr svg
+{
+	  width: 100%;
+	 height: auto;
+	display: block;
+}
+
+.bsod_info
+{
+	font-size: .8em;
+}
+
+.bsod_info p
+{
+	margin: 0 0 .5em;
 }
 
 .network_caption

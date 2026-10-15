@@ -27,6 +27,10 @@ const	ascii_element = DOM.GET.ID("ascii");
 const	wire_canvas = DOM.GET.ID("wire");
 const	glass_canvas = DOM.GET.ID("glass");
 const	glow = DOM.GET.ID("glow");
+const	label_soul = DOM.GET.ID("label_soul");
+const	label_mind = DOM.GET.ID("label_mind");
+const	label_eyes = DOM.GET.ID("label_eyes");
+const	hero_side = DOM.GET.CLASS(hero, "hero_side")[0];
 const	manifesto = DOM.GET.ID("manifesto");
 const	layers = DOM.GET.ID("layers");
 const	stack = DOM.GET.ID("stack");
@@ -59,6 +63,8 @@ const	network_canvas = DOM.GET.ID("network");
 const	orb = DOM.GET.ID("orb");
 const	neuron_count = DOM.GET.ID("neuron_count");
 const	layer_count = DOM.GET.ID("layer_count");
+const	bsod_percent = DOM.GET.ID("bsod_percent");
+const	bsod_qr = DOM.GET.ID("bsod_qr");
 const	year_date = DOM.GET.ID("year_date");
 
 const	mobile_width = 1100;
@@ -363,6 +369,12 @@ function
 	);
 	request_frame();
 	postcard_refresh();
+
+	if (hero_state)
+	{
+		hero_measure_labels();
+		hero_draw(performance.now());
+	}
 }
 
 function
@@ -451,6 +463,7 @@ function
 	state.height = height;
 	state.aspect = width / height;
 	state.cell_width = font_size * character_ratio;
+	hero_measure_labels();
 
 	if (!state.ascii || state.ascii.columns !== columns || state.ascii.rows !== rows)
 		state.ascii = ascii_create(state.models.ascii, columns, rows, (height / rows) / state.cell_width);
@@ -465,6 +478,135 @@ function
 	glass_canvas.height = Math.round(height * glass_scale);
 	state.cut_key = "";
 	state.dirty = true;
+}
+
+/*
+** WHAT THE STRIPS MEAN: "OPEN YOUR SOUL" UNDER THE TEXT, "OPEN YOUR MIND"
+** OVER THE WIREFRAME, "OPEN YOUR EYES" UNDER THE GLASS. THEY SIT AROUND THE
+** BOX THE CAMERA KEEPS IN VIEW (pumpkin_fit), SLIDE ALONG WITH THEIR STRIP
+** WHEN THE SEAMS MOVE AND HIDE WHEN THEIR STRIP NO LONGER COVERS THEM. THE
+** CSS ALSO WAITS FOR EACH STRIP TO APPEAR BEFORE ITS LABEL DOES.
+*/
+function
+	hero_measure_labels()
+{
+	if (!hero_state)
+		return ;
+
+	hero_state.labels = [label_soul, label_mind, label_eyes].map(
+		function(label)
+		{
+			return ({width: label.offsetWidth, height: label.offsetHeight});
+		}
+	);
+	hero_state.cut_key = "";
+}
+
+function
+	hero_labels(a_top, a_bottom, b_top, b_bottom)
+{
+	const	state = hero_state;
+	const	width = state.width;
+	const	height = state.height;
+	const	edge = 16;
+	const	scale = Math.min(height / (pumpkin_fit[1] * 2), width / (pumpkin_fit[0] * 2));
+	const	box_left = width / 2 - pumpkin_fit[0] * scale;
+	const	box_right = width / 2 + pumpkin_fit[0] * scale;
+	const	box_top = height / 2 - pumpkin_fit[1] * scale;
+	const	box_bottom = height / 2 + pumpkin_fit[1] * scale;
+	const	soul = state.labels ? state.labels[0] : null;
+	const	mind = state.labels ? state.labels[1] : null;
+	const	eyes = state.labels ? state.labels[2] : null;
+	var		side;
+	var		low;
+	var		high;
+	var		x;
+	var		y;
+	var		mind_at;
+	var		eyes_row = -1;
+
+	if (!soul || width === 0 || height === 0)
+		return ;
+
+	/* THE HERO'S TEXT AND BUTTONS, IN STAGE PIXELS (THE STAGE MAY BE SCALED) */
+	{
+		const	stage_box = stage.getBoundingClientRect();
+		const	text_box = hero_side.getBoundingClientRect();
+		const	ratio = stage_box.width / width || 1;
+
+		side = {
+			left: (text_box.left - stage_box.left) / ratio - 24,
+			right: (text_box.right - stage_box.left) / ratio + 24,
+			top: (text_box.top - stage_box.top) / ratio - 12,
+			bottom: (text_box.bottom - stage_box.top) / ratio + 12
+		};
+	}
+
+	/* WHERE A STRIP'S EDGE IS AT HEIGHT y (THE SEAMS ARE SLANTED) */
+	function
+		seam(top, bottom, y)
+	{
+		return (Math.min(width * 2, top + (bottom - top) * y / height));
+	}
+
+	function
+		over_text(left, top, size)
+	{
+		return (left < side.right && left + size.width > side.left && top < side.bottom && top + size.height > side.top);
+	}
+
+	function
+		place(label, left, top, fits)
+	{
+		label.style.left = round_2(left) + "px";
+		label.style.top = round_2(top) + "px";
+		set_class(label, "fits", fits);
+	}
+
+	/* BELOW THE PUMPKIN WHEN THERE IS ROOM (PHONES), BESIDE ITS LOWER HALF
+	** OTHERWISE, SO THE PAGE FOLD DOES NOT CUT THEM OFF */
+	low = box_bottom + 4;
+
+	if (low + soul.height > height - edge)
+		low = height / 2 + pumpkin_fit[1] * scale * 0.74;
+
+	high = Math.max(edge, box_top - mind.height - 6);
+
+	/* SOUL: AT THE BOX'S LEFT EDGE, PUSHED LEFT BY THE FIRST SEAM */
+	y = low + soul.height / 2;
+	x = Math.min(Math.max(edge, box_left), seam(a_top, a_bottom, y) - 8 - soul.width / 2);
+	place(label_soul, x, low, x >= edge);
+
+	/* MIND: CENTRED ON THE WIREFRAME STRIP (NO GLASS YET: UP TO THE EDGE) */
+	y = high + mind.height / 2;
+	x = clamp((seam(a_top, a_bottom, y) + Math.min(width, seam(b_top, b_bottom, y))) / 2 - mind.width / 2, edge, width - edge - mind.width);
+
+	/* UNDER THE HERO'S TEXT: SLIDE LEFT OF IT, IF IT STAYS ON ITS STRIP */
+	if (over_text(x, high, mind))
+		x = Math.max(edge, side.left - mind.width);
+
+	mind_at = x + mind.width / 2 >= seam(a_top, a_bottom, y) + 8 && x + mind.width / 2 <= Math.min(width, seam(b_top, b_bottom, y)) - 8 && !over_text(x, high, mind) ? x : -1;
+	place(label_mind, x, high, mind_at >= 0);
+
+	/* EYES: AT THE BOX'S RIGHT EDGE, PUSHED RIGHT BY THE SECOND SEAM. WHERE
+	** THE GLASS IS TOO NARROW DOWN THERE (PHONES), THE TOP RIGHT INSTEAD */
+	JS.ITERATE(
+		[low, high],
+		function(row)
+		{
+			const	middle = row + eyes.height / 2;
+			const	left = Math.max(Math.min(width - edge, box_right) - eyes.width, seam(b_top, b_bottom, middle) + 8 - eyes.width / 2);
+
+			if (eyes_row < 0 && left + eyes.width <= width - edge && !over_text(left, row, eyes) && !(row === high && mind_at >= 0 && left < mind_at + mind.width + 24))
+			{
+				place(label_eyes, left, row, true);
+				eyes_row = row;
+			}
+		}
+	);
+
+	if (eyes_row < 0)
+		set_class(label_eyes, "fits", false);
 }
 
 /* THE TWO DIAGONAL SEAMS: TEXT | WIREFRAME | GLASS */
@@ -504,6 +646,7 @@ function
 				DOM.ATTRIBUTE.SET(line, "y2", height);
 			}
 		);
+		hero_labels(a_top, a_bottom, b_top, b_bottom);
 	}
 
 	return (
@@ -2475,6 +2618,13 @@ function
 /* D.R.O.N.E.: A NETWORK THAT GROWS                                           */
 /* ========================================================================== */
 
+/* SIGNAL COLOURS: [FILL, GLOW, TEXT MODE FILL, "R, G, B" FOR LINES AND FLASHES] */
+const	network_tones = {
+	"": ["rgba(255, 208, 138, 0.95)", "rgba(255, 122, 26, 0.9)", "#FF8A2A", "255, 208, 138"],
+	love: ["rgba(255, 178, 212, 0.95)", "rgba(255, 92, 160, 0.9)", "#FF6FA8", "255, 178, 212"],
+	rage: ["rgba(255, 128, 96, 0.95)", "rgba(255, 46, 20, 0.9)", "#FF4A2E", "255, 128, 96"]
+};
+
 function
 	network_node(birth)
 {
@@ -2592,10 +2742,15 @@ function
 	return (ease(segment(now - node.birth, 1400, 3600)));
 }
 
+/* A SIGNAL INTO THE FIRST LAYER. THE HOTTER THE DRONE, THE FASTER IT RUNS,
+** PINK WHEN IT LIKES YOU, RED WHEN IT DOES NOT */
 function
 	network_spawn(now)
 {
 	const	first = network.layers[0];
+
+	if (network.pulses.length > 180)
+		return ;
 
 	network.pulses.push(
 		{
@@ -2603,7 +2758,8 @@ function
 			from: Math.floor(Math.random() * first.nodes.length),
 			to: -1,
 			start: now,
-			length: 520 + Math.random() * 260
+			length: (520 + Math.random() * 260) * (1 - 0.55 * network.heat),
+			tone: network.heat > 0.15 ? network.tone : ""
 		}
 	);
 }
@@ -2655,6 +2811,11 @@ function
 	const	orb_r = width * 0.12;
 	const	fade = network.fade ? 1 - segment(now - network.fade, 0, 900) : 1;
 	const	layers_now = network.layers;
+	const	heat = network.heat;
+	const	rage = network.tone === "rage" ? heat : 0;
+	const	love = network.tone === "love" ? heat : 0;
+	const	glow = 1 + 1.4 * heat;
+	const	line = heat > 0.3 ? network_tones[network.tone][3] : "236, 230, 216";
 
 	context.clearRect(0, 0, width, height);
 	context.globalAlpha = fade;
@@ -2671,6 +2832,10 @@ function
 				{
 					node.shown_y = lerp(node.shown_y, node.y, 0.08);
 					node.flash *= 0.9;
+
+					/* FURIOUS: THE WHOLE NETWORK SHAKES */
+					if (rage > 0.25)
+						node.shown_y += (Math.random() - 0.5) * 0.01 * rage;
 				}
 			);
 		}
@@ -2694,7 +2859,7 @@ function
 
 				if (!next)
 				{
-					context.strokeStyle = "rgba(236, 230, 216, " + (0.05 + 0.10 * wake_a).toFixed(3) + ")";
+					context.strokeStyle = "rgba(" + line + ", " + Math.min(1, (0.05 + 0.10 * wake_a) * glow).toFixed(3) + ")";
 					context.beginPath();
 					context.moveTo(ax, ay);
 					context.lineTo(orb_x - orb_r * 0.9, orb_y + (a.shown_y - 0.5) * orb_r * 0.6);
@@ -2708,7 +2873,7 @@ function
 					{
 						const	wake = Math.min(wake_a, network_awake(b, now));
 
-						context.strokeStyle = "rgba(236, 230, 216, " + (0.025 + 0.085 * wake).toFixed(3) + ")";
+						context.strokeStyle = "rgba(" + line + ", " + Math.min(1, (0.025 + 0.085 * wake) * glow).toFixed(3) + ")";
 						context.beginPath();
 						context.moveTo(ax, ay);
 						context.lineTo(next.shown_x * width, b.shown_y * height);
@@ -2751,14 +2916,15 @@ function
 				if (next)
 				{
 					next.nodes[pulse.to].flash = 1;
-					network.arrived.push({layer: pulse.layer + 1, from: pulse.to, to: -1, start: now, length: pulse.length});
+					next.nodes[pulse.to].tone = pulse.tone;
+					network.arrived.push({layer: pulse.layer + 1, from: pulse.to, to: -1, start: now, length: pulse.length, tone: pulse.tone});
 				}
 
 				return (false);
 			}
 
-			context.fillStyle = text_mode ? "#FF8A2A" : "rgba(255, 208, 138, 0.95)";
-			context.shadowColor = "rgba(255, 122, 26, 0.9)";
+			context.fillStyle = network_tones[pulse.tone][text_mode ? 2 : 0];
+			context.shadowColor = network_tones[pulse.tone][1];
 			context.shadowBlur = text_mode ? 0 : 10 * ratio;
 			context.beginPath();
 			context.arc(lerp(ax, bx, amount), lerp(ay, by, amount), 1.8 * ratio, 0, Math.PI * 2);
@@ -2781,7 +2947,8 @@ function
 					const	wake = network_awake(node, now);
 					const	x = layer.shown_x * width;
 					const	y = node.shown_y * height;
-					const	radius = (3.2 + 1.6 * node.flash) * ratio;
+					/* IN LOVE: THE NEURONS THROB */
+					const	radius = (3.2 + 1.6 * node.flash) * ratio * (1 + 0.22 * love * Math.sin(now / 110 + x * 0.05));
 
 					context.beginPath();
 					context.arc(x, y, radius, 0, Math.PI * 2);
@@ -2794,7 +2961,7 @@ function
 						return ;
 					}
 
-					context.fillStyle = node.flash > 0.2 ? "rgba(255, 208, 138, " + (0.4 + 0.6 * wake).toFixed(3) + ")" : "rgba(236, 230, 216, " + (0.25 + 0.75 * wake).toFixed(3) + ")";
+					context.fillStyle = node.flash > 0.2 ? "rgba(" + network_tones[node.tone || ""][3] + ", " + (0.4 + 0.6 * wake).toFixed(3) + ")" : "rgba(236, 230, 216, " + (0.25 + 0.75 * wake).toFixed(3) + ")";
 					context.fill();
 				}
 			);
@@ -2823,7 +2990,13 @@ function
 function
 	network_loop(now)
 {
+	const	watching = orb_state && orb_state.noticed;
+
 	network.frame = 0;
+
+	/* BLUE SCREEN: NOTHING TO DRAW UNTIL IT RESTARTS */
+	if (orb_state && orb_state.crashed)
+		return ;
 
 	if (network.fade && now - network.fade > 1000)
 	{
@@ -2831,15 +3004,26 @@ function
 		network_count();
 	}
 
-	if (!network.fade && now >= network.next_event)
+	/* IT ONLY GROWS FROM WHAT IT LEARNS WATCHING YOU (drone_feed) */
+	if (!network.fade && network.food >= 1 && now >= network.next_event)
 	{
+		network.food -= 1;
 		network_grow(now);
 		network_count();
-		network.next_event = now + 1500 + Math.random() * 900;
+		network.next_event = now + 420;
 	}
 
-	if (Math.random() < 0.3)
+	/* A SLOW TRICKLE ALONE, MORE WHILE IT SEES YOU, WILD WHEN IT IS FAR
+	** FROM CALM (THE MOOD, AWAY FROM 50) */
+	network.tone = orb_state && orb_state.mood < 50 ? "love" : "rage";
+	network.heat = lerp(network.heat, watching ? drone_arousal() : 0, 0.05);
+	network.charge += 0.012 + (watching ? 0.02 : 0) + network.heat * network.heat * 1.4;
+
+	while (network.charge >= 1)
+	{
+		network.charge -= 1;
 		network_spawn(now);
+	}
 
 	network_draw(now);
 
@@ -2858,7 +3042,11 @@ function
 		next_event: 0,
 		fade: 0,
 		frame: 0,
-		ratio: 1
+		ratio: 1,
+		food: 0,
+		charge: 0,
+		heat: 0,
+		tone: ""
 	};
 	network_size();
 	network_reset(performance.now());
@@ -2889,13 +3077,455 @@ function
 }
 
 /*
-** THE DRONE'S HEAD. IT WATCHES THE POINTER AND BLINKS. IT ALSO HAS FEELINGS:
+** THE DRONE'S HEAD. IT ONLY NOTICES THE POINTER AROUND ITS BOX; THE REST OF
+** THE TIME ITS EYES WANDER. IT ALSO HAS FEELINGS:
 **  - THE TOP OF ITS HEAD CAN BE PETTED (GRAB AND RUB): IT GETS HAPPY.
 **  - A QUICK GRAB AND LET GO ON ITS FOREHEAD CONFUSES IT: IT LOOKS UP.
 **  - POKING AN EYE HURTS THAT EYE AND ANNOYS IT (MORE POKES, MORE ANGRY).
 **  - POKING ANYWHERE ELSE GLITCHES IT, LIKE SMACKING AN OLD CRT TV.
+**
+** AND A SECRET: A MOOD FROM 0 (ADORES YOU) TO 100 (CRASHES), KEPT IN
+** localStorage, SO IT REMEMBERS YOU. POKES, HEAD TAPS, SHAKING THE POINTER
+** AT IT AND CLICKING NONSTOP RAISE IT, MORE WHEN THEY COME IN A QUICK ROW;
+** PETTING LOWERS IT. WHILE YOU ARE AWAY IT DRIFTS BACK TO 50, 1 AN HOUR.
+** WHEN THE POINTER COMES NEAR:
+**      0-25  LEVEL -2  A BURST OF JOY, THEN LIKE LEVEL -1
+**     25-40  LEVEL -1  NARROWS ITS EYES HAPPILY AND BLUSHES
+**     40-60  LEVEL  0  A "?" FIRST, THEN WATCHES WITH ITS HEAD TILTED
+**     60-75  LEVEL  1  FROWNS AND LEANS AWAY
+**     75-99  LEVEL  2  NARROW RED EYES, TREMBLING
+**       100            A BLUE SCREEN, THEN A RESTART (STILL CROSS: 85)
+** THE FURTHER FROM 50, THE WILDER THE NETWORK FIRES WHILE IT SEES YOU, AND
+** THE NETWORK ONLY GROWS FROM WHAT IT SEES YOU DO.
 */
+const	drone_key = "drone";
+const	drone_restart_mood = 85;
+const	drone_notice_margin = 36; /* PX AROUND THE BOX WHERE IT SPOTS YOU */
+const	drone_forget_margin = 90; /* A LITTLE FURTHER TO LOSE YOU AGAIN */
+const	orb_faces = ["happy", "confused", "annoyed", "angry", "fond", "excited", "bothered", "glaring"];
 var		orb_state = null;
+
+/* -2 ... 2, OR 3 FOR THE BLUE SCREEN */
+function
+	drone_level()
+{
+	const	mood = orb_state.mood;
+
+	if (mood >= 100)
+		return (3);
+
+	if (mood >= 75)
+		return (2);
+
+	if (mood >= 60)
+		return (1);
+
+	if (mood > 40)
+		return (0);
+
+	return (mood > 25 ? -1 : -2);
+}
+
+/* 0 WHEN CALM (50), 1 AT EITHER END: HOW WILD THE NETWORK GETS */
+function
+	drone_arousal()
+{
+	return (clamp(Math.abs(orb_state.mood - 50) / 50, 0, 1));
+}
+
+function
+	drone_load()
+{
+	const	saved = storage_get(drone_key);
+	var		mood = 50;
+	var		hours;
+
+	if (saved && typeof(saved.mood) === "number" && isFinite(saved.mood))
+	{
+		mood = clamp(saved.mood, 0, 100);
+		hours = (Date.now() - (Number(saved.time) || Date.now())) / 3600000;
+
+		/* AWAY FOR A WHILE (NOT JUST A RELOAD): IT FORGIVES, OR FORGETS */
+		if (hours > 0.17)
+			mood = mood > 50 ? Math.max(50, mood - hours) : Math.min(50, mood + hours);
+	}
+
+	return (mood);
+}
+
+function
+	drone_save()
+{
+	storage_set(drone_key, {mood: round_2(orb_state.mood), time: Date.now()});
+}
+
+/*
+** ANNOYING IT (points > 0) OR PLEASING IT (points < 0). IT IS ABOUT HOW
+** OFTEN: EACH ANNOYANCE IN THE LAST 8 SECONDS MAKES THE NEXT ONE COUNT 30%
+** MORE (UP TO 3 TIMES)
+*/
+function
+	drone_mood(points)
+{
+	const	now = performance.now();
+	const	before = drone_level();
+	var		level;
+
+	if (orb_state.crashed)
+		return ;
+
+	if (points > 0)
+	{
+		orb_state.annoyances = orb_state.annoyances.filter(
+			function(time)
+			{
+				return (now - time < 8000);
+			}
+		);
+		points *= Math.min(3, 1 + 0.3 * orb_state.annoyances.length);
+		orb_state.annoyances.push(now);
+	}
+
+	orb_state.mood = clamp(orb_state.mood + points, 0, 100);
+	drone_save();
+	level = drone_level();
+
+	if (level === 3)
+	{
+		drone_crash();
+		return ;
+	}
+
+	if (level === before)
+		return ;
+
+	if (level === -2 && orb_state.noticed)
+		drone_excite();
+	else
+		orb_face();
+}
+
+/* WHAT IT SEES FEEDS THE NETWORK: EVERY WHOLE UNIT GROWS A NEURON */
+function
+	drone_feed(amount)
+{
+	const	now = performance.now();
+
+	if (!network || orb_state.crashed)
+		return ;
+
+	network.food += amount;
+
+	/* NO ANIMATION LOOP WITH REDUCED MOTION: GROW AND DRAW RIGHT HERE */
+	if (reduced_motion && network.food >= 1)
+	{
+		network.food -= 1;
+		network_grow(now);
+
+		if (network.fade)
+			network_reset(now);
+
+		network_count();
+		network_draw(now + 4000);
+	}
+}
+
+/* SIGNALS INTO THE NETWORK, SENT ON THE NEXT FRAMES */
+function
+	drone_input(count)
+{
+	if (network && !orb_state.crashed)
+		network.charge += count;
+}
+
+/* LEVEL -2 SPOTTING YOU: A BURST OF JOY */
+function
+	drone_excite()
+{
+	orb_state.excited_until = performance.now() + 1700;
+	drone_input(10);
+
+	for (let i = 0; i < 5; i++)
+		window.setTimeout(orb_heart, i * 120);
+
+	orb_face();
+}
+
+/* IT ONLY SEES THE POINTER AROUND ITS BOX */
+function
+	drone_near(x, y)
+{
+	const	rect = network_frame.getBoundingClientRect();
+	const	margin = orb_state.noticed ? drone_forget_margin : drone_notice_margin;
+
+	return (x > rect.left - margin && x < rect.right + margin && y > rect.top - margin && y < rect.bottom + margin);
+}
+
+function
+	drone_notice(seen)
+{
+	const	now = performance.now();
+	var		level;
+
+	if (seen === orb_state.noticed || orb_state.crashed)
+		return ;
+
+	orb_state.noticed = seen;
+
+	if (!seen)
+	{
+		orb_state.lost_time = now;
+
+		if (!orb_state.down)
+			orb.style.removeProperty("--tilt");
+
+		orb_face();
+		orb_wander();
+		return ;
+	}
+
+	window.clearTimeout(orb_state.wander_timer);
+
+	/* SOMEONE NEW (OR BACK AFTER A WHILE): A FIRST REACTION */
+	if (now - orb_state.lost_time > 2500)
+	{
+		level = drone_level();
+		drone_feed(0.6);
+		drone_input(3 + Math.round(drone_arousal() * 10));
+
+		if (level === 0)
+			orb_state.curious_until = now + 1900;
+
+		if (level === -2)
+		{
+			drone_excite();
+			return ;
+		}
+	}
+
+	orb_face();
+}
+
+/* EVERY POINTER MOVE ON THE PAGE: DOES IT SEE YOU, AND WHAT ARE YOU DOING */
+function
+	drone_pointer(event)
+{
+	const	now = performance.now();
+	const	last = orb_state.pointer;
+	const	dx = event.clientX - last.x;
+	const	step = last.time ? Math.min(200, Math.hypot(dx, event.clientY - last.y)) : 0;
+
+	orb_state.pointer = {x: event.clientX, y: event.clientY, time: now, mouse: event.pointerType === "mouse"};
+
+	if (orb_state.crashed)
+		return ;
+
+	/* A FINGER IS ONLY THERE WHILE IT TOUCHES, AND A MOMENT AFTER */
+	if (!orb_state.pointer.mouse)
+	{
+		window.clearTimeout(orb_state.touch_timer);
+		orb_state.touch_timer = window.setTimeout(
+			function()
+			{
+				drone_notice(false);
+			},
+			2600
+		);
+	}
+
+	drone_notice(drone_near(event.clientX, event.clientY));
+
+	if (!orb_state.noticed)
+		return ;
+
+	/* MOVING AROUND IN FRONT OF IT: SOMETHING TO WATCH AND LEARN FROM */
+	drone_feed(step * 0.0009);
+	drone_input(step * 0.004);
+
+	if (now >= orb_state.stare_until)
+		orb_look(event.clientX, event.clientY, 0);
+
+	if (orb_state.pointer.mouse && !orb_state.down)
+		drone_shake(dx, now);
+
+	/* CURIOUS: THE HEAD TILTS TOWARDS THE POINTER */
+	if (!orb_state.face && !orb_state.down && drone_level() === 0)
+	{
+		const	rect = orb.getBoundingClientRect();
+
+		orb.style.setProperty("--tilt", round_2(clamp((event.clientX - rect.left - rect.width / 2) / rect.width * 5, -7, 7)) + "deg");
+	}
+}
+
+/* SHAKING THE POINTER AT IT: FOUR QUICK TURNS IN UNDER A SECOND */
+function
+	drone_shake(dx, now)
+{
+	const	shake = orb_state.shake;
+	const	sign = dx > 3 ? 1 : (dx < -3 ? -1 : 0);
+
+	if (!sign)
+		return ;
+
+	if (shake.sign && sign !== shake.sign)
+		shake.turns.push(now);
+
+	shake.sign = sign;
+	shake.turns = shake.turns.filter(
+		function(time)
+		{
+			return (now - time < 900);
+		}
+	);
+
+	if (shake.turns.length < 4 || now - shake.last < 1400)
+		return ;
+
+	shake.last = now;
+	shake.turns = [];
+	drone_feed(0.5);
+	drone_input(6);
+	orb_flash("flinch", 420);
+	orb_feel(drone_level() < 0 ? "confused" : "annoyed", 1100);
+	drone_mood(2.5);
+}
+
+/* CLICKING AROUND ITS BOX: IT LOOKS AND LEARNS. CLICKING NONSTOP ANNOYS IT */
+function
+	drone_click(event)
+{
+	const	now = performance.now();
+
+	if (orb_state.crashed || orb.contains(event.target))
+		return ;
+
+	drone_notice(true);
+	drone_feed(0.35);
+	drone_input(4);
+	orb_look(event.clientX, event.clientY, 0);
+	orb_state.clicks = orb_state.clicks.filter(
+		function(time)
+		{
+			return (now - time < 1400);
+		}
+	);
+	orb_state.clicks.push(now);
+
+	if (orb_state.clicks.length < 4)
+		return ;
+
+	if (drone_level() >= 0)
+		orb_feel("annoyed", 900);
+
+	drone_mood(0.8);
+}
+
+/* 100: A BLUE SCREEN INSTEAD OF THE DRONE. IT COUNTS UP, THEN RESTARTS */
+function
+	drone_crash()
+{
+	if (orb_state.crashed)
+		return ;
+
+	orb_state.crashed = true;
+	orb_state.noticed = false;
+	orb_state.down = null;
+	orb_state.feeling = "";
+	orb_state.mood = 100;
+	orb_state.bsod_done = 0;
+	drone_save();
+	window.clearTimeout(orb_state.feel_timer);
+	window.clearTimeout(orb_state.wander_timer);
+	orb_face();
+	DOM.CLASS.REMOVE(orb, "grabbing");
+	orb.style.removeProperty("--tilt");
+	bsod_percent.textContent = "0";
+	drone_qr();
+	DOM.CLASS.ADD(network_frame, "crashed");
+	drone_bsod_step(2200);
+}
+
+/* LIKE WINDOWS: THE PERCENTAGE JUMPS IN UNEVEN STEPS (ONLY WHILE SEEN) */
+function
+	drone_bsod_step(wait)
+{
+	window.clearTimeout(orb_state.bsod_timer);
+	orb_state.bsod_timer = window.setTimeout(
+		function()
+		{
+			if (network_visible && page_visible)
+			{
+				orb_state.bsod_done = Math.min(100, orb_state.bsod_done + 4 + Math.floor(Math.random() * 22));
+				bsod_percent.textContent = String(orb_state.bsod_done);
+			}
+
+			if (orb_state.bsod_done >= 100)
+				orb_state.bsod_timer = window.setTimeout(drone_restart, 1600);
+			else
+				drone_bsod_step(600 + Math.random() * 1100);
+		},
+		wait
+	);
+}
+
+/* BACK FROM THE BLUE SCREEN: A FRESH NETWORK, BUT IT HAS NOT FORGOTTEN */
+function
+	drone_restart()
+{
+	const	now = performance.now();
+
+	orb_state.crashed = false;
+	orb_state.mood = drone_restart_mood;
+	orb_state.annoyances = [];
+	orb_state.lost_time = -10000;
+	drone_save();
+	DOM.CLASS.REMOVE(network_frame, "crashed");
+	network_reset(now);
+	network.food = 0;
+	network.heat = 0;
+	network.charge = 0;
+	network_count();
+	network_draw(now);
+	orb_flash("glitch", 520);
+	orb_wander();
+
+	if (network_visible && page_visible && !network.frame && !reduced_motion)
+		network.frame = window.requestAnimationFrame(network_loop);
+
+	if (orb_state.pointer.mouse)
+		drone_notice(drone_near(orb_state.pointer.x, orb_state.pointer.y));
+}
+
+/* A MADE-UP QR CODE FOR THE BLUE SCREEN: THREE FINDER SQUARES, NOISE BETWEEN */
+function
+	drone_qr()
+{
+	var		path = "";
+
+	for (let y = 0; y < 25; y++)
+	{
+		for (let x = 0; x < 25; x++)
+		{
+			if ((x < 8 && y < 8) || (x > 16 && y < 8) || (x < 8 && y > 16))
+				continue ;
+
+			if (Math.random() < 0.5)
+				path += "M" + x + " " + y + "h1v1h-1z";
+		}
+	}
+
+	JS.ITERATE(
+		[[0, 0], [18, 0], [0, 18]],
+		function(corner)
+		{
+			const	x = corner[0];
+			const	y = corner[1];
+
+			path += "M" + x + " " + y + "h7v7h-7z" + "M" + (x + 1) + " " + (y + 1) + "h5v5h-5z" + "M" + (x + 2) + " " + (y + 2) + "h3v3h-3z";
+		}
+	);
+	bsod_qr.innerHTML = "<svg viewBox=\"-2 -2 29 29\"><rect x=\"-2\" y=\"-2\" width=\"29\" height=\"29\" fill=\"#FFF\"/><path fill=\"#0078D7\" fill-rule=\"evenodd\" d=\"" + path + "\"/></svg>";
+}
 
 function
 	orb_zone(event)
@@ -2928,17 +3558,63 @@ function
 	return (v < -0.36 ? "head" : "body");
 }
 
+/*
+** WHAT ITS FACE SHOWS: A SHORT FEELING (A POKE, A PAT ...) COMES FIRST;
+** OTHERWISE, WHILE IT SEES YOU, ITS MOOD; OTHERWISE A CALM FACE
+*/
+function
+	orb_face()
+{
+	const	now = performance.now();
+	var		face = orb_state.feeling;
+	var		until = 0;
+	var		level;
+
+	if (!face && orb_state.noticed && !orb_state.crashed)
+	{
+		level = drone_level();
+
+		if (level === -2 && now < orb_state.excited_until)
+		{
+			face = "excited";
+			until = orb_state.excited_until;
+		}
+		else if (level < 0)
+			face = "fond";
+		else if (level === 0 && now < orb_state.curious_until)
+		{
+			face = "confused";
+			until = orb_state.curious_until;
+		}
+		else if (level === 1)
+			face = "bothered";
+		else if (level === 2)
+			face = "glaring";
+	}
+
+	JS.ITERATE(
+		orb_faces,
+		function(name)
+		{
+			set_class(orb, name, name === face || (name === "annoyed" && (face === "angry" || face === "bothered" || face === "glaring")) || (name === "angry" && face === "glaring"));
+		}
+	);
+	orb_state.face = face;
+
+	if (face && !orb_state.down)
+		orb.style.removeProperty("--tilt");
+
+	window.clearTimeout(orb_state.face_timer);
+
+	if (until)
+		orb_state.face_timer = window.setTimeout(orb_face, until - now + 20);
+}
+
 /* A FEELING FOR A WHILE; ms = 0 KEEPS IT UNTIL SOMETHING ELSE HAPPENS */
 function
 	orb_feel(name, ms)
 {
-	JS.ITERATE(
-		["happy", "confused", "annoyed", "angry"],
-		function(other)
-		{
-			set_class(orb, other, other === name || (name === "angry" && other === "annoyed"));
-		}
-	);
+	orb_state.feeling = name;
 	window.clearTimeout(orb_state.feel_timer);
 
 	if (name && ms)
@@ -2951,6 +3627,8 @@ function
 			ms
 		);
 	}
+
+	orb_face();
 }
 
 function
@@ -2969,6 +3647,31 @@ function
 			eye.style.setProperty("--look-x", round_2(dx / distance * amount) + "px");
 			eye.style.setProperty("--look-y", round_2(dy / distance * amount * 0.8) + "px");
 		}
+	);
+}
+
+/* NOBODY AROUND: NOW AND THEN THE EYES DRIFT SOMEWHERE ELSE */
+function
+	orb_wander()
+{
+	window.clearTimeout(orb_state.wander_timer);
+
+	if (reduced_motion)
+		return ;
+
+	orb_state.wander_timer = window.setTimeout(
+		function()
+		{
+			const	rect = orb.getBoundingClientRect();
+			const	angle = Math.random() * Math.PI * 2;
+
+			if (orb_state.noticed || orb_state.down || orb_state.crashed)
+				return ;
+
+			orb_look(rect.left + rect.width / 2 + Math.cos(angle) * 100, rect.top + rect.height / 2 + Math.sin(angle) * 100, Math.random() < 0.3 ? 0.01 : 0.35 + Math.random() * 0.5);
+			orb_wander();
+		},
+		1400 + Math.random() * 2600
 	);
 }
 
@@ -3016,6 +3719,9 @@ function
 	);
 	orb_feel(orb_state.pokes.length >= 3 ? "angry" : "annoyed", orb_state.pokes.length >= 3 ? 2600 : 1700);
 	orb_flash("flinch", 420);
+	drone_feed(0.7);
+	drone_input(5);
+	drone_mood(6);
 }
 
 /* A SHORT ONE-OFF ANIMATION CLASS (THE GLITCH, THE FLINCH) */
@@ -3040,10 +3746,12 @@ function
 {
 	const	zone = orb_zone(event);
 
-	if (!zone || (event.pointerType === "mouse" && event.button !== 0))
+	if (orb_state.crashed || !zone || (event.pointerType === "mouse" && event.button !== 0))
 		return ;
 
+	drone_notice(true);
 	orb_state.down = {zone: zone, x: event.clientX, y: event.clientY, last_x: event.clientX, last_y: event.clientY, time: performance.now(), moved: 0};
+	orb_state.pet_relief = 0;
 
 	try
 	{
@@ -3073,6 +3781,7 @@ function
 
 	{
 		const	step = Math.hypot(event.clientX - down.last_x, event.clientY - down.last_y);
+		var		feeling;
 
 		down.moved += step;
 		down.last_x = event.clientX;
@@ -3081,19 +3790,31 @@ function
 		if (down.zone !== "head")
 			return ;
 
-		/* RUBBING: THE HEAD LEANS WITH THE HAND, HAPPINESS BUILDS UP */
+		/* RUBBING: THE HEAD LEANS WITH THE HAND. IT CALMS IT DOWN, AND ONCE IT
+		** IS NOT CROSS ANY MORE, HAPPINESS BUILDS UP */
 		orb_state.pet += step;
+		orb_state.pet_relief += step;
 		orb.style.setProperty("--tilt", round_2(clamp((event.clientX - down.x) * 0.12, -9, 9)) + "deg");
+		drone_feed(step * 0.002);
 
-		if (orb_state.pet > 70)
+		while (orb_state.pet_relief >= 90 && !orb_state.crashed)
 		{
-			orb_feel("happy", 0);
+			orb_state.pet_relief -= 90;
+			drone_mood(-1);
+		}
 
-			if (performance.now() - orb_state.heart_time > 320)
-			{
-				orb_state.heart_time = performance.now();
-				orb_heart();
-			}
+		if (orb_state.pet <= 70)
+			return ;
+
+		feeling = orb_state.mood < 60 ? "happy" : "annoyed";
+
+		if (orb_state.feeling !== feeling)
+			orb_feel(feeling, 0);
+
+		if (feeling === "happy" && performance.now() - orb_state.heart_time > 320)
+		{
+			orb_state.heart_time = performance.now();
+			orb_heart();
 		}
 	}
 }
@@ -3102,7 +3823,8 @@ function
 	orb_up(event)
 {
 	const	down = orb_state.down;
-	const	quick = down && performance.now() - down.time < 320 && down.moved < 10;
+	const	now = performance.now();
+	const	quick = down && now - down.time < 320 && down.moved < 10;
 
 	if (!down)
 		return ;
@@ -3118,12 +3840,26 @@ function
 	{
 		if (quick && orb_state.pet < 70)
 		{
-			/* GRABBED AND LET GO AT ONCE: WHAT WAS THAT? IT LOOKS UP AT YOU */
+			/* GRABBED AND LET GO AT ONCE: WHAT WAS THAT? IT LOOKS UP AT YOU.
+			** OVER AND OVER, IT GETS OLD QUICKLY */
+			orb_state.stare_until = now + 1800;
 			orb_feel("confused", 1800);
 			orb_look(event.clientX, event.clientY - orb.getBoundingClientRect().height * 0.4, 1.25);
+			orb_state.taps = orb_state.taps.filter(
+				function(time)
+				{
+					return (now - time < 2500);
+				}
+			);
+			orb_state.taps.push(now);
+			drone_feed(0.3);
+			drone_input(3);
+
+			if (orb_state.taps.length >= 3)
+				drone_mood(1.5);
 		}
 		else if (orb_state.pet >= 70)
-			orb_feel("happy", 1400);
+			orb_feel(orb_state.mood < 60 ? "happy" : "", 1400);
 
 		orb_state.pet = 0;
 		return ;
@@ -3135,7 +3871,12 @@ function
 	if (down.zone === "eye0" || down.zone === "eye1")
 		orb_poke_eye(Number(down.zone.charAt(3)));
 	else
+	{
 		orb_flash("glitch", 520);
+		drone_feed(0.5);
+		drone_input(4);
+		drone_mood(3);
+	}
 }
 
 function
@@ -3143,18 +3884,50 @@ function
 {
 	const	eyes = to_array(DOM.GET.CLASS(orb, "orb_eye"));
 
-	orb_state = {eyes: eyes, down: null, pet: 0, pokes: [], heart_time: 0, feel_timer: 0, eye_timers: [0, 0], flash_timers: {}};
+	orb_state = {
+		eyes: eyes,
+		mood: drone_load(),
+		noticed: false,
+		crashed: false,
+		feeling: "",
+		face: "",
+		down: null,
+		pet: 0,
+		pet_relief: 0,
+		pokes: [],
+		taps: [],
+		clicks: [],
+		annoyances: [],
+		shake: {sign: 0, turns: [], last: 0},
+		pointer: {x: 0, y: 0, time: 0, mouse: false},
+		lost_time: -10000,
+		excited_until: 0,
+		curious_until: 0,
+		stare_until: 0,
+		bsod_done: 0,
+		heart_time: 0,
+		feel_timer: 0,
+		face_timer: 0,
+		wander_timer: 0,
+		touch_timer: 0,
+		bsod_timer: 0,
+		eye_timers: [0, 0],
+		flash_timers: {}
+	};
 
+	window.addEventListener("pointermove", drone_pointer, {passive: true});
+	window.addEventListener("pointerdown", drone_pointer, {passive: true});
 	window.addEventListener(
-		"pointermove",
-		function(event)
+		"scroll",
+		function()
 		{
-			/* WHILE CONFUSED IT KEEPS STARING UP AT WHERE YOU WERE */
-			if (!DOM.CLASS.CHECK(orb, "confused"))
-				orb_look(event.clientX, event.clientY, 0);
+			/* THE PAGE SCROLLED UNDER A STILL MOUSE */
+			if (orb_state.pointer.mouse && !orb_state.crashed)
+				drone_notice(drone_near(orb_state.pointer.x, orb_state.pointer.y));
 		},
 		{passive: true}
 	);
+	network_frame.addEventListener("pointerdown", drone_click);
 	orb.addEventListener("pointerdown", orb_down);
 	orb.addEventListener("pointermove", orb_move);
 	orb.addEventListener("pointerup", orb_up);
@@ -3167,6 +3940,12 @@ function
 				DOM.ATTRIBUTE.SET(orb, "data-zone", "");
 		}
 	);
+
+	/* LEFT AT 100 A MOMENT AGO: STILL ON THE BLUE SCREEN */
+	if (orb_state.mood >= 100)
+		drone_crash();
+
+	orb_wander();
 
 	if (reduced_motion)
 		return ;
@@ -3199,7 +3978,6 @@ function
 
 	window.setTimeout(blink, 2400);
 }
-
 
 /* ========================================================================== */
 /* 3D TILT                                                                    */

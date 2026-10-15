@@ -39,7 +39,7 @@
   <meta name="rating" content="general"/>
   <meta name="revisit-after" content="1"/>
   <meta name="keywords" content="Maximum Tension, CMT, C Maximum Tension, header-only C library, Visual Universe, D.R.O.N.E., neural network engine, JIT compiler, legacy systems, low level programming, web design, 3D modelling, animation, Teoman Deniz"/>
-  <meta name="description" content="We're Maximum Tension. We build software, algorithms and circuits from the lowest level up, do our own 3D, art and animation, and design websites with Apple-level care at small-studio prices."/>
+  <meta name="description" content="We build software, algorithms and circuits from the lowest level up, our own 3D, art and animation, and websites with Apple-level care at small-studio prices."/>
   <meta name="copyright" content="© 2026 Maximum Tension™. All rights reserved."/>
   <meta name="author" content="Teoman Deniz"/>
   <meta name="generator" content="maximum-tension.com"/>
@@ -92,10 +92,10 @@
   <link rel="yandex-tableau-widget" href="favicons/yandex-browser-manifest.json"/>
   <meta name="twitter:card" content="summary_large_image"/>
   <meta name="twitter:title" content="Maximum Tension"/>
-  <meta name="twitter:description" content="We're Maximum Tension. We build software, algorithms and circuits from the lowest level up, do our own 3D, art and animation, and design websites with Apple-level care at small-studio prices."/>
+  <meta name="twitter:description" content="We build software, algorithms and circuits from the lowest level up, our own 3D, art and animation, and websites with Apple-level care at small-studio prices."/>
   <meta name="twitter:image" content="https://maximum-tension.com/images/share/PREVIEW.gif"/>
   <meta name="twitter:image:alt" content="Maximum Tension, next to a jack-o&#39;-lantern drawn in ASCII characters, slowly spinning"/>
-  <meta property="og:description" content="We're Maximum Tension. We build software, algorithms and circuits from the lowest level up, do our own 3D, art and animation, and design websites with Apple-level care at small-studio prices."/>
+  <meta property="og:description" content="We build software, algorithms and circuits from the lowest level up, our own 3D, art and animation, and websites with Apple-level care at small-studio prices."/>
   <meta property="og:type" content="website"/>
   <meta property="og:title" content="Maximum Tension"/>
   <meta property="og:site_name" content="maximum-tension.com"/>
@@ -144,31 +144,32 @@
   <!--[if !IE]>-->
    <script type="text/javascript" src="js/JS.js"></script>
   <!--<![endif]-->
-  <SCRIPT TYPE="text/javascript">
+  <script TYPE="text/javascript">
 if (
-	(
-		window.matchMedia &&
-		window.matchMedia("(prefers-color-scheme: dark)").matches
-	) === true
+  (
+    window.matchMedia &&
+    window.matchMedia("(prefers-color-scheme: dark)").matches
+  ) === true
 )
 {
-	DOM.GET.ID("favicon").href =
-		"favicons/favicon-dark.ico";
-	DOM.GET.ID("favicon_16").href =
-		"favicons/favicon-16x16-DARK.png";
-	DOM.GET.ID("favicon_16_shortcut").href =
-		"favicons/favicon-16x16-DARK.png";
-	DOM.GET.ID("favicon_16_sizes").href =
-		"favicons/favicon-16x16-DARK.png";
-	DOM.GET.ID("favicon_32").href =
-		"favicons/favicon-32x32-DARK.png";
+  DOM.GET.ID("favicon").href =
+    "favicons/favicon-dark.ico";
+  DOM.GET.ID("favicon_16").href =
+    "favicons/favicon-16x16-DARK.png";
+  DOM.GET.ID("favicon_16_shortcut").href =
+    "favicons/favicon-16x16-DARK.png";
+  DOM.GET.ID("favicon_16_sizes").href =
+    "favicons/favicon-16x16-DARK.png";
+  DOM.GET.ID("favicon_32").href =
+    "favicons/favicon-32x32-DARK.png";
 }
-  </SCRIPT>
+  </script>
   <script type="text/javascript" src="lang.js"></script>
   <link rel="stylesheet" href="style.css"/>
  </head>
  <body id="body">
-  <h1 class="seo_header">Maximum Tension</h1>
+  <h1 class="seo_h1">Software, algorithms and circuits built from the lowest level up</h1>
+  <h2 class="seo_header">Maximum Tension</h2>
   <a class="skip" href="#main" data-lang="8">Skip to content</a>
   <div class="progress" aria-hidden="true"><span class="progress_bar" id="progress_bar"></span></div>
   <header class="header" id="header">
@@ -204,6 +205,9 @@ if (
        <canvas class="layer layer_wire" id="wire" aria-hidden="true"></canvas>
        <canvas class="layer layer_glass" id="glass" aria-hidden="true"></canvas>
        <svg class="seams" id="seams" aria-hidden="true"><line id="seam_a"/><line id="seam_b"/></svg>
+       <p class="strip_label strip_soul" id="label_soul" aria-hidden="true" data-lang="105">Open your soul</p>
+       <p class="strip_label strip_mind" id="label_mind" aria-hidden="true" data-lang="106">Open your mind</p>
+       <p class="strip_label strip_eyes" id="label_eyes" aria-hidden="true" data-lang="107">Open your eyes</p>
        <p class="render_missing" data-lang="116">Glass needs WebGL, which is turned off in this browser.</p>
       </div>
      </div>
@@ -346,53 +350,53 @@ if (
 #include "CMT/CONSOLE.HPP" // *.HPP gives C++ classes in C++, and CMT's own object model in C
 
 SECTION (int, TEST, (int test)) // Assembly DSL. Also works on compilers that don't support inline assembly at all
-	MOV_EAX_ARG1
-	ADD_EAX_(22)
-	RET
+  MOV_EAX_ARG1
+  ADD_EAX_(22)
+  RET
 END
 
 int main(void)
 {
-	var error_message = 0;
+  var error_message = 0;
 
-	try
-	{
-		if (error_message == 0)
-			throw ((var)"It falls here");
+  try
+  {
+    if (error_message == 0)
+      throw ((var)"It falls here");
 
-		console.log("You won't see me no matter what");
-		cancel ;
-		return (1);
-	}
-	catch (error_message)
-	{
-		console.print("[%s]\n", (char *)error_message);
-	}
+    console.log("You won't see me no matter what");
+    cancel ;
+    return (1);
+  }
+  catch (error_message)
+  {
+    console.print("[%s]\n", (char *)error_message);
+  }
 
-	console.log("A text with newline")
-		-&gt;log(" continued till here.")
-		-&gt;log(" Then another line started")
-		-&gt;log(" thanks to the log function")
-		-&gt;log(" and ended there again.\n");
-	console.warning_here("Test\n"); // "b.c (33): WARNING: Test"
-	console.print("%d\n", 42) // 42
-		-&gt;put.colored.frame('#', 0X0A, 18, 5, 34, 11)
-		-&gt;put.colored.frame_radius('*', 0X0E, 38, 5, 54, 11, 3)
-		-&gt;put.colored.rectangle('.', 0X09, 58, 5, 68, 11)
-		-&gt;put.colored.rectangle_radius('o', 0X0D, 72, 5, 88, 11, 2)
-		-&gt;put.colored.circle('O', 0X0B, 2, 14, 24, 26)
-		-&gt;put.colored.ellipse('e', 0X4F, 28, 14, 50, 26)
-		-&gt;put.colored.curve('~', 0X06, 54, 14, 96, 14, 6.0F, -6.0F)
-		-&gt;input.wait.key()-&gt;clear();
+  console.log("A text with newline")
+    -&gt;log(" continued till here.")
+    -&gt;log(" Then another line started")
+    -&gt;log(" thanks to the log function")
+    -&gt;log(" and ended there again.\n");
+  console.warning_here("Test\n"); // "b.c (33): WARNING: Test"
+  console.print("%d\n", 42) // 42
+    -&gt;put.colored.frame('#', 0X0A, 18, 5, 34, 11)
+    -&gt;put.colored.frame_radius('*', 0X0E, 38, 5, 54, 11, 3)
+    -&gt;put.colored.rectangle('.', 0X09, 58, 5, 68, 11)
+    -&gt;put.colored.rectangle_radius('o', 0X0D, 72, 5, 88, 11, 2)
+    -&gt;put.colored.circle('O', 0X0B, 2, 14, 24, 26)
+    -&gt;put.colored.ellipse('e', 0X4F, 28, 14, 50, 26)
+    -&gt;put.colored.curve('~', 0X06, 54, 14, 96, 14, 6.0F, -6.0F)
+    -&gt;input.wait.key()-&gt;clear();
 
-	console.print("TESTING ASM - %d\n", TEST(50)); // TESTING ASM - 72
+  console.print("TESTING ASM - %d\n", TEST(50)); // TESTING ASM - 72
 
 #ifdef __PLATFORM_WINDOWS__ // Windows API without windows.h or import libraries
-	KERNEL32.Sleep(1000);
-	USER32.MessageBoxA(0, "Hello, World!", "CMT", 0);
+  KERNEL32.Sleep(1000);
+  USER32.MessageBoxA(0, "Hello, World!", "CMT", 0);
 #endif /* __PLATFORM_WINDOWS__ */
 
-	return (0);
+  return (0);
 }
 </code></pre></div>
        <div class="win_status"><span>Ln <b id="code_line">1</b>, Col 1</span><span>C (CMT)</span></div>
@@ -685,10 +689,23 @@ int main(void)
       <div class="network_frame" id="network_frame">
        <canvas class="network" id="network" aria-hidden="true"></canvas>
        <div class="orb" id="orb" aria-hidden="true">
-        <i class="orb_eye"></i><i class="orb_eye"></i>
+        <i class="orb_eye"></i><i class="orb_eye"></i><span class="orb_cheeks"></span>
+       </div>
+       <div class="bsod" id="bsod" aria-hidden="true">
+        <p class="bsod_face">:(</p>
+        <p class="bsod_text" data-lang="532">Your drone ran into a problem and needs to restart. We're just collecting some error info, and then we'll restart for you.</p>
+        <p class="bsod_done"><span data-lang="533"></span><span id="bsod_percent">0</span><span data-lang="534">% complete</span></p>
+        <div class="bsod_more">
+         <div class="bsod_qr" id="bsod_qr"></div>
+         <div class="bsod_info">
+          <p data-lang="535">If you call a support person, give them this info:</p>
+          <p><span data-lang="536">Stop code</span>: DRONE_PATIENCE_EXHAUSTED</p>
+          <p><span data-lang="537">What failed</span>: patience.sys</p>
+         </div>
+        </div>
        </div>
       </div>
-      <p class="network_caption"><span data-lang="522">This network grows while you watch. New neurons start silent.</span></p>
+      <p class="network_caption"><span data-lang="522">This network grows from what you do near it. New neurons start silent.</span></p>
       <p class="network_count"><span><b id="neuron_count">0</b> <span data-lang="520">neurons</span></span><span><b id="layer_count">0</b> <span data-lang="521">layers</span></span></p>
       <blockquote class="idea">
        <p data-lang="530">Instead of one huge fixed model trained on massive data: a compact engine that grows and reshapes itself as it learns, using the most efficient technique in each place.</p>
