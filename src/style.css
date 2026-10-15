@@ -5846,8 +5846,7 @@ html[data-mode="text"] .orb::after
 /* THE SECRET MOODS, SHOWN WHILE IT SEES YOU (THE SCRIPT EXPLAINS THEM) */
 
 /* FOND AND EXCITED: A HAPPY SQUINT, THE CHEEKS PUSH THE BOTTOM OF THE EYES
-** UP FLAT (ROUND TOPS, FLAT BOTTOMS), AND A BLUSH. THE BLUSH ALSO SHOWS WHEN
-** HAPPY */
+** UP FLAT (ROUND TOPS, FLAT BOTTOMS) */
 
 .orb.fond .orb_eye,
 .orb.excited .orb_eye
@@ -5858,41 +5857,6 @@ html[data-mode="text"] .orb::after
 	-webkit-border-radius: 50% 50% 10% 10% / 37% 37% 7% 7%;
 	   -moz-border-radius: 50% 50% 10% 10% / 37% 37% 7% 7%;
 	        border-radius: 50% 50% 10% 10% / 37% 37% 7% 7%;
-}
-
-.orb_cheeks
-{
-	                  top: 0;
-	                 left: 0;
-	                width: 100%;
-	               height: 100%;
-	              opacity: 0;
-	             position: absolute;
-	           background: -webkit-radial-gradient(32% 68%, 10% 6%, rgba(255, 111, 168, 0.55), rgba(255, 111, 168, 0)), -webkit-radial-gradient(68% 68%, 10% 6%, rgba(255, 111, 168, 0.55), rgba(255, 111, 168, 0));
-	           background: -moz-radial-gradient(32% 68%, 10% 6%, rgba(255, 111, 168, 0.55), rgba(255, 111, 168, 0)), -moz-radial-gradient(68% 68%, 10% 6%, rgba(255, 111, 168, 0.55), rgba(255, 111, 168, 0));
-	           background: -o-radial-gradient(32% 68%, 10% 6%, rgba(255, 111, 168, 0.55), rgba(255, 111, 168, 0)), -o-radial-gradient(68% 68%, 10% 6%, rgba(255, 111, 168, 0.55), rgba(255, 111, 168, 0));
-	           background: radial-gradient(10% 6% at 32% 68%, rgba(255, 111, 168, 0.55), rgba(255, 111, 168, 0)), radial-gradient(10% 6% at 68% 68%, rgba(255, 111, 168, 0.55), rgba(255, 111, 168, 0));
-	       pointer-events: none;
-
-	-webkit-border-radius: 50%;
-	   -moz-border-radius: 50%;
-	        border-radius: 50%;
-
-	   -webkit-transition: opacity .4s cubic-bezier(.22, .7, .2, 1); /* FALLBACK */
-	   -webkit-transition: opacity .4s var(--ease);
-	      -moz-transition: opacity .4s cubic-bezier(.22, .7, .2, 1); /* FALLBACK */
-	      -moz-transition: opacity .4s var(--ease);
-	        -o-transition: opacity .4s cubic-bezier(.22, .7, .2, 1); /* FALLBACK */
-	        -o-transition: opacity .4s var(--ease);
-	           transition: opacity .4s cubic-bezier(.22, .7, .2, 1); /* FALLBACK */
-	           transition: opacity .4s var(--ease);
-}
-
-.orb.fond .orb_cheeks,
-.orb.happy .orb_cheeks,
-.orb.excited .orb_cheeks
-{
-	opacity: 1;
 }
 
 /* EXCITED (IT ADORES YOU AND JUST SPOTTED YOU): THE SQUINT GLOWS, IT HOPS */
