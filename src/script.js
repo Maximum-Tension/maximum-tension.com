@@ -3645,7 +3645,6 @@ function
 	code_start();
 	cmd_start();
 	space_start();
-
 	JS.ITERATE(
 		to_array(DOM.GET.CLASS(nav, "nav_link")),
 		function(link)
@@ -3653,7 +3652,6 @@ function
 			link.addEventListener("click", close_menu);
 		}
 	);
-
 	document.addEventListener(
 		"keydown",
 		function(event)
@@ -3678,7 +3676,6 @@ function
 			}
 		}
 	);
-
 	observe(
 		timeline,
 		function(visible)
@@ -3691,7 +3688,6 @@ function
 		},
 		{threshold: 0.4}
 	);
-
 	window.addEventListener("scroll", request_frame, {passive: true});
 	window.addEventListener("resize", on_resize);
 	year_date.textContent = new Date().getFullYear().toString();
