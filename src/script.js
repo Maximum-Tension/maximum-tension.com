@@ -2768,7 +2768,7 @@ function
 {
 	const	first = network.layers[0];
 
-	if (network.pulses.length > 180)
+	if (network.pulses.length > (network.mode === "storm" ? 420 : 180))
 		return ;
 
 	network.pulses.push(
@@ -2777,7 +2777,7 @@ function
 			from: Math.floor(Math.random() * first.nodes.length),
 			to: -1,
 			start: now,
-			length: (520 + Math.random() * 260) * (1 - 0.55 * network.heat),
+			length: (520 + Math.random() * 260) * (1 - 0.55 * network.heat) * (network.mode === "storm" ? 0.3 : 1),
 			tone: network.heat > 0.15 ? network.tone : ""
 		}
 	);
@@ -2990,6 +2990,124 @@ function
 	context.globalAlpha = 1;
 }
 
+/* THE NETWORK FALLS APART: EVERY NEURON BECOMES A FALLING BIT (WITH SOME
+** DUST), STARTING NEXT TO THE HEAD AND SPREADING AWAY FROM IT */
+function
+	network_shatter(now)
+{
+	const	width = network_canvas.width;
+	const	height = network_canvas.height;
+	const	ratio = network.ratio;
+	const	bits = [];
+	const	links = [];
+
+	JS.ITERATE(
+		network.layers,
+		function(layer)
+		{
+			JS.ITERATE(
+				layer.nodes,
+				function(node)
+				{
+					const	bit = {x: layer.shown_x * width, y: node.shown_y * height, vx: wobble(-50, 50) * ratio, vy: wobble(-140, 10) * ratio, size: 3.2 * ratio, dust: false, delay: (1 - layer.shown_x) * wobble(500, 800) + wobble(0, 220)};
+
+					node.bit = bit;
+					bits.push(bit);
+
+					for (let i = 0; i < 3; i++)
+						bits.push({x: bit.x, y: bit.y, vx: wobble(-150, 150) * ratio, vy: wobble(-240, -20) * ratio, size: wobble(0.7, 1.7) * ratio, dust: true, delay: bit.delay});
+				}
+			);
+		}
+	);
+
+	JS.ITERATE(
+		network.layers,
+		function(layer, index)
+		{
+			const	next = network.layers[index + 1];
+
+			if (next)
+				JS.ITERATE(
+					layer.nodes,
+					function(a)
+					{
+						JS.ITERATE(
+							next.nodes,
+							function(b)
+							{
+								links.push([a.bit, b.bit]);
+							}
+						);
+					}
+				);
+		}
+	);
+
+	network.bits = bits;
+	network.links = links;
+	network.pulses = [];
+	network.shatter_time = now;
+	network.last_time = now;
+}
+
+/* THE LINKS SNAP AS THEIR NEURONS LET GO; THE BITS FALL OUT OF THE BOX */
+function
+	network_collapse(now)
+{
+	const	context = network.context;
+	const	width = network_canvas.width;
+	const	height = network_canvas.height;
+	const	ratio = network.ratio;
+	const	age = now - network.shatter_time;
+	const	delta = Math.min(0.05, (now - network.last_time) / 1000);
+
+	network.last_time = now;
+	context.clearRect(0, 0, width, height);
+	context.lineWidth = ratio * 0.7;
+
+	JS.ITERATE(
+		network.links,
+		function(link)
+		{
+			const	snap = Math.min(link[0].delay, link[1].delay);
+			const	left = 1 - segment(age, snap - 150, snap + 60);
+
+			if (left <= 0)
+				return ;
+
+			context.strokeStyle = "rgba(236, 230, 216, " + (0.1 * left).toFixed(3) + ")";
+			context.beginPath();
+			context.moveTo(link[0].x, link[0].y);
+			context.lineTo(link[1].x, link[1].y);
+			context.stroke();
+		}
+	);
+
+	JS.ITERATE(
+		network.bits,
+		function(bit)
+		{
+			if (age > bit.delay)
+			{
+				bit.vy += 900 * ratio * delta;
+				bit.x += bit.vx * delta;
+				bit.y += bit.vy * delta;
+			}
+			else if (bit.dust)
+				return ;
+
+			if (bit.y > height + 20)
+				return ;
+
+			context.fillStyle = bit.dust ? "rgba(255, 208, 138, 0.75)" : "rgba(236, 230, 216, 0.9)";
+			context.beginPath();
+			context.arc(bit.x, bit.y, bit.size, 0, Math.PI * 2);
+			context.fill();
+		}
+	);
+}
+
 function
 	network_count()
 {
@@ -3013,38 +3131,54 @@ function
 
 	network.frame = 0;
 
-	/* BLUE SCREEN: NOTHING TO DRAW UNTIL IT RESTARTS */
-	if (orb_state && orb_state.crashed)
+	/* BLUE SCREEN: NOTHING TO DRAW UNTIL IT RESTARTS (A BREAKDOWN STILL DRAWS:
+	** network.mode IS "idle", "silent", "storm" OR "collapse" THEN) */
+	if (orb_state && orb_state.crashed && !network.mode)
 		return ;
 
-	if (network.fade && now - network.fade > 1000)
+	if (network.mode === "collapse")
+		network_collapse(now);
+	else
 	{
-		network_reset(now);
-		network_count();
+		if (network.fade && now - network.fade > 1000)
+		{
+			network_reset(now);
+			network_count();
+		}
+
+		/* IT ONLY GROWS FROM WHAT IT LEARNS WATCHING YOU (drone_feed) */
+		if (!network.mode && !network.fade && network.food >= 1 && now >= network.next_event)
+		{
+			network.food -= 1;
+			network_grow(now);
+			network_count();
+			network.next_event = now + 420;
+		}
+
+		/* A SLOW TRICKLE ALONE, MORE WHILE IT SEES YOU, WILD WHEN IT IS FAR
+		** FROM CALM (THE MOOD, AWAY FROM 50). SILENT: NOTHING AT ALL. A
+		** STORM: A FLOOD */
+		if (network.mode === "storm")
+		{
+			network.tone = "rage";
+			network.heat = 1;
+			network.charge += wobble(4, 7);
+		}
+		else if (network.mode !== "silent")
+		{
+			network.tone = orb_state && orb_state.mood < 50 ? "love" : "rage";
+			network.heat = lerp(network.heat, watching ? drone_arousal() : 0, 0.05);
+			network.charge += 0.012 + (watching ? 0.02 : 0) + network.heat * network.heat * 1.4;
+		}
+
+		while (network.charge >= 1)
+		{
+			network.charge -= 1;
+			network_spawn(now);
+		}
+
+		network_draw(now);
 	}
-
-	/* IT ONLY GROWS FROM WHAT IT LEARNS WATCHING YOU (drone_feed) */
-	if (!network.fade && network.food >= 1 && now >= network.next_event)
-	{
-		network.food -= 1;
-		network_grow(now);
-		network_count();
-		network.next_event = now + 420;
-	}
-
-	/* A SLOW TRICKLE ALONE, MORE WHILE IT SEES YOU, WILD WHEN IT IS FAR
-	** FROM CALM (THE MOOD, AWAY FROM 50) */
-	network.tone = orb_state && orb_state.mood < 50 ? "love" : "rage";
-	network.heat = lerp(network.heat, watching ? drone_arousal() : 0, 0.05);
-	network.charge += 0.012 + (watching ? 0.02 : 0) + network.heat * network.heat * 1.4;
-
-	while (network.charge >= 1)
-	{
-		network.charge -= 1;
-		network_spawn(now);
-	}
-
-	network_draw(now);
 
 	if (network_visible && page_visible && !reduced_motion)
 		network.frame = window.requestAnimationFrame(network_loop);
@@ -3065,7 +3199,10 @@ function
 		food: 0,
 		charge: 0,
 		heat: 0,
-		tone: ""
+		tone: "",
+		mode: "",
+		bits: [],
+		links: []
 	};
 	network_size();
 	network_reset(performance.now());
@@ -3117,13 +3254,14 @@ function
 **     60-75  LEVEL  1  FROWNS AND LEANS AWAY
 **     75-99  LEVEL  2  NARROW RED EYES, TREMBLING. THE RED STAYS WHATEVER
 **                      ELSE IT FEELS (CONFUSED: THE WIDE EYE STAYS ANGRY)
-**       100            A JUMPSCARE (ONE OF THREE, NEVER QUITE THE SAME), A
-**                      BLUE SCREEN, THEN A RESTART (STILL CROSS: 85)
+**       100            A BREAKDOWN (FOUR, TAKING TURNS, NEVER QUITE THE SAME:
+**                      SEE drone_breakdown), THEN A BLUE SCREEN AND A RESTART.
+**                      THE BAR STARTS OVER AT 50
 ** THE FURTHER FROM 50, THE WILDER THE NETWORK FIRES WHILE IT SEES YOU, AND
 ** THE NETWORK ONLY GROWS FROM WHAT IT SEES YOU DO.
 */
 const	drone_key = "drone";
-const	drone_restart_mood = 85;
+const	drone_restart_mood = 50;
 const	drone_notice_margin = 36; /* PX AROUND THE BOX WHERE IT SPOTS YOU */
 const	drone_forget_margin = 90; /* A LITTLE FURTHER TO LOSE YOU AGAIN */
 const	orb_faces = ["happy", "confused", "annoyed", "angry", "fond", "excited", "bothered", "glaring"];
@@ -3157,11 +3295,13 @@ function
 	return (clamp(Math.abs(orb_state.mood - 50) / 50, 0, 1));
 }
 
+/* THE SAVED MOOD, AND WHICH BREAKDOWN COMES NEXT: {mood, scene} */
 function
 	drone_load()
 {
 	const	saved = storage_get(drone_key);
 	var		mood = 50;
+	var		scene = 0;
 	var		hours;
 
 	if (saved && typeof(saved.mood) === "number" && isFinite(saved.mood))
@@ -3174,13 +3314,16 @@ function
 			mood = mood > 50 ? Math.max(50, mood - hours) : Math.min(50, mood + hours);
 	}
 
-	return (mood);
+	if (saved && typeof(saved.scene) === "number" && isFinite(saved.scene))
+		scene = Math.max(0, Math.floor(saved.scene));
+
+	return ({mood: mood, scene: scene});
 }
 
 function
 	drone_save()
 {
-	storage_set(drone_key, {mood: round_2(orb_state.mood), time: Date.now()});
+	storage_set(drone_key, {mood: round_2(orb_state.mood), scene: orb_state.scene_next, time: Date.now()});
 }
 
 /*
@@ -3444,169 +3587,567 @@ function
 	drone_mood(0.8);
 }
 
-/* A RANDOM NUMBER BETWEEN min AND max: NO TWO JUMPSCARES MOVE THE SAME */
+/* A RANDOM NUMBER BETWEEN min AND max: NO TWO BREAKDOWNS MOVE THE SAME */
 function
 	wobble(min, max)
 {
 	return (min + Math.random() * (max - min));
 }
 
-/* THE NETWORK TURNS INTO TV STATIC (THE "STATIC" JUMPSCARE) */
-function
-	drone_static(until)
-{
-	const	context = network.context;
-	const	width = network_canvas.width;
-	const	height = network_canvas.height;
-	const	size = Math.max(2, Math.round(3 * network.ratio));
-
-	context.clearRect(0, 0, width, height);
-
-	for (let i = 0; i < 900; i++)
-	{
-		const	shade = Math.floor(Math.random() * 256);
-
-		context.fillStyle = "rgba(" + shade + ", " + shade + ", " + shade + ", " + wobble(0.2, 0.75).toFixed(2) + ")";
-		context.fillRect(Math.random() * width, Math.random() * height, size * wobble(1, 4), size);
-	}
-
-	if (performance.now() < until)
-		orb_state.static_frame = window.requestAnimationFrame(
-			function()
-			{
-				drone_static(until);
-			}
-		);
-}
-
 /*
-** RIGHT BEFORE THE BLUE SCREEN: A JUMPSCARE, ONE OF THREE. EVERY STEP TAKES A
-** RANDOM VALUE BETWEEN A MIN AND A MAX (PLACE, SIZE, ANGLE, TIMING):
-**  0 LUNGE   IT CREEPS CLOSER, TREMBLING, THEN LUNGES AT YOU AND SHAKES
-**  1 STATIC  THE NETWORK TURNS TO STATIC, IT FLICKERS FROM PLACE TO PLACE,
-**            THEN IT IS RIGHT IN FRONT OF YOU
-**  2 SNAP    IT SLOWLY TURNS AWAY AND SHUTS ITS EYES, THEN SNAPS BACK IN
-**            YOUR FACE, EYES WIDE OPEN
+** A COPY OF THE HEAD, FIXED ON THE WINDOW, SO IT CAN LEAVE ITS BOX (THE BOX
+** CLIPS EVERYTHING INSIDE IT). THE REAL HEAD HIDES UNTIL THE RESTART. MOVED
+** WITH transform, FROM WHERE THE REAL HEAD WAS
 */
 function
-	drone_scare(done)
+	drone_ghost(classes)
 {
-	const	frame = network_frame.getBoundingClientRect();
 	const	box = orb.getBoundingClientRect();
-	const	dx = frame.left + frame.width / 2 - (box.left + box.width / 2);
-	const	dy = frame.top + frame.height / 2 - (box.top + box.height / 2);
-	const	kind = Math.floor(Math.random() * 3);
-	const	side = Math.random() < 0.5 ? -1 : 1;
-	const	frames = [];
-	var		length;
-	var		motion;
+	const	ghost = orb.cloneNode(true);
 
-	function
-		at(x, y, size, turn, opacity, offset, easing)
-	{
-		frames.push(
-			{
-				transform: "translateY(-50%) translate(" + round_2(x) + "px, " + round_2(y) + "px) scale(" + round_2(size) + ") rotate(" + round_2(turn) + "deg)",
-				opacity: opacity,
-				offset: offset,
-				easing: easing || "linear"
-			}
-		);
-	}
-
-	at(0, 0, 1, 0, 1, 0);
-
-	if (kind === 0)
-	{
-		length = wobble(1300, 1700);
-
-		for (let i = 1; i <= 5; i++)
-			at(dx * 0.04 * i + wobble(-3, 3), wobble(-3, 3), 1 + 0.04 * i, wobble(-4, 4), 1, 0.08 * i);
-
-		at(dx * wobble(0.85, 1.05), dy * wobble(0.7, 1), wobble(3.2, 3.9), wobble(-8, 8), 1, wobble(0.46, 0.5), "steps(1)");
-
-		for (let i = 0; i < 6; i++)
-			at(dx + wobble(-14, 14), dy + wobble(-10, 10), wobble(3.4, 4), wobble(-10, 10), 1, 0.55 + i * 0.075, "steps(1)");
-	}
-	else if (kind === 1)
-	{
-		length = wobble(1500, 1900);
-		at(0, 0, 1, 0, 0, wobble(0.08, 0.12), "steps(1)");
-
-		for (let i = 0; i < 4; i++)
+	JS.ITERATE(
+		to_array(ghost.querySelectorAll(".orb_heart, .orb_vein, .orb_smoke")),
+		function(extra)
 		{
-			const	start = 0.16 + i * 0.15 + wobble(-0.02, 0.02);
-			const	x = dx + wobble(-0.32, 0.32) * frame.width;
-			const	y = dy + wobble(-0.28, 0.28) * frame.height;
-			const	size = wobble(1.1, 2.1);
-			const	turn = wobble(-25, 25);
-
-			at(x, y, size, turn, 1, start, "steps(1)");
-			at(x + wobble(-6, 6), y + wobble(-6, 6), size, turn, 0, start + wobble(0.08, 0.11), "steps(1)");
+			DOM.REMOVE(extra);
 		}
+	);
+	ghost.removeAttribute("id");
+	ghost.removeAttribute("data-zone");
+	ghost.className = "orb orb_ghost " + classes;
+	ghost.style.cssText = "left:" + round_2(box.left) + "px;top:" + round_2(box.top) + "px;width:" + round_2(box.width) + "px;height:" + round_2(box.height) + "px";
+	body.appendChild(ghost);
+	orb.style.visibility = "hidden";
+	orb_state.ghost = ghost;
+	return ({element: ghost, left: box.left, top: box.top, x: box.left + box.width / 2, y: box.top + box.height / 2, size: box.width});
+}
 
-		at(dx + wobble(-8, 8), dy + wobble(-8, 8), wobble(3.5, 4.1), wobble(-6, 6), 1, wobble(0.8, 0.84), "steps(1)");
+/* PLACES THE GHOST BY ITS CENTRE (x, y), TURNED AND SQUASHED */
+function
+	drone_ghost_at(ghost, x, y, turn, stretch_x, stretch_y)
+{
+	ghost.element.style.transform = "translate(" + round_2(x - ghost.x) + "px, " + round_2(y - ghost.y) + "px) rotate(" + round_2(turn) + "deg) scale(" + round_2(stretch_x) + ", " + round_2(stretch_y) + ")";
+}
 
-		for (let i = 0; i < 3; i++)
-			at(dx + wobble(-12, 12), dy + wobble(-9, 9), wobble(3.6, 4.2), wobble(-8, 8), 1, 0.88 + i * 0.04, "steps(1)");
-
-		DOM.CLASS.ADD(orb, "scare_static");
-		DOM.CLASS.ADD(network_frame, "scare_static");
-		drone_static(performance.now() + length);
-	}
-	else
-	{
-		length = wobble(1600, 2000);
-		at(wobble(-10, 10), wobble(0, 8), wobble(0.92, 0.98), side * wobble(22, 34), 1, wobble(0.4, 0.5), "ease-in");
-		at(wobble(-12, 12), wobble(2, 10), wobble(0.88, 0.95), side * wobble(28, 40), 1, 0.6, "steps(1)");
-		at(dx * wobble(0.8, 1), dy * wobble(0.6, 1), wobble(2.8, 3.4), -side * wobble(4, 12), 1, wobble(0.63, 0.66), "steps(1)");
-
-		for (let i = 0; i < 5; i++)
-			at(dx + wobble(-12, 12), dy + wobble(-8, 8), wobble(3, 3.6), wobble(-8, 8), 1, 0.72 + i * 0.055, "steps(1)");
-
-		/* EYES SHUT WHILE IT TURNS AWAY, WIDE OPEN WHEN IT SNAPS BACK */
-		DOM.CLASS.ADD(orb, "scare_shut");
-		window.setTimeout(
-			function()
-			{
-				DOM.CLASS.REMOVE(orb, "scare_shut");
-			},
-			length * 0.62
-		);
-	}
-
-	/* HOLD THE LAST SHAKE UNTIL THE BLUE SCREEN CUTS IN */
-	frames.push({transform: frames[frames.length - 1].transform, opacity: 1, offset: 1});
-	orb_look(box.left + box.width / 2, box.top + box.height / 2, 0.01);
-	DOM.CLASS.ADD(orb, "scare");
-	DOM.CLASS.ADD(network_frame, "scaring");
-	motion = orb.animate(frames, {duration: length, fill: "forwards"});
-
-	window.setTimeout(
-		function()
+/* THE GHOST'S EYES LOOK ALONG (dx, dy), -1 ... 1 */
+function
+	drone_ghost_look(ghost, dx, dy)
+{
+	JS.ITERATE(
+		to_array(DOM.GET.CLASS(ghost.element, "orb_eye")),
+		function(eye)
 		{
-			window.cancelAnimationFrame(orb_state.static_frame);
-			done();
-			DOM.CLASS.REMOVE(orb, "scare");
-			DOM.CLASS.REMOVE(orb, "scare_static");
-			DOM.CLASS.REMOVE(orb, "scare_shut");
-			DOM.CLASS.REMOVE(network_frame, "scaring");
-			DOM.CLASS.REMOVE(network_frame, "scare_static");
-			motion.cancel();
-		},
-		length + 60
+			eye.style.setProperty("--look-x", round_2(dx * ghost.size * 0.12) + "px");
+			eye.style.setProperty("--look-y", round_2(dy * ghost.size * 0.1) + "px");
+		}
 	);
 }
 
-/* THE BLUE SCREEN ITSELF */
+/* SMOKE RISES FROM ITS HEAD (THE "COLLAPSE" BREAKDOWN) */
+function
+	orb_smoke()
+{
+	const	puff = DOM.CREATE.ELEMENT("i");
+	const	life = wobble(1200, 2000);
+
+	puff.className = "orb_smoke";
+	puff.style.left = round_2(wobble(34, 66)) + "%";
+	puff.style.setProperty("--drift", round_2(wobble(-0.4, 0.4) * orb.offsetWidth) + "px");
+	puff.style.setProperty("--rise", round_2(wobble(-1.15, -0.7) * orb.offsetWidth) + "px");
+	puff.style.animationDuration = Math.round(life) + "ms";
+	orb.appendChild(puff);
+	window.setTimeout(
+		function()
+		{
+			DOM.REMOVE(puff);
+		},
+		life
+	);
+}
+
+/* ONE GEAR, teeth TEETH, AS SVG */
+function
+	gear_svg(teeth)
+{
+	const	step = Math.PI * 2 / teeth;
+	var		path = "";
+
+	for (let i = 0; i < teeth; i++)
+	{
+		const	a = i * step;
+
+		JS.ITERATE(
+			[[a, 8.6], [a + step * 0.18, 12], [a + step * 0.5, 12], [a + step * 0.68, 8.6]],
+			function(point, index)
+			{
+				path += (i === 0 && index === 0 ? "M" : "L") + round_2(12 + Math.cos(point[0]) * point[1]) + " " + round_2(12 + Math.sin(point[0]) * point[1]);
+			}
+		);
+	}
+
+	return ("<svg viewBox=\"0 0 24 24\"><path d=\"" + path + "Z M15.4 12A3.4 3.4 0 1 0 8.6 12A3.4 3.4 0 1 0 15.4 12Z\"/></svg>");
+}
+
+/* GEARS BURST UP FROM THE BOTTOM EDGE OF THE WINDOW, WHERE IT HIT THE GROUND */
+function
+	drone_gears(x)
+{
+	const	gears = [];
+	var		last = performance.now();
+
+	for (let i = Math.round(wobble(7, 11)); i > 0; i--)
+	{
+		const	gear = DOM.CREATE.ELEMENT("i");
+		const	size = wobble(14, 36);
+
+		gear.className = "drone_gear";
+		gear.innerHTML = gear_svg(Math.round(wobble(6, 10)));
+		gear.style.width = round_2(size) + "px";
+		gear.style.height = round_2(size) + "px";
+		body.appendChild(gear);
+		gears.push({element: gear, size: size, x: x + wobble(-40, 40), y: window.innerHeight + size * 0.5, vx: wobble(-340, 340), vy: wobble(-980, -520), spin: wobble(-900, 900), turn: wobble(0, 360)});
+	}
+
+	function
+		step(now)
+	{
+		const	delta = Math.min(0.05, (now - last) / 1000);
+		var		flying = false;
+
+		last = now;
+		JS.ITERATE(
+			gears,
+			function(gear)
+			{
+				gear.vy += 2400 * delta;
+				gear.x += gear.vx * delta;
+				gear.y += gear.vy * delta;
+				gear.turn += gear.spin * delta;
+				gear.element.style.transform = "translate(" + round_2(gear.x - gear.size / 2) + "px, " + round_2(gear.y - gear.size / 2) + "px) rotate(" + round_2(gear.turn) + "deg)";
+
+				if (gear.y < window.innerHeight + gear.size)
+					flying = true;
+			}
+		);
+
+		if (flying)
+			window.requestAnimationFrame(step);
+		else
+			JS.ITERATE(
+				gears,
+				function(gear)
+				{
+					DOM.REMOVE(gear.element);
+				}
+			);
+	}
+
+	window.requestAnimationFrame(step);
+}
+
+/* A TIMER THAT THE CLEAN-UP CAN CANCEL */
+function
+	scene_later(callback, ms)
+{
+	orb_state.scene_timers.push(window.setTimeout(callback, ms));
+}
+
+/*
+** STARE: THE NETWORK GOES SILENT. IT STARES STRAIGHT AT YOU WITH NORMAL BUT
+** RED EYES, NOT BLINKING, AND IGNORES EVERYTHING. 3 TO 4 SECONDS LATER A
+** FLOOD OF SIGNALS HITS THE NETWORK, IT GLITCHES OUT, AND IT CRASHES
+*/
+function
+	scene_stare(done)
+{
+	const	rect = orb.getBoundingClientRect();
+
+	network.mode = "silent";
+	orb_state.frozen = true;
+	orb_look(rect.left + rect.width / 2, rect.top + rect.height / 2, 0.01);
+	DOM.CLASS.ADD(orb, "staring");
+
+	scene_later(
+		function()
+		{
+			network.mode = "storm";
+			DOM.CLASS.ADD(orb, "breaking");
+			DOM.CLASS.ADD(network_frame, "quaking");
+
+			/* IT TWITCHES: A RANDOM JOLT EVERY FEW FRAMES */
+			function
+				jolt()
+			{
+				orb.style.rotate = round_2(wobble(-14, 14)) + "deg";
+				orb.style.scale = round_2(wobble(0.88, 1.18));
+				scene_later(jolt, wobble(40, 90));
+			}
+
+			jolt();
+			scene_later(done, wobble(650, 950));
+		},
+		wobble(3000, 4000)
+	);
+}
+
+/*
+** WALK: IT CROUCHES, JUMPS OUT OF ITS BOX, LANDS IN FRONT OF IT AND HOPS
+** OFF THROUGH THE NEARER SIDE OF THE WINDOW, WADDLING, ANGER MARKS
+** POPPING. A MOMENT AFTER IT IS GONE, THE BLUE SCREEN
+*/
+function
+	scene_walk(done)
+{
+	const	ghost = drone_ghost("annoyed angry glaring walker");
+	const	frame = network_frame.getBoundingClientRect();
+	const	size = ghost.size;
+	const	side = frame.left + frame.width / 2 > window.innerWidth / 2 ? 1 : -1;
+	const	crouch = wobble(220, 320);
+	const	flight = wobble(520, 680);
+	const	land_x = ghost.x + side * wobble(0.3, 0.7) * size;
+	const	land_y = Math.min(window.innerHeight - size * 0.75, frame.bottom - size * wobble(0.2, 0.35));
+	const	peak = size * wobble(0.7, 1.1);
+	const	speed = size * wobble(1.8, 2.4);
+	const	start = performance.now();
+	var		last = start;
+	var		x = land_x;
+	var		walked = 0;
+	var		next_vein = 0;
+
+	drone_ghost_look(ghost, side, 0);
+
+	function
+		frame_step(now)
+	{
+		const	time = now - start;
+		const	delta = Math.min(0.05, (now - last) / 1000);
+
+		last = now;
+
+		if (time < crouch)
+		{
+			/* GATHERING ITSELF */
+			const	p = ease(time / crouch);
+
+			drone_ghost_at(ghost, ghost.x, ghost.y + size * 0.06 * p, 0, 1 + 0.1 * p, 1 - 0.18 * p);
+		}
+		else if (time < crouch + flight)
+		{
+			/* THE JUMP: AN ARC OUT OF THE BOX */
+			const	p = (time - crouch) / flight;
+
+			drone_ghost_at(ghost, lerp(ghost.x, land_x, p), lerp(ghost.y, land_y, p) - peak * 4 * p * (1 - p), side * 18 * Math.sin(p * Math.PI), 0.94, 1.08);
+		}
+		else if (time < crouch + flight + 160)
+		{
+			/* LANDING: A SQUASH */
+			const	p = (time - crouch - flight) / 160;
+
+			drone_ghost_at(ghost, land_x, land_y + size * 0.05 * (1 - p), 0, 1 + 0.14 * (1 - p), 1 - 0.2 * (1 - p));
+		}
+		else
+		{
+			/* HOPPING OFF, WADDLING, FUMING */
+			walked += delta * 12;
+			x += side * speed * delta;
+			drone_ghost_at(ghost, x, land_y - Math.abs(Math.sin(walked)) * size * 0.06, Math.sin(walked) * 7, 1, 1);
+
+			if (now > next_vein)
+			{
+				next_vein = now + wobble(500, 900);
+				orb_vein(ghost.element);
+			}
+
+			/* GONE THROUGH THE EDGE OF THE WINDOW */
+			if ((side > 0 && x - size > window.innerWidth) || (side < 0 && x + size < 0) || time > 9000)
+			{
+				DOM.REMOVE(ghost.element);
+				orb_state.ghost = null;
+				scene_later(done, wobble(500, 900));
+				return ;
+			}
+		}
+
+		orb_state.scene_frame = window.requestAnimationFrame(frame_step);
+	}
+
+	orb_state.scene_frame = window.requestAnimationFrame(frame_step);
+}
+
+/*
+** COLLAPSE: THE NETWORK FALLS APART INTO BITS, FROM THE HEAD OUTWARDS. IT
+** FREEZES IN SHOCK (TINY EYES), THEN ITS BRAIN BURNS OUT: SMOKE RISES FROM
+** ITS HEAD, ITS EYES CLOSE FOR GOOD AND THE HEAD DROOPS, DEAD
+*/
+function
+	scene_collapse(done)
+{
+	const	rect = orb.getBoundingClientRect();
+	const	start = performance.now();
+	const	length = wobble(2000, 2600);
+
+	network_shatter(start);
+	network.mode = "collapse";
+	orb_state.frozen = true;
+	orb_look(rect.left + rect.width / 2, rect.top + rect.height / 2, 0.01);
+	DOM.CLASS.ADD(orb, "shocked");
+	orb_flash("flinch", 420);
+
+	function
+		puff()
+	{
+		if (performance.now() - start > length)
+			return ;
+
+		orb_smoke();
+		scene_later(puff, wobble(60, 130));
+	}
+
+	/* THE BRAIN BURNS OUT: THE EYES CLOSE FOR GOOD, THE HEAD DROOPS, SMOKE */
+	scene_later(
+		function()
+		{
+			DOM.CLASS.REMOVE(orb, "shocked");
+			DOM.CLASS.ADD(orb, "dead");
+			puff();
+		},
+		wobble(350, 550)
+	);
+	scene_later(done, length);
+}
+
+/*
+** BITE (MOUSE ONLY): A MOUTH FULL OF SHARP TEETH OPENS, IT LUNGES AND BITES
+** THE POINTER, THEN HANGS FROM IT LIKE A PENDULUM: MOVE THE MOUSE AND IT
+** SWINGS. AFTER A FEW HARD SWINGS (OR A FEW SECONDS) IT LETS GO, FALLS OFF
+** THE BOTTOM OF THE WINDOW AND HITS THE GROUND: GEARS FLY, BLUE SCREEN
+*/
+function
+	scene_bite(done)
+{
+	const	ghost = drone_ghost("annoyed angry glaring biter");
+	const	size = ghost.size;
+	const	reach = size * 0.21;
+	const	arm = size * 0.9;
+	const	gravity = 2400;
+	const	open = wobble(380, 480);
+	const	lunge = wobble(160, 220);
+	const	patience = wobble(5000, 7000);
+	const	start = performance.now();
+	var		last = start;
+	var		phase = "open";
+	var		angle = Math.PI + (Math.random() < 0.5 ? -1 : 1) * wobble(0.08, 0.2);
+	var		swing = 0;
+	var		hard = 0;
+	var		hard_time = 0;
+	var		bite_time = 0;
+	var		pivot = {x: orb_state.pointer.x, y: orb_state.pointer.y, vx: 0, vy: 0};
+	var		fall = null;
+
+	ghost.element.insertAdjacentHTML("beforeend", "<i class=\"orb_mouth\"><svg viewBox=\"0 0 60 32\"><path class=\"mouth_inside\" d=\"M3 5Q30 -1 57 5Q55 29 30 31Q5 29 3 5Z\"/><path class=\"mouth_teeth\" d=\"M3 5L8 13L12 4.4L16.5 13.5L21 3.7L25.5 14L30 3.5L34.5 14L39 3.7L43.5 13.5L48 4.4L52 13L57 5Q30 -1 3 5Z M6.5 21L11 15.5L15 25.6L19.5 16.5L24 27.8L28.5 17L33 28.3L37.5 17L42 27.6L46.5 16.5L50.5 25L54 19Q46 30 30 31Q14 30 6.5 21Z\"/></svg></i>");
+	window.requestAnimationFrame(
+		function()
+		{
+			DOM.CLASS.ADD(ghost.element, "mouth_open");
+		}
+	);
+
+	function
+		frame_step(now)
+	{
+		const	time = now - start;
+		const	delta = Math.min(0.04, Math.max(0.001, (now - last) / 1000));
+		const	target = orb_state.pointer;
+
+		last = now;
+
+		if (phase === "open")
+		{
+			/* JAWS OPEN, EYES ON THE POINTER, LEANING IN */
+			const	dx = target.x - ghost.x;
+			const	dy = target.y - ghost.y;
+			const	distance = Math.hypot(dx, dy) || 1;
+
+			drone_ghost_look(ghost, dx / distance, dy / distance);
+			drone_ghost_at(ghost, ghost.x + dx * 0.04, ghost.y + dy * 0.04, clamp(dx * 0.03, -10, 10), 1, 1);
+
+			if (time > open)
+				phase = "lunge";
+		}
+		else if (phase === "lunge")
+		{
+			/* SNAP: THE MOUTH GOES WHERE THE POINTER IS */
+			const	p = ease(Math.min(1, (time - open) / lunge));
+
+			drone_ghost_at(ghost, lerp(ghost.x + (target.x - ghost.x) * 0.04, target.x, p), lerp(ghost.y + (target.y - ghost.y) * 0.04, target.y - reach, p), 0, 1 + 0.08 * p, 1 + 0.08 * p);
+
+			if (p >= 1)
+			{
+				phase = "hang";
+				bite_time = now;
+				pivot = {x: target.x, y: target.y, vx: 0, vy: 0};
+				DOM.CLASS.ADD(ghost.element, "chomp");
+				drone_ghost_look(ghost, 0, -1);
+			}
+		}
+		else if (phase === "hang")
+		{
+			/* A PENDULUM HANGING FROM THE POINTER: GRAVITY, AND THE POINTER'S
+			** OWN ACCELERATION PUSHING IT (IN THE POINTER'S FRAME) */
+			const	vx = (target.x - pivot.x) / delta;
+			const	vy = (target.y - pivot.y) / delta;
+			const	kick_x = clamp(vx - pivot.vx, -2500, 2500);
+			const	kick_y = clamp(vy - pivot.vy, -2500, 2500);
+
+			swing += -(kick_x * Math.cos(angle) - kick_y * Math.sin(angle)) / arm;
+			swing += -gravity / arm * Math.sin(angle) * delta;
+			swing *= Math.exp(-0.45 * delta);
+			angle += swing * delta;
+			pivot = {x: target.x, y: target.y, vx: vx, vy: vy};
+
+			/* A HARD SWING: FAST ENOUGH, NOT TOO SOON AFTER THE LAST ONE */
+			if (Math.abs(swing) > 7 && now - hard_time > 350)
+			{
+				hard++;
+				hard_time = now;
+			}
+
+			drone_ghost_at(ghost, target.x + reach * Math.sin(angle), target.y + reach * Math.cos(angle), (Math.PI - angle) * 180 / Math.PI, 1.08, 1.08);
+
+			if ((hard >= 3 && now - bite_time > 1200) || now - bite_time > patience)
+			{
+				/* IT LETS GO, FLUNG WITH THE SWING */
+				phase = "fall";
+				DOM.CLASS.REMOVE(ghost.element, "chomp");
+				fall = {
+					x: target.x + reach * Math.sin(angle),
+					y: target.y + reach * Math.cos(angle),
+					vx: clamp(pivot.vx * 0.5 + reach * swing * Math.cos(angle) * 3, -900, 900),
+					vy: clamp(pivot.vy * 0.5 - reach * swing * Math.sin(angle) * 3, -900, 600),
+					turn: (Math.PI - angle) * 180 / Math.PI,
+					spin: clamp(-swing * 57, -720, 720)
+				};
+			}
+		}
+		else
+		{
+			/* FALLING OFF THE BOTTOM OF THE WINDOW */
+			fall.vy += gravity * delta;
+			fall.x += fall.vx * delta;
+			fall.y += fall.vy * delta;
+			fall.turn += fall.spin * delta;
+			drone_ghost_at(ghost, fall.x, fall.y, fall.turn, 1.08, 1.08);
+
+			if (fall.y - size * 0.6 > window.innerHeight || time > patience + 5000)
+			{
+				/* IT HIT THE GROUND: GEARS, AND THE BLUE SCREEN AT ONCE */
+				drone_gears(clamp(fall.x, 24, window.innerWidth - 24));
+				DOM.REMOVE(ghost.element);
+				orb_state.ghost = null;
+				done();
+				return ;
+			}
+		}
+
+		orb_state.scene_frame = window.requestAnimationFrame(frame_step);
+	}
+
+	orb_state.scene_frame = window.requestAnimationFrame(frame_step);
+}
+
+/* EVERYTHING A BREAKDOWN CHANGED, PUT BACK (THE BLUE SCREEN IS UP BY NOW) */
+function
+	drone_scene_end()
+{
+	JS.ITERATE(
+		orb_state.scene_timers,
+		function(timer)
+		{
+			window.clearTimeout(timer);
+		}
+	);
+	orb_state.scene_timers = [];
+	window.cancelAnimationFrame(orb_state.scene_frame);
+	orb_state.frozen = false;
+	network.mode = "";
+	JS.ITERATE(
+		["staring", "breaking", "shocked", "dead"],
+		function(name)
+		{
+			DOM.CLASS.REMOVE(orb, name);
+		}
+	);
+	DOM.CLASS.REMOVE(network_frame, "quaking");
+	orb.style.removeProperty("rotate");
+	orb.style.removeProperty("scale");
+	orb.style.removeProperty("visibility");
+	JS.ITERATE(
+		to_array(DOM.GET.CLASS(orb, "orb_smoke")),
+		function(puff)
+		{
+			DOM.REMOVE(puff);
+		}
+	);
+
+	if (orb_state.ghost)
+	{
+		DOM.REMOVE(orb_state.ghost);
+		orb_state.ghost = null;
+	}
+}
+
+/*
+** RIGHT BEFORE THE BLUE SCREEN, THE BREAKDOWNS ABOVE TAKE TURNS, IN THIS
+** ORDER (THE NEXT ONE IS SAVED WITH THE MOOD). WITHOUT A MOUSE (PHONES,
+** TABLETS) THE ONES THAT NEED A POINTER ARE SKIPPED: NO WALKING OFF THE
+** WINDOW, NO BITING. EVERY STEP STILL TAKES A RANDOM VALUE BETWEEN A MIN
+** AND A MAX, SO NONE OF THEM PLAYS THE SAME WAY TWICE
+*/
+const	drone_scenes = [
+	{play: scene_stare, pointer: false},
+	{play: scene_walk, pointer: true},
+	{play: scene_collapse, pointer: false},
+	{play: scene_bite, pointer: true}
+];
+
+function
+	drone_breakdown(done)
+{
+	const	mouse = orb_state.pointer.time ? orb_state.pointer.mouse : window.matchMedia("(hover: hover) and (pointer: fine)").matches;
+	var		index = orb_state.scene_next % drone_scenes.length;
+	var		finished = false;
+
+	while (drone_scenes[index].pointer && !mouse)
+		index = (index + 1) % drone_scenes.length;
+
+	orb_state.scene_next = (index + 1) % drone_scenes.length;
+	drone_save();
+	orb_state.scene_timers = [];
+	network.mode = "idle";
+	drone_scenes[index].play(
+		function()
+		{
+			if (finished)
+				return ;
+
+			finished = true;
+			done();
+			drone_scene_end();
+		}
+	);
+}
+
+/* THE BLUE SCREEN ITSELF. THE BAR STARTS OVER AT 50 THE MOMENT IT CRASHES */
 function
 	drone_bsod()
 {
+	orb_state.mood = 50;
+	drone_save();
 	DOM.CLASS.ADD(network_frame, "crashed");
 	drone_bsod_step(2200);
 }
 
-/* 100: (A JUMPSCARE, THEN) A BLUE SCREEN INSTEAD OF THE DRONE. IT COUNTS UP,
+/* 100: (A BREAKDOWN, THEN) A BLUE SCREEN INSTEAD OF THE DRONE. IT COUNTS UP,
 ** THEN RESTARTS. scare IS FALSE WHEN THE PAGE OPENS ALREADY CRASHED */
 function
 	drone_crash(scare)
@@ -3630,8 +4171,8 @@ function
 	bsod_percent.textContent = "0";
 	drone_qr();
 
-	if (scare && orb.animate && !reduced_motion && network_visible && page_visible)
-		drone_scare(drone_bsod);
+	if (scare && !reduced_motion && network_visible && page_visible)
+		drone_breakdown(drone_bsod);
 	else
 		drone_bsod();
 }
@@ -3659,7 +4200,7 @@ function
 	);
 }
 
-/* BACK FROM THE BLUE SCREEN: A FRESH NETWORK, BUT IT HAS NOT FORGOTTEN */
+/* BACK FROM THE BLUE SCREEN: A FRESH NETWORK AND A FRESH START (50) */
 function
 	drone_restart()
 {
@@ -3672,6 +4213,7 @@ function
 	drone_save();
 	DOM.CLASS.REMOVE(network_frame, "crashed");
 	network_reset(now);
+	network.mode = "";
 	network.food = 0;
 	network.heat = 0;
 	network.charge = 0;
@@ -3926,15 +4468,15 @@ function
 	);
 }
 
-/* AN ANGER MARK POPS UP ON ITS FOREHEAD */
+/* AN ANGER MARK POPS UP ON ITS FOREHEAD (THE HEAD'S, OR A GHOST'S) */
 function
-	orb_vein()
+	orb_vein(head)
 {
 	const	vein = DOM.CREATE.ELEMENT("i");
 
 	vein.className = "orb_vein";
 	vein.innerHTML = "<svg viewBox=\"0 0 24 24\"><path d=\"M9 2.5Q9 9 2.5 9M15 2.5Q15 9 21.5 9M21.5 15Q15 15 15 21.5M2.5 15Q9 15 9 21.5\"/></svg>";
-	orb.appendChild(vein);
+	(head || orb).appendChild(vein);
 	window.setTimeout(
 		function()
 		{
@@ -4164,10 +4706,12 @@ function
 	orb_start()
 {
 	const	eyes = to_array(DOM.GET.CLASS(orb, "orb_eye"));
+	const	saved = drone_load();
 
 	orb_state = {
 		eyes: eyes,
-		mood: drone_load(),
+		mood: saved.mood,
+		scene_next: saved.scene,
 		noticed: false,
 		crashed: false,
 		feeling: "",
@@ -4194,7 +4738,10 @@ function
 		wander_timer: 0,
 		touch_timer: 0,
 		bsod_timer: 0,
-		static_frame: 0,
+		scene_timers: [],
+		scene_frame: 0,
+		frozen: false,
+		ghost: null,
 		eye_timers: [0, 0],
 		flash_timers: {}
 	};
@@ -4240,13 +4787,15 @@ function
 	function
 		blink()
 	{
-		JS.ITERATE(
-			eyes,
-			function(eye)
-			{
-				eye.style.setProperty("--blink", "0.08");
-			}
-		);
+		/* FROZEN (STARING, IN SHOCK): NOT EVEN A BLINK */
+		if (!orb_state.frozen)
+			JS.ITERATE(
+				eyes,
+				function(eye)
+				{
+					eye.style.setProperty("--blink", "0.08");
+				}
+			);
 		window.setTimeout(
 			function()
 			{
